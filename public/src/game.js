@@ -1,6 +1,7 @@
 import { Base } from "./base.js";
 import { Monster } from "./monster.js";
 import { Tower } from "./tower.js";
+import towerData from "../assets/tower.json" with {type: 'json'};
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -10,16 +11,17 @@ let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-const NUM_OF_MONSTERS = 5; // 몬스터 개수
+const NUM_OF_TOWERS = 5; // 타워 이미지 개수
+const NUM_OF_MONSTERS = 6; // 몬스터 이미지 개수
 
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 
 let towerCost = 0; // 타워 구입 비용
-let numOfInitialTowers = 0; // 초기 타워 개수
-let monsterLevel = 0; // 몬스터 레벨
-let monsterSpawnInterval = 0; // 몬스터 생성 주기
+let numOfInitialTowers = 3; // 초기 타워 개수
+let monsterLevel = 1; // 몬스터 레벨
+let monsterSpawnInterval = 2000; // 몬스터 생성 주기 (ms)
 const monsters = [];
 const towers = [];
 
@@ -31,8 +33,16 @@ let isInitGame = false;
 const backgroundImage = new Image();
 backgroundImage.src = "images/bg.webp";
 
-const towerImage = new Image();
-towerImage.src = "images/tower.png";
+// const towerImage = new Image();
+// towerImage.src = "images/tower.png";
+
+const towerImages = {};
+for (let i = 1; i <= NUM_OF_TOWERS; i++) {
+  const img = new Image();
+  img.src = `images/tower${i}.png`;
+  towerImages[i] = img;
+  // towerImages.push(img);
+}
 
 const baseImage = new Image();
 baseImage.src = "images/base.png";
@@ -40,11 +50,11 @@ baseImage.src = "images/base.png";
 const pathImage = new Image();
 pathImage.src = "images/path.png";
 
-const monsterImages = [];
+const monsterImages = {};
 for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
   const img = new Image();
   img.src = `images/monster${i}.png`;
-  monsterImages.push(img);
+  monsterImages[i] = img;
 }
 
 let monsterPath;
@@ -146,10 +156,11 @@ function placeInitialTowers() {
   */
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
-    const tower = new Tower(x, y, towerCost);
+    const tower = new Tower(x, y);
     towers.push(tower);
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx, towerImages[tower.getLevel()]);
   }
+  // sendEvent()
 }
 
 function placeNewTower() {
@@ -160,7 +171,7 @@ function placeNewTower() {
   const { x, y } = getRandomPositionNearPath(200);
   const tower = new Tower(x, y);
   towers.push(tower);
-  tower.draw(ctx, towerImage);
+  tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
 function placeBase() {
@@ -170,7 +181,7 @@ function placeBase() {
 }
 
 function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
+  monsters.push(new Monster(monsterPath, monsterImages));
 }
 
 function gameLoop() {
@@ -190,7 +201,7 @@ function gameLoop() {
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx, towerImages[tower.getLevel()]);
     tower.updateCooldown();
     monsters.forEach((monster) => {
       const distance = Math.sqrt(
@@ -234,6 +245,9 @@ function initGame() {
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
+  let initialStageId = 100; // 최초 스테이지 정보
+  Monster.setMonsterPoolByStageId(initialStageId);
+
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
@@ -242,16 +256,19 @@ function initGame() {
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
-  new Promise((resolve) => (towerImage.onload = resolve)),
+  // new Promise((resolve) => (towerImage.onload = resolve)),
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
-  ...monsterImages.map(
+  Object.values(towerImages).map(
+    (img) => new Promise((resolve) => (img.onload = resolve))
+  ),
+  Object.values(monsterImages).map(
     (img) => new Promise((resolve) => (img.onload = resolve))
   ),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   let somewhere;
-  serverSocket = io("서버주소", {
+  serverSocket = io("http://localhost:3000", {
     auth: {
       token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
     },
@@ -265,6 +282,9 @@ Promise.all([
       initGame();
     }
   */
+  if (!isInitGame) {
+    initGame();
+  }
 });
 
 const buyTowerButton = document.createElement("button");
