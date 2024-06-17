@@ -12,7 +12,7 @@ export class Monster {
       throw new Error('생성할 몬스터 목록이 없습니다.');
     }
 
-    this.monsterNumber = Math.floor(Math.random() * monsterPool.length);
+    this.monsterNumber = Math.floor(Math.random() * (monsterPool.length - 1)); // 고블린 제외
     this.path = path; // 몬스터가 이동할 경로
     this.currentIndex = 0; // 몬스터가 이동 중인 경로의 인덱스
     this.x = path[0].x; // 몬스터의 x 좌표 (최초 위치는 경로의 첫 번째 지점)
@@ -22,7 +22,9 @@ export class Monster {
     this.speed = monsterPool[this.monsterNumber].speed; // 몬스터의 이동 속도
     this.image = monsterImages[monsterPool[this.monsterNumber].image_index]; // 몬스터 이미지
     this.maxHp = monsterPool[this.monsterNumber].hp;
+    this.attackPower = monsterPool[this.monsterNumber].attack_power;
     this.hp = this.maxHp;
+    this.score = monsterPool[this.monsterNumber].score;
     // this.level = level; // 몬스터 레벨
     // this.init(level);
   }
