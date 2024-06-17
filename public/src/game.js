@@ -16,10 +16,10 @@ const NUM_OF_MONSTERS = 6; // 몬스터 이미지 개수
 
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
-let baseHp = 0; // 기지 체력
+let baseHp = 200; // 기지 체력
 
-let towerCost = 0; // 타워 구입 비용
-let numOfInitialTowers = 3; // 초기 타워 개수
+let towerCost = towerData.data[0].cost; // 타워 구입 비용
+let numOfInitialTowers = 0; // 초기 타워 개수
 let monsterLevel = 1; // 몬스터 레벨
 let monsterSpawnInterval = 2000; // 몬스터 생성 주기 (ms)
 const monsters = [];
@@ -221,11 +221,14 @@ function gameLoop() {
       if (isDestroyed) {
         /* 게임 오버 */
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
+        // sendEvent() // 게임 오버 이벤트
         location.reload();
       }
       monster.draw(ctx);
     } else {
       /* 몬스터가 죽었을 때 */
+      score += monster.score;
+      // sendEvent() 몬스터 처치 이벤트
       monsters.splice(i, 1);
     }
   }
