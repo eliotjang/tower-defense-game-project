@@ -1,4 +1,4 @@
-import monsterData from '../assets/monster.json' with {type:'json'};
+import monsterData from '../assets/monster.json' with { type: 'json' };
 
 let monsterPool = null;
 
@@ -6,10 +6,10 @@ export class Monster {
   constructor(path, monsterImages) {
     // 생성자 안에서 몬스터의 속성을 정의한다고 생각하시면 됩니다!
     if (!path || path.length <= 0) {
-      throw new Error("몬스터가 이동할 경로가 필요합니다.");
+      throw new Error('몬스터가 이동할 경로가 필요합니다.');
     }
     if (!monsterPool) {
-      throw new Error("생성할 몬스터 목록이 없습니다.")
+      throw new Error('생성할 몬스터 목록이 없습니다.');
     }
 
     this.monsterNumber = Math.floor(Math.random() * monsterPool.length);
@@ -31,7 +31,7 @@ export class Monster {
    * 게임 시작/ 스테이지 이동 시 외부에서 한 번 호출되어야 하는 method
    * @param {Number} stageId 스테이지 ID
    */
-  static setMonsterPoolByStageId (stageId) {
+  static setMonsterPoolByStageId(stageId) {
     monsterPool = monsterData.data.filter((data) => data.stage_id === stageId);
   }
 
@@ -67,12 +67,8 @@ export class Monster {
 
   draw(ctx) {
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-    ctx.font = "12px Arial";
-    ctx.fillStyle = "white";
-    ctx.fillText(
-      `(레벨 ${this.level}) ${this.hp}/${this.maxHp}`,
-      this.x,
-      this.y - 5
-    );
+    ctx.font = '12px Arial';
+    ctx.fillStyle = 'white';
+    ctx.fillText(`(레벨 ${this.level}) ${this.hp}/${this.maxHp}`, this.x, this.y - 5);
   }
 }

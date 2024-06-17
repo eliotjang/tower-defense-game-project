@@ -1,4 +1,4 @@
-import towerData from '../assets/tower.json' with {type:'json'};;
+import towerData from '../assets/tower.json' with { type: 'json' };
 
 export class Tower {
   constructor(x, y) {
@@ -13,7 +13,7 @@ export class Tower {
     return this.level;
   }
 
-  setStats (level) {
+  setStats(level) {
     this.level = level; // 타워 레벨
     const index = this.level - 1;
     this.width = towerData.data[index].width; // 타워 이미지 가로 길이 (이미지 파일 길이에 따라 변경 필요하며 세로 길이와 비율을 맞춰주셔야 합니다!)
@@ -39,11 +39,8 @@ export class Tower {
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x + this.width / 2, this.y + this.height / 2);
-      ctx.lineTo(
-        this.target.x + this.target.width / 2,
-        this.target.y + this.target.height / 2
-      );
-      ctx.strokeStyle = "skyblue";
+      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2);
+      ctx.strokeStyle = 'skyblue';
       ctx.lineWidth = 10;
       ctx.stroke();
       ctx.closePath();
