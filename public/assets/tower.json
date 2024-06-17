@@ -1,0 +1,12 @@
+{
+    "name": "tower",
+    "version": "1.0.0",
+    "data": [
+        { "id": 1, "attack_power": 40, "range": 300, "cost": 500, "cooldown": 180, "beamDuration": 30, "width": 78, "height": 150, "path": "/images/tower1.png"},
+        { "id": 2, "attack_power": 50, "range": 310, "cost": 1000, "cooldown": 160, "beamDuration": 60, "width": 78, "height": 150, "path": "/images/tower2.png" },
+        { "id": 3, "attack_power": 60, "range": 320, "cost": 1500, "cooldown": 140, "beamDuration": 90, "width": 78, "height": 150, "path": "/images/tower3.png" },
+        { "id": 4, "attack_power": 70, "range": 330, "cost": 2000, "cooldown": 120, "beamDuration": 120, "width": 78, "height": 150, "path": "/images/tower4.png" },
+        { "id": 5, "attack_power": 80, "range": 340, "cost": 2500, "cooldown": 100, "beamDuration": 150, "width": 78, "height": 150, "path": "/images/tower5.png" }
+    ]
+}
+  
