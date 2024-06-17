@@ -18,7 +18,7 @@ export const removeUser = async (uuid) => {
 
 // 유저 조회
 export const findUser = async (uuid) => {
-  const index = users.findIndex((user) => user.socketId === socketId);
+  const index = users.findIndex((user) => user.socketId === uuid);
   if (index != -1) {
     return users[index];
   }
