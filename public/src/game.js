@@ -2,6 +2,7 @@ import { Base } from './base.js';
 import { Monster } from './monster.js';
 import { Tower } from './tower.js';
 import towerData from '../assets/tower.json' with { type: 'json' };
+import { CLIENT_VERSION } from './Constants.js';
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -254,6 +255,7 @@ function initGame() {
   isInitGame = true;
 }
 
+let sendEvent;
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
@@ -264,11 +266,16 @@ Promise.all([
   Object.values(monsterImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
+  console.log('game.js 시작');
+
   let somewhere;
   serverSocket = io('http://localhost:3000', {
-    auth: {
-      token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
+    query: {
+      clientVersion: CLIENT_VERSION,
     },
+    /* auth: {
+      token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
+    }, */
   });
 
   /* 
@@ -279,10 +286,46 @@ Promise.all([
       initGame();
     }
   */
+  let userId = null;
+  serverSocket.on('response', (data) => {
+    console.log(data);
+  });
+
+  serverSocket.on('connection', (data) => {
+    const user = window.localStorage.getItem('client');
+    if (user) {
+      console.log(`클라이언트 정보가 확인됐습니다. ${user}`);
+      userId = user;
+    } else {
+      userId = data.uuid;
+      window.localStorage.setItem('client', userId);
+      console.log(`클라이언트 정보가 확인되지 않았습니다. ${userId}`);
+    }
+
+    if (!isInitGame) {
+      initGame();
+    }
+  });
+
+  sendEvent = (handlerId, payload) => {
+    serverSocket.emit('event', {
+      userId,
+      clientVersion: CLIENT_VERSION,
+      handlerId,
+      payload,
+    });
+  };
+
+  serverSocket.on('broadcast', (data) => {
+    console.log(data);
+  });
+
   if (!isInitGame) {
     initGame();
   }
 });
+
+export { sendEvent };
 
 const buyTowerButton = document.createElement('button');
 buyTowerButton.textContent = '타워 구입';
