@@ -1,4 +1,5 @@
 import { getGameAssets } from '../init/assets.js';
+import { gameRedis, highscoreRedis } from '../utils/redis.utils.js';
 
 export const gameStart = (uuid, payload, socket) => {
   const { timeStamp, userGold, baseHp, numOfInitialTowers, score } = payload;
@@ -27,11 +28,16 @@ export const gameStart = (uuid, payload, socket) => {
   socket.emit('gameStart', { status: 'success', message: '게임 시작!' });
 };
 
-export const gameEnd = (uuid, payload, socket) => {
+export const gameEnd = async (uuid, payload, socket) => {
   const { score: currentScore } = payload;
 
   if (false) {
     socket.emit('gameEnd', { status: 'fail', message: '게임 오버 검증 실패' });
+  }
+
+  const isHighscore = await highscoreRedis.createHighscoreData(uuid, score);
+  if (isHighscore && isHighscore[1]) {
+    io.emit('highscore', { highscore: score });
   }
 
   socket.emit('gameEnd', { status: 'success', message: '게임 오버' });
