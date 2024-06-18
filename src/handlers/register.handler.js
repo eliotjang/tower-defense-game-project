@@ -35,8 +35,7 @@ const registerHandler = (io) => {
       userUUID = uuidv4(); // UUID 생성
       console.log('생성된 uuid', userUUID);
       await userRedis.createUserData(userUUID, userData.userId, userData.password);
-      user = await userRedis.getUserData(userUUID);
-      console.log(`새로운 유저 ${user.user_id}님이 등록되었습니다.`);
+      console.log(`새로운 유저 ${userData.userId}님이 등록되었습니다.`);
     } else {
       console.log(`기존 유저 ${user.user_id}님이 접속했습니다.`);
     }

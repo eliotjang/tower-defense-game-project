@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import configs from '../utils/configs.js';
 
 
-export const handleConnection = async (socket, userUUID) => {
+export const handleConnection = (socket, userUUID) => {
   socket.emit('connection', { uuid: userUUID });
 };
 
