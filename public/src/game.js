@@ -375,13 +375,6 @@ Promise.all([
     console.log(data);
   });
 
-  serverSocket.on('connection', (data) => {
-    console.log(data);
-    if (!isInitGame) {
-      initGame();
-    }
-  });
-
   sendEvent = (handlerId, payload) => {
     serverSocket.emit('event', {
       userId,
