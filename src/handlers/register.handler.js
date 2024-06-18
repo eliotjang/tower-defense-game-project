@@ -6,6 +6,7 @@ const registerHandler = (io) => {
   io.on('connection', async (socket) => {
     // 최초 커넥션을 맺은 이후 발생하는 각종 이벤트를 처리하는 곳
 
+    //let userUUID = '90fbf84b-6da3-473f-bdef-851b8a17c0ee';
     let userUUID;
     let user = await userRedis.getUserData(userUUID);
     const userData = { userId: '우쿵쿵', password: '1111' };
