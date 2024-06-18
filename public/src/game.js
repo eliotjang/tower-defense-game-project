@@ -368,6 +368,10 @@ Promise.all([
     console.log(data);
   });
 
+  serverSocket.on('highscore', (data) => {
+    console.log(data);
+  });
+
   serverSocket.on('connection', (data) => {
     console.log(data);
     if (!isInitGame) {
