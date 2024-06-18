@@ -15,7 +15,7 @@ export const gameStart = async (uuid, payload, socket) => {
   await gameRedis.createGameData(uuid, userGold, stageId, score, numOfInitialTowers, baseHp);
   const data = await gameRedis.getGameData(uuid);
 
-  console.log('Redis 데이터', data);
+  //console.log('Redis 데이터', data);
 
   socket.emit('gameStart', {
     status: 'success',
