@@ -1,4 +1,3 @@
-import { getUsers } from '../models/user.model.js';
 import { CLIENT_VERSION } from '../constants.js';
 import handlerMappings from './handlerMapping.js';
 

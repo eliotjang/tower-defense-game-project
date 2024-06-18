@@ -50,7 +50,7 @@ export const userRedis = {
         [USER_FIELD_PASSWORD]: data[1],
       };
     } catch (err) {
-      console.error('Error getting user data: ', err);
+      //console.error('Error getting user data: ', err);
       return null;
     }
   },
