@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -44,18 +44,39 @@
       <button id="back">뒤로가기</button>
     </div>
     <script>
-      document.getElementById("login").addEventListener("click", () => {
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
+      document.getElementById('login').addEventListener('click', async () => {
+        const user_id = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        try {
+          //서버로 로그인 요청 보냄
+          const response = await fetch('/api/signIn', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id, password }),
+          });
 
-        /* 
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.errorMessage || '로그인 실패');
+          } else {
+            localStorage.setItem('accessToken', data.token);
+          }
+          alert(data.message);
+          window.location.href = 'index.html';
+        } catch (error) {
+          alert(error.message);
+        }
+        /*
           로그인 API 호출 후 로그인 성공 시 index.html로 이동시켜주세요!
-          이 때, 엑세스 토큰은 어딘가에 저장을 해놔야겠죠?! 
+          이 때, 엑세스 토큰은 어딘가에 저장을 해놔야겠죠?!
         */
       });
 
-      document.getElementById("back").addEventListener("click", () => {
-        window.location.href = "index.html";
+      document.getElementById('back').addEventListener('click', () => {
+        window.location.href = 'index.html';
       });
     </script>
   </body>

@@ -1,6 +1,9 @@
 import { getUsers } from '../models/user.model.js';
 import { CLIENT_VERSION } from '../constants.js';
 import handlerMappings from './handlerMapping.js';
+import jwt from 'jsonwebtoken';
+import configs from '../utils/configs.js';
+
 
 export const handleConnection = async (socket, userUUID) => {
   socket.emit('connection', { uuid: userUUID });
@@ -8,6 +11,7 @@ export const handleConnection = async (socket, userUUID) => {
 
 export const handleDisconnect = (socket, uuid) => {
   console.log(`유저 연결을 해제합니다.`);
+  socket.isAuthenticated = false; // 인증 정보 초기화
   console.log(`uuid : ${uuid}, socket id : ${socket.id}`);
 };
 

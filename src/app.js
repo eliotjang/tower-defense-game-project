@@ -3,7 +3,8 @@ import { createServer } from 'http';
 import initSocket from './init/socket.js';
 import { loadGameAssets } from './init/assets.js';
 import config from './utils/configs.js';
-
+import cors from 'cors';
+import accountRouter from './routers/accounts.router.js';
 const app = express();
 const server = createServer(app);
 const PORT = config.serverPort;
@@ -14,7 +15,7 @@ app.use(express.static('public'));
 app.use(express.json());
 // content-type이 form인 경우, body data 가져옴
 app.use(express.urlencoded({ extended: false }));
-
+app.use('/api',accountRouter);
 initSocket(server);
 
 app.get('/', (req, res) => {

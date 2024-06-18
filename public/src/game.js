@@ -268,13 +268,13 @@ Promise.all([
   console.log('game.js 시작');
 
   let somewhere;
-  serverSocket = io('http://localhost:3000', {
+  serverSocket = io('localhost:3000', {
     query: {
       clientVersion: CLIENT_VERSION,
     },
-    /* auth: {
-      token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
-    }, */
+    auth: {
+      token: localStorage.getItem('accessToken'),
+    },
   });
 
   /* 
@@ -286,6 +286,10 @@ Promise.all([
     }
   */
   let userId = null;
+  serverSocket.on('unauthorized', (message) => {
+    alert(message);
+    window.location.href = 'index.html';
+  });
   serverSocket.on('gameStart', (data) => {
     if (data.status === 'success') {
       gameLoop(); // 게임 루프 최초 실행
