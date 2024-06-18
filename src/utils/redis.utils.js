@@ -38,15 +38,15 @@ export const userRedis = {
   getUserData: async function (userId) {
     try {
       const key = `${USER_PREFIX}${userId}`;
-      console.log('KEY: ', key);
+      //console.log('KEY: ', key);
       const data = await redisClient.hVals(key);
-      console.log('DATA: ', data);
+      //console.log('DATA: ', data);
       if (!data || data.length === 0) {
         throw new Error(`User data doesn't exists.`);
       }
       return { [USER_FIELD_USER_ID]: userId, [USER_FIELD_PASSWORD]: data[0] };
     } catch (err) {
-      console.error('Error getting user data: ', err);
+      //console.error('Error getting user data: ', err);
       return null;
     }
   },
