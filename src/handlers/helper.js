@@ -26,7 +26,7 @@ export const handleEvent = (io, socket, data) => {
   }
 
   // 유저에게 메시지 전송
-  const response = handler(data.userId, data.payload);
+  const response = handler(data.userId, data.payload, socket);
   if (response.broadcast) {
     io.emit('broadcast', response);
     return;

@@ -251,6 +251,8 @@ function initGame() {
   Monster.setMonsterPoolByStageId(initialStageId);
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
+
+  sendEvent(2, { timeStamp: Date.now() });
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
@@ -287,6 +289,10 @@ Promise.all([
     }
   */
   let userId = null;
+  serverSocket.on('gameStart', (data) => {
+    console.log(data);
+  });
+
   serverSocket.on('response', (data) => {
     console.log(data);
   });
