@@ -1,4 +1,4 @@
-export const monsterKillHandler = (userId, payload, socket) => {
+export const monsterKillHandler = (uuid, payload, socket) => {
   const { score: currentScore } = payload;
 
   if (false) {
@@ -9,7 +9,7 @@ export const monsterKillHandler = (userId, payload, socket) => {
   socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', score });
 };
 
-export const monsterPassHandler = (userId, payload, socket) => {
+export const monsterPassHandler = (uuid, payload, socket) => {
   const { monsterId } = payload;
 
   if (false) {
@@ -20,7 +20,7 @@ export const monsterPassHandler = (userId, payload, socket) => {
   socket.emit('monsterPass', { status: 'success', message: '몬스터 통과 성공' });
 };
 
-export const goblinSpawnHandler = (userId, payload, socket) => {
+export const goblinSpawnHandler = (uuid, payload, socket) => {
   const { goblinId, spawnTime } = payload;
 
   if (false) {

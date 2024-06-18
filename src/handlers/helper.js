@@ -1,8 +1,7 @@
-import { getUsers } from '../models/user.model.js';
 import { CLIENT_VERSION } from '../constants.js';
 import handlerMappings from './handlerMapping.js';
 
-export const handleConnection = async (socket, userUUID) => {
+export const handleConnection = (socket, userUUID) => {
   socket.emit('connection', { uuid: userUUID });
 };
 
