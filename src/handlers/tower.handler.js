@@ -1,3 +1,5 @@
+import { getGameAssets } from '../init/assets.js';
+
 export const towerInitialHandler = (userId, payload, socket) => {
   const { towerData } = payload;
 
@@ -15,13 +17,23 @@ export const towerInitialHandler = (userId, payload, socket) => {
 
 export const towerPurchaseHandler = (userId, payload, socket) => {
   const { towerData } = payload;
+  let { userGold } = payload;
+  const { tower } = getGameAssets();
 
-  if (false) {
+  // 추후 Redis 연동하여 towerData 값 저장
+
+  let verification = false;
+  if (userGold >= tower.data[0].cost) {
+    userGold -= tower.data[0].cost;
+    verification = true;
+  }
+
+  if (!verification) {
     socket.emit('towerPurchase', { status: 'fail', message: '타워 구매 검증 실패' });
     return;
   }
 
-  socket.emit('towerPurchase', { status: 'success', message: '타워 구매 완료' });
+  socket.emit('towerPurchase', { status: 'success', message: '타워 구매 완료', towerData, userGold });
 };
 
 export const towerRefundHandler = (userId, payload, socket) => {

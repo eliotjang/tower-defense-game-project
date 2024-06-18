@@ -157,12 +157,7 @@ function placeInitialTower(x, y) {
   tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
-function placeNewTower() {
-  /* 
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요! 
-  */
-  const { x, y } = getRandomPositionNearPath(200);
+function placeNewTower(x, y) {
   const tower = new Tower(x, y);
   towers.push(tower);
   tower.draw(ctx, towerImages[tower.getLevel()]);
@@ -346,9 +341,12 @@ Promise.all([
 
   serverSocket.on('towerPurchase', (data) => {
     if (data.status === 'success') {
+      userGold = data.userGold;
+      placeNewTower(data.towerData.x, data.towerData.y);
     } else {
-      alert('실패 메시지 입력');
+      alert('타워 구매 검증 실패');
     }
+
     console.log(data);
   });
 
@@ -413,6 +411,10 @@ buyTowerButton.style.padding = '10px 20px';
 buyTowerButton.style.fontSize = '16px';
 buyTowerButton.style.cursor = 'pointer';
 
-buyTowerButton.addEventListener('click', placeNewTower);
+buyTowerButton.addEventListener('click', () => {
+  const { x, y } = getRandomPositionNearPath(200);
+  // Redis 연동 시 userGold 삭제 후 Redis 데이터로 검증
+  sendEvent(31, { towerData: { x, y }, userGold });
+});
 
 document.body.appendChild(buyTowerButton);
