@@ -2,7 +2,7 @@ import { CLIENT_VERSION } from '../constants.js';
 import handlerMappings from './handlerMapping.js';
 
 export const handleConnection = async (socket, userUUID) => {
-  socket.emit('connection', { uuid: userUUID });
+  await socket.emit('connection', { uuid: userUUID });
 };
 
 export const handleDisconnect = (socket, uuid) => {

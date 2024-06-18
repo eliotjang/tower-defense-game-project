@@ -1,30 +1,31 @@
 import { getGameAssets } from '../init/assets.js';
+import { gameRedis } from '../utils/redis.utils.js';
 
-export const gameStart = (uuid, payload, socket) => {
-  const { timeStamp, userGold, baseHp, numOfInitialTowers, score } = payload;
-  const { game } = getGameAssets();
+export const gameStart = async (uuid, payload, socket) => {
+  const { timeStamp } = payload;
+  const { game, stage } = getGameAssets();
+  const { userGold, baseHp, numOfInitialTowers, score } = game.data;
+  const stageId = stage.data[0].id;
 
-  const userGoldAsset = game.data.userGold;
-  const baseHpAsset = game.data.baseHp;
-  const numOfInitialTowersAsset = game.data.numOfinitialTowers;
-  const scoreAsset = game.data.score;
+  console.log(payload);
 
-  let verification = false;
-  if (
-    userGold === userGoldAsset &&
-    baseHp === baseHpAsset &&
-    numOfInitialTowers === numOfInitialTowersAsset &&
-    score === scoreAsset
-  ) {
-    verification = true;
-  }
-
-  if (!verification) {
+  if (!timeStamp) {
     socket.emit('gameStart', { status: 'fail', message: '게임 초기 정보 검증 실패' });
     return;
   }
 
-  socket.emit('gameStart', { status: 'success', message: '게임 시작!' });
+  const gameData = await gameRedis.createGameData(uuid, userGold, stageId, score, null, numOfInitialTowers);
+
+  console.log('Redis Data', gameData);
+
+  socket.emit('gameStart', {
+    status: 'success',
+    message: '게임 시작!',
+    userGold,
+    baseHp,
+    numOfInitialTowers,
+    scoreAsset,
+  });
 };
 
 export const gameEnd = (uuid, payload, socket) => {
