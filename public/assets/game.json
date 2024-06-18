@@ -1,0 +1,5 @@
+{
+  "name": "game",
+  "version": "1.0.0",
+  "data": { "userGold": 0, "baseHp": 200, "numOfinitialTowers": 3, "score": 0 }
+}

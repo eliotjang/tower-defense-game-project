@@ -2,6 +2,7 @@ import { Base } from './base.js';
 import { Monster } from './monster.js';
 import { Tower } from './tower.js';
 import towerData from '../assets/tower.json' with { type: 'json' };
+import game from '../assets/game.json' with { type: 'json' };
 import { CLIENT_VERSION } from './Constants.js';
 
 /* 
@@ -15,18 +16,18 @@ const ctx = canvas.getContext('2d');
 const NUM_OF_TOWERS = 5; // 타워 이미지 개수
 const NUM_OF_MONSTERS = 6; // 몬스터 이미지 개수
 
-let userGold = 0; // 유저 골드
+let userGold = game.data.userGold; // 유저 골드
 let base; // 기지 객체
-let baseHp = 200; // 기지 체력
+let baseHp = game.data.baseHp; // 기지 체력
 
 let towerCost = towerData.data[0].cost; // 타워 구입 비용
-let numOfInitialTowers = 0; // 초기 타워 개수
+let numOfInitialTowers = game.data.numOfinitialTowers; // 초기 타워 개수
 let monsterLevel = 1; // 몬스터 레벨
 let monsterSpawnInterval = 2000; // 몬스터 생성 주기 (ms)
 const monsters = [];
 const towers = [];
 
-let score = 0; // 게임 점수
+let score = game.data.score; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
 
@@ -252,8 +253,7 @@ function initGame() {
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
 
-  sendEvent(2, { timeStamp: Date.now() });
-  gameLoop(); // 게임 루프 최초 실행
+  sendEvent(2, { timeStamp: Date.now(), userGold, baseHp, numOfInitialTowers, score });
   isInitGame = true;
 }
 
@@ -290,6 +290,11 @@ Promise.all([
   */
   let userId = null;
   serverSocket.on('gameStart', (data) => {
+    if (data.status === 'success') {
+      gameLoop(); // 게임 루프 최초 실행
+    } else {
+      alert('게임 초기 정보 검증에 실패했습니다.');
+    }
     console.log(data);
   });
 
