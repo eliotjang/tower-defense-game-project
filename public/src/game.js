@@ -214,8 +214,8 @@ function gameLoop() {
       const isDestroyed = monster.move(base);
       if (isDestroyed) {
         /* 게임 오버 */
+        sendEvent(3, { timeStamp: Date.now(), score });
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
-        // sendEvent() // 게임 오버 이벤트
         location.reload();
       }
       monster.draw(ctx);
