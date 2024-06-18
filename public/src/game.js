@@ -4,9 +4,10 @@ import { Tower } from './tower.js';
 import towerData from '../assets/tower.json' with { type: 'json' };
 import { CLIENT_VERSION } from './Constants.js';
 
-/* 
-  어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
-*/
+if(!localStorage.getItem('accessToken')){
+  alert("로그인이 필요합니다");
+  window.location.href = 'index.html';
+}
 
 let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
@@ -274,15 +275,6 @@ Promise.all([
     },
   });
 
-  /* 
-    서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
-    e.g. serverSocket.on("...", () => {...});
-    이 때, 상태 동기화 이벤트의 경우에 아래의 코드를 마지막에 넣어주세요! 최초의 상태 동기화 이후에 게임을 초기화해야 하기 때문입니다! 
-    if (!isInitGame) {
-      initGame();
-    }
-  */
-  
   serverSocket.on('unauthorized', (message) => {
     alert(message);
     window.location.href = 'index.html';

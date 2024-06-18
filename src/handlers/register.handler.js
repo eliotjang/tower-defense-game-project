@@ -28,25 +28,13 @@ const registerHandler = (io) => {
       socket.disconnect(true);
     }
 
-    const user = await findUser(socket.id);
-
-    let userUUID;
-    if (!user) {
-      userUUID = uuidv4(); // UUID 생성
-      console.log('생성된 uuid', userUUID);
-      await userRedis.createUserData(userUUID, userData.userId, userData.password);
-      console.log(`새로운 유저 ${userData.userId}님이 등록되었습니다.`);
-    } else {
-      console.log(`기존 유저 ${user.user_id}님이 접속했습니다.`);
-    }
-
-    handleConnection(socket, userUUID);
+    handleConnection(socket, socket.data.user_id);
 
     // 모든 서비스 이벤트 처리
     socket.on('event', (data) => handleEvent(io, socket, data));
 
     // 접속 해제시 이벤트 처리
-    socket.on('disconnect', () => handleDisconnect(socket, userUUID));
+    socket.on('disconnect', () => handleDisconnect(socket, socket.data.user_id));
   });
 };
 
