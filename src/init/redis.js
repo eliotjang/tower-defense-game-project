@@ -4,7 +4,6 @@ import redis from 'redis';
 // connect Redis
 const redisClient = redis.createClient({
   url: `redis://${config.redisUsername}:${config.redisPassword}@${config.redisHost}:${config.redisPort}/0`,
-  legacyMode: true,
 });
 redisClient.on('connect', () => {
   console.info('Redis connected!');
