@@ -8,6 +8,7 @@ const GAME_FIELD_GOLD = 'user_gold';
 const GAME_FIELD_STAGE = 'stage_id';
 const GAME_FIELD_SCORE = 'score';
 const GAME_FIELD_TOWER = 'tower_coordinates';
+const GAME_FIELD_INITIAL_TOWERS = 'initial_towers';
 const GAME_FIELD_BASE_HP = 'base_hp';
 // const GAME_FIELD_HIGHSCORE = 'highscore';
 const HIGHSCORE_PREFIX = 'highscore:';
@@ -91,10 +92,10 @@ export const gameRedis = {
    * @param {number} gold 유저 보유 gold
    * @param {number} stageId 현재 스테이지 ID
    * @param {number} score 유저 점수
-   * @param {Array<{x:number, y:number, tower_id:number}>} towerCoordinates 타워 좌표, {x:x좌표, y:y좌표, tower_id:타워ID} 형식의 객체들을 담은 배열
+   * @param {number} numOfInitialTowers 초기 타워 개수
    * @param {number} baseHp 기지의 HP
    */
-  createGameData: async function (uuid, gold, stageId, score, towerCoordinates, baseHp) {
+  createGameData: async function (uuid, gold, stageId, score, numOfInitialTowers, baseHp) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
       const data = await redisClient.hVals(key);
@@ -102,7 +103,8 @@ export const gameRedis = {
         await redisClient.hSet(key, `${GAME_FIELD_GOLD}`, `${gold}`);
         await redisClient.hSet(key, `${GAME_FIELD_STAGE}`, `${stageId}`);
         await redisClient.hSet(key, `${GAME_FIELD_SCORE}`, `${score}`);
-        await redisClient.hSet(key, `${GAME_FIELD_TOWER}`, JSON.stringify(towerCoordinates));
+        await redisClient.hSet(key, `${GAME_FIELD_TOWER}`, '[]');
+        await redisClient.hSet(key, `${GAME_FIELD_INITIAL_TOWERS}`, `${numOfInitialTowers}`);
         await redisClient.hSet(key, `${GAME_FIELD_BASE_HP}`, `${baseHp}`);
       }
     } catch (err) {
@@ -125,7 +127,8 @@ export const gameRedis = {
           [GAME_FIELD_STAGE]: +data[1],
           [GAME_FIELD_SCORE]: +data[2],
           [GAME_FIELD_TOWER]: JSON.parse(data[3]),
-          [GAME_FIELD_BASE_HP]: +data[4],
+          [GAME_FIELD_INITIAL_TOWERS]: +data[4],
+          [GAME_FIELD_BASE_HP]: +data[5],
         };
       }
     } catch (err) {
@@ -145,6 +148,25 @@ export const gameRedis = {
       const exists = await redisClient.hExists(key, `${fieldName}`);
       if (exists) {
         await redisClient.hSet(key, `${fieldName}`, JSON.stringify(value));
+      }
+    } catch (err) {
+      console.error('Error patching game data: ', err);
+    }
+  },
+  /**
+   * 범용 함수, Redis 데이터 테이블의 field 이름과 value 타입에 맞춘 key-value 객체를 통해 업데이트
+   * @param {uuid} uuid 유저의 UUID
+   * @param {Object} data Redis 테이블의 field를 key로 가지는 key-value 페어를 담은 객체 (예: {stage_id: 100, gold:50})
+   */
+  patchGameDataEx: async function (uuid, data) {
+    try {
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      const properties = Object.keys(data);
+      for (let i = 0; i < properties.length; i++) {
+        const exists = await redisClient.hExists(key, `${properties[i]}`);
+        if (exists) {
+          await redisClient.hSet(key, `${properties[i]}`, JSON.stringify(data[properties[i]]));
+        }
       }
     } catch (err) {
       console.error('Error patching game data: ', err);
