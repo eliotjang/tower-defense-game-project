@@ -23,7 +23,7 @@ let baseHp = null; // 기지 체력
 let towerCost = towerData.data[0].cost; // 타워 구입 비용
 let numOfInitialTowers = null; // 초기 타워 개수
 let monsterLevel = 1; // 몬스터 레벨
-let monsterSpawnInterval = 2000; // 몬스터 생성 주기 (ms)
+let monsterSpawnInterval = null; // 몬스터 생성 주기 (ms)
 const monsters = [];
 const towers = [];
 
@@ -233,10 +233,10 @@ function initGame() {
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
-  for (let i = 0; i < numOfInitialTowers; i++) {
+  /* for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
     sendEvent(30, { towerData: { x, y } });
-  }
+  } */
   console.log('loop after');
 
   let initialStageId = 100; // 최초 스테이지 정보
@@ -294,7 +294,8 @@ Promise.all([
       baseHp = data.baseHp;
       numOfInitialTowers = data.numOfInitialTowers;
       score = data.score;
-
+      monsterSpawnInterval = data.monsterSpawnInterval;
+      console.log(monsterSpawnInterval);
       if (!isInitGame) {
         initGame();
       }
