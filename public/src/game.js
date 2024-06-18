@@ -2,7 +2,6 @@ import { Base } from './base.js';
 import { Monster } from './monster.js';
 import { Tower } from './tower.js';
 import towerData from '../assets/tower.json' with { type: 'json' };
-import game from '../assets/game.json' with { type: 'json' };
 import { CLIENT_VERSION } from './Constants.js';
 
 /* 
@@ -10,24 +9,25 @@ import { CLIENT_VERSION } from './Constants.js';
 */
 
 let serverSocket; // 서버 웹소켓 객체
+let sendEvent;
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 const NUM_OF_TOWERS = 5; // 타워 이미지 개수
 const NUM_OF_MONSTERS = 6; // 몬스터 이미지 개수
 
-let userGold = game.data.userGold; // 유저 골드
+let userGold = null; // 유저 골드
 let base; // 기지 객체
-let baseHp = game.data.baseHp; // 기지 체력
+let baseHp = null; // 기지 체력
 
 let towerCost = towerData.data[0].cost; // 타워 구입 비용
-let numOfInitialTowers = game.data.numOfinitialTowers; // 초기 타워 개수
+let numOfInitialTowers = null; // 초기 타워 개수
 let monsterLevel = 1; // 몬스터 레벨
 let monsterSpawnInterval = 2000; // 몬스터 생성 주기 (ms)
 const monsters = [];
 const towers = [];
 
-let score = game.data.score; // 게임 점수
+let score = null; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
 
@@ -234,8 +234,7 @@ function initGame() {
   if (isInitGame) {
     return;
   }
-  sendEvent(2, { timeStamp: Date.now(), userGold, baseHp, numOfInitialTowers, score });
-
+  console.log('gamestart after');
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -243,18 +242,18 @@ function initGame() {
     const { x, y } = getRandomPositionNearPath(200);
     sendEvent(30, { towerData: { x, y } });
   }
-
-  placeBase(); // 기지 배치
+  console.log('loop after');
 
   let initialStageId = 100; // 최초 스테이지 정보
   Monster.setMonsterPoolByStageId(initialStageId);
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
 
+  placeBase(); // 기지 배치
+  gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
 
-let sendEvent;
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
@@ -277,18 +276,33 @@ Promise.all([
     }, */
   });
 
-  /* 
-    서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
-    e.g. serverSocket.on("...", () => {...});
-    이 때, 상태 동기화 이벤트의 경우에 아래의 코드를 마지막에 넣어주세요! 최초의 상태 동기화 이후에 게임을 초기화해야 하기 때문입니다! 
-    if (!isInitGame) {
-      initGame();
-    }
-  */
+  // 커넥션
   let userId = null;
+  serverSocket.on('connection', async (data) => {
+    console.log(data);
+    userId = data.uuid;
+    sendEvent(2, { timeStamp: Date.now() });
+  });
+
+  serverSocket.on('towerInitial', (data) => {
+    if (data.status === 'success') {
+      placeInitialTower(data.towerData.x, data.towerData.y); // 설정된 초기 타워 개수만큼 사전에 타워 배치
+    } else {
+      alert('최초 타워 추가 검증 실패');
+    }
+    console.log(data);
+  });
+
   serverSocket.on('gameStart', (data) => {
     if (data.status === 'success') {
-      gameLoop(); // 게임 루프 최초 실행
+      userGold = data.userGold;
+      baseHp = data.baseHp;
+      numOfInitialTowers = data.numOfInitialTowers;
+      score = data.score;
+
+      if (!isInitGame) {
+        initGame();
+      }
     } else {
       alert('게임 초기 정보 검증에 실패했습니다.');
     }
@@ -331,15 +345,6 @@ Promise.all([
     if (data.status === 'success') {
     } else {
       alert('실패 메시지 입력');
-    }
-    console.log(data);
-  });
-
-  serverSocket.on('towerInitial', (data) => {
-    if (data.status === 'success') {
-      placeInitialTower(data.towerData.x, data.towerData.y); // 설정된 초기 타워 개수만큼 사전에 타워 배치
-    } else {
-      alert('최초 타워 추가 검증 실패');
     }
     console.log(data);
   });
@@ -391,10 +396,6 @@ Promise.all([
   serverSocket.on('broadcast', (data) => {
     console.log(data);
   });
-
-  if (!isInitGame) {
-    initGame();
-  }
 });
 
 export { sendEvent };

@@ -1,9 +1,14 @@
-export const towerInitialHandler = (userId, payload, socket) => {
+import { gameRedis } from '../utils/redis.utils.js';
+
+export const towerInitialHandler = async (uuid, payload, socket) => {
   const { towerData } = payload;
 
-  console.log(towerData);
+  console.log('1', towerData);
 
-  // 추후 Redis 연동하여 towerData 값 저장
+  await gameRedis.patchGameDataTower(uuid, towerData);
+
+  const user = await gameRedis.getGameData(uuid);
+  console.log('2', user.tower_coordinates);
 
   if (!towerData) {
     socket.emit('towerInitial', { status: 'fail', message: '최초 타워 추가 검증 실패' });
@@ -13,7 +18,7 @@ export const towerInitialHandler = (userId, payload, socket) => {
   socket.emit('towerInitial', { status: 'success', message: '최초 타워 추가 완료', towerData });
 };
 
-export const towerPurchaseHandler = (userId, payload, socket) => {
+export const towerPurchaseHandler = (uuid, payload, socket) => {
   const { towerData } = payload;
 
   if (false) {
@@ -24,7 +29,7 @@ export const towerPurchaseHandler = (userId, payload, socket) => {
   socket.emit('towerPurchase', { status: 'success', message: '타워 구매 완료' });
 };
 
-export const towerRefundHandler = (userId, payload, socket) => {
+export const towerRefundHandler = (uuid, payload, socket) => {
   const { towerData } = payload;
 
   if (false) {
@@ -35,7 +40,7 @@ export const towerRefundHandler = (userId, payload, socket) => {
   socket.emit('towerRefund', { status: 'success', message: '타워 환불 성공' });
 };
 
-export const towerUpgradeHandler = (userId, payload, socket) => {
+export const towerUpgradeHandler = (uuid, payload, socket) => {
   const { towerData } = payload;
 
   if (false) {

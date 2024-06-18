@@ -172,6 +172,53 @@ export const gameRedis = {
       console.error('Error patching game data: ', err);
     }
   },
+  // 임시
+  getGameDataTower: async function (uuid) {
+    try {
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      const data = await redisClient.hVals(key);
+      if (data && data.length > 0) {
+        return {
+          [GAME_FIELD_TOWER]: JSON.parse(data[3]),
+        };
+      }
+    } catch (err) {
+      console.error('Error getting game data: ', err);
+      return null;
+    }
+  },
+  // 임시
+  patchGameDataTower: async function (uuid, towerData) {
+    try {
+      const tower = await this.getGameDataTower(uuid);
+      const baseData = tower[GAME_FIELD_TOWER];
+
+      console.log('baseData : ', baseData);
+
+      if (baseData !== '[]') {
+        console.log('베이스 없음');
+        const key = `${GAME_DATA_PREFIX}${uuid}`;
+        const exists = await redisClient.hExists(key, `${GAME_FIELD_TOWER}`);
+        if (exists) {
+          console.log('존재함');
+          await redisClient.hSet(key, `${GAME_FIELD_TOWER}`, JSON.stringify(towerData));
+        }
+      } else {
+        console.log('베이스 있음');
+        /* const key = `${GAME_DATA_PREFIX}${uuid}`;
+        const exists = await redisClient.hExists(key, `${GAME_FIELD_TOWER}`);
+        if (exists) {
+          const newData = JSON.parse(baseData[GAME_FIELD_TOWER]);
+          console.log('newData', newData);
+          newData.push(towerData);
+          console.log('pushed newData', newData);
+          await redisClient.hSet(key, `${GAME_FIELD_TOWER}`, JSON.stringify(newData));
+        } */
+      }
+    } catch (err) {
+      console.error('Error patching game data: ', err);
+    }
+  },
   patchGameDataGold: async function (uuid, newGold) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
