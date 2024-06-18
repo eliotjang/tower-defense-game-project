@@ -9,6 +9,7 @@ import { CLIENT_VERSION } from './Constants.js';
 */
 
 let serverSocket; // 서버 웹소켓 객체
+let sendEvent;
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -233,8 +234,7 @@ function initGame() {
   if (isInitGame) {
     return;
   }
-  sendEvent(2, { timeStamp: Date.now() });
-
+  console.log('gamestart after');
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -242,16 +242,18 @@ function initGame() {
     const { x, y } = getRandomPositionNearPath(200);
     sendEvent(30, { towerData: { x, y } });
   }
+  console.log('loop after');
 
   let initialStageId = 100; // 최초 스테이지 정보
   Monster.setMonsterPoolByStageId(initialStageId);
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
 
+  placeBase(); // 기지 배치
+  gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
 
-let sendEvent;
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
@@ -274,15 +276,33 @@ Promise.all([
     }, */
   });
 
+  // 커넥션
+  let userId = null;
+  serverSocket.on('connection', async (data) => {
+    console.log(data);
+    userId = data.uuid;
+    sendEvent(2, { timeStamp: Date.now() });
+  });
+
+  serverSocket.on('towerInitial', (data) => {
+    if (data.status === 'success') {
+      placeInitialTower(data.towerData.x, data.towerData.y); // 설정된 초기 타워 개수만큼 사전에 타워 배치
+    } else {
+      alert('최초 타워 추가 검증 실패');
+    }
+    console.log(data);
+  });
+
   serverSocket.on('gameStart', (data) => {
     if (data.status === 'success') {
       userGold = data.userGold;
       baseHp = data.baseHp;
       numOfInitialTowers = data.numOfInitialTowers;
       score = data.score;
-      placeBase(); // 기지 배치
 
-      gameLoop(); // 게임 루프 최초 실행
+      if (!isInitGame) {
+        initGame();
+      }
     } else {
       alert('게임 초기 정보 검증에 실패했습니다.');
     }
@@ -329,15 +349,6 @@ Promise.all([
     console.log(data);
   });
 
-  serverSocket.on('towerInitial', (data) => {
-    if (data.status === 'success') {
-      placeInitialTower(data.towerData.x, data.towerData.y); // 설정된 초기 타워 개수만큼 사전에 타워 배치
-    } else {
-      alert('최초 타워 추가 검증 실패');
-    }
-    console.log(data);
-  });
-
   serverSocket.on('towerPurchase', (data) => {
     if (data.status === 'success') {
     } else {
@@ -360,16 +371,6 @@ Promise.all([
       alert('실패 메시지 입력');
     }
     console.log(data);
-  });
-
-  // 커넥션
-  let userId = null;
-  serverSocket.on('connection', async (data) => {
-    console.log(data);
-    userId = data.uuid;
-    if (!isInitGame) {
-      initGame();
-    }
   });
 
   sendEvent = (handlerId, payload) => {
