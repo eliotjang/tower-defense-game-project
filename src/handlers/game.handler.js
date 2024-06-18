@@ -1,5 +1,5 @@
 import { getGameAssets } from '../init/assets.js';
-import { gameRedis, highscoreRedis } from '../utils/redis.utils.js';\
+import { gameRedis, highscoreRedis } from '../utils/redis.utils.js';
 
 export const gameStart = async (uuid, payload, socket) => {
   const { timeStamp } = payload;
