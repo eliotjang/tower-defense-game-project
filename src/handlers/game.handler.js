@@ -7,16 +7,15 @@ export const gameStart = async (uuid, payload, socket) => {
   const { userGold, baseHp, numOfInitialTowers, score } = game.data;
   const stageId = stage.data[0].id;
 
-  console.log(payload);
-
   if (!timeStamp) {
     socket.emit('gameStart', { status: 'fail', message: '게임 초기 정보 검증 실패' });
     return;
   }
 
-  const gameData = await gameRedis.createGameData(uuid, userGold, stageId, score, null, numOfInitialTowers);
+  await gameRedis.createGameData(uuid, userGold, stageId, score, numOfInitialTowers, baseHp);
+  const data = await gameRedis.getGameData(uuid);
 
-  console.log('Redis Data', gameData);
+  console.log('Redis 데이터', data);
 
   socket.emit('gameStart', {
     status: 'success',
@@ -24,7 +23,7 @@ export const gameStart = async (uuid, payload, socket) => {
     userGold,
     baseHp,
     numOfInitialTowers,
-    scoreAsset,
+    score,
   });
 };
 

@@ -229,12 +229,11 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
-const initGame = async () => {
+function initGame() {
   if (isInitGame) {
     return;
   }
-  console.log('init game');
-  await sendEvent(2, { timeStamp: Date.now() });
+  sendEvent(2, { timeStamp: Date.now() });
 
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
@@ -244,15 +243,13 @@ const initGame = async () => {
     sendEvent(30, { towerData: { x, y } });
   }
 
-  placeBase(); // 기지 배치
-
   let initialStageId = 100; // 최초 스테이지 정보
   Monster.setMonsterPoolByStageId(initialStageId);
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
 
   isInitGame = true;
-};
+}
 
 let sendEvent;
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
@@ -277,14 +274,14 @@ Promise.all([
     }, */
   });
 
-  let userId = null;
   serverSocket.on('gameStart', (data) => {
-    console.log('gamestart event');
     if (data.status === 'success') {
       userGold = data.userGold;
       baseHp = data.baseHp;
       numOfInitialTowers = data.numOfInitialTowers;
       score = data.score;
+      placeBase(); // 기지 배치
+
       gameLoop(); // 게임 루프 최초 실행
     } else {
       alert('게임 초기 정보 검증에 실패했습니다.');
@@ -365,9 +362,11 @@ Promise.all([
     console.log(data);
   });
 
-  serverSocket.on('connection', (data) => {
+  // 커넥션
+  let userId = null;
+  serverSocket.on('connection', async (data) => {
     console.log(data);
-    console.log('connection -> initGame');
+    userId = data.uuid;
     if (!isInitGame) {
       initGame();
     }
@@ -385,10 +384,6 @@ Promise.all([
   serverSocket.on('broadcast', (data) => {
     console.log(data);
   });
-
-  if (!isInitGame) {
-    initGame();
-  }
 });
 
 export { sendEvent };
