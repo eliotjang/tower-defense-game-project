@@ -152,17 +152,13 @@ function getRandomPositionNearPath(maxDistance) {
 }
 
 function placeInitialTowers() {
-  /* 
-    타워를 초기에 배치하는 함수입니다.
-    무언가 빠진 코드가 있는 것 같지 않나요? 
-  */
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
     const tower = new Tower(x, y);
     towers.push(tower);
     tower.draw(ctx, towerImages[tower.getLevel()]);
+    sendEvent(30, { towerData: { x, y } });
   }
-  // sendEvent()
 }
 
 function placeNewTower() {
@@ -242,6 +238,7 @@ function initGame() {
   if (isInitGame) {
     return;
   }
+  sendEvent(2, { timeStamp: Date.now(), userGold, baseHp, numOfInitialTowers, score });
 
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
@@ -253,7 +250,6 @@ function initGame() {
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
 
-  sendEvent(2, { timeStamp: Date.now(), userGold, baseHp, numOfInitialTowers, score });
   isInitGame = true;
 }
 
@@ -299,38 +295,74 @@ Promise.all([
   });
 
   serverSocket.on('gameEnd', (data) => {
+    if (data.status === 'success') {
+    } else {
+      alert('실패 메시지 입력');
+    }
     console.log(data);
   });
 
   serverSocket.on('monsterKill', (data) => {
+    if (data.status === 'success') {
+    } else {
+      alert('실패 메시지 입력');
+    }
     console.log(data);
   });
 
   serverSocket.on('monsterPass', (data) => {
+    if (data.status === 'success') {
+    } else {
+      alert('실패 메시지 입력');
+    }
     console.log(data);
   });
 
   serverSocket.on('goblinSpawn', (data) => {
+    if (data.status === 'success') {
+    } else {
+      alert('실패 메시지 입력');
+    }
     console.log(data);
   });
 
   serverSocket.on('moveStage', (data) => {
+    if (data.status === 'success') {
+    } else {
+      alert('실패 메시지 입력');
+    }
     console.log(data);
   });
 
   serverSocket.on('towerInitial', (data) => {
+    if (data.status === 'success') {
+    } else {
+      alert('최초 타워 추가 검증 실패');
+    }
     console.log(data);
   });
 
   serverSocket.on('towerPurchase', (data) => {
+    if (data.status === 'success') {
+    } else {
+      alert('실패 메시지 입력');
+    }
     console.log(data);
   });
 
   serverSocket.on('towerRefund', (data) => {
+    if (data.status === 'success') {
+    } else {
+      alert('실패 메시지 입력');
+    }
     console.log(data);
   });
 
   serverSocket.on('towerUpgrade', (data) => {
+    if (data.status === 'success') {
+    } else {
+      alert('실패 메시지 입력');
+    }
     console.log(data);
   });
 

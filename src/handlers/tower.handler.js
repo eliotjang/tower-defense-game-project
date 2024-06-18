@@ -1,7 +1,11 @@
 export const towerInitialHandler = (userId, payload, socket) => {
-  const { numOfInitialTowers } = payload;
+  const { towerData } = payload;
 
-  if (false) {
+  console.log(towerData);
+
+  // 추후 Redis 연동하여 towerData 값 저장
+
+  if (!towerData) {
     socket.emit('towerInitial', { status: 'fail', message: '최초 타워 추가 검증 실패' });
     return;
   }
