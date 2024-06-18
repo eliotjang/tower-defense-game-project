@@ -10,7 +10,7 @@ export const towerInitialHandler = (userId, payload, socket) => {
     return;
   }
 
-  socket.emit('towerInitial', { status: 'success', message: '최초 타워 추가 완료' });
+  socket.emit('towerInitial', { status: 'success', message: '최초 타워 추가 완료', towerData });
 };
 
 export const towerPurchaseHandler = (userId, payload, socket) => {

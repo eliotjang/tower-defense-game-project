@@ -151,14 +151,10 @@ function getRandomPositionNearPath(maxDistance) {
   };
 }
 
-function placeInitialTowers() {
-  for (let i = 0; i < numOfInitialTowers; i++) {
-    const { x, y } = getRandomPositionNearPath(200);
-    const tower = new Tower(x, y);
-    towers.push(tower);
-    tower.draw(ctx, towerImages[tower.getLevel()]);
-    sendEvent(30, { towerData: { x, y } });
-  }
+function placeInitialTower(x, y) {
+  const tower = new Tower(x, y);
+  towers.push(tower);
+  tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
 function placeNewTower() {
@@ -242,7 +238,12 @@ function initGame() {
 
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
-  placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
+
+  for (let i = 0; i < numOfInitialTowers; i++) {
+    const { x, y } = getRandomPositionNearPath(200);
+    sendEvent(30, { towerData: { x, y } });
+  }
+
   placeBase(); // 기지 배치
 
   let initialStageId = 100; // 최초 스테이지 정보
@@ -336,6 +337,7 @@ Promise.all([
 
   serverSocket.on('towerInitial', (data) => {
     if (data.status === 'success') {
+      placeInitialTower(data.towerData.x, data.towerData.y); // 설정된 초기 타워 개수만큼 사전에 타워 배치
     } else {
       alert('최초 타워 추가 검증 실패');
     }
