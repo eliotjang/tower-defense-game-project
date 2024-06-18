@@ -233,10 +233,10 @@ function initGame() {
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
-  /* for (let i = 0; i < numOfInitialTowers; i++) {
+  for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
     sendEvent(30, { towerData: { x, y } });
-  } */
+  }
   console.log('loop after');
 
   let initialStageId = 100; // 최초 스테이지 정보
