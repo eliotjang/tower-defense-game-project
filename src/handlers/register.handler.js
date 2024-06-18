@@ -3,6 +3,7 @@ import { handleConnection, handleDisconnect, handleEvent } from './helper.js';
 import { addUser, findUser } from '../models/user.model.js';
 import configs from '../utils/configs.js';
 import jwt from 'jsonwebtoken';
+import { userRedis } from '../utils/redis.utils.js';
 
 const registerHandler = (io) => {
   io.on('connection', async (socket) => {
@@ -32,11 +33,12 @@ const registerHandler = (io) => {
     let userUUID;
     if (!user) {
       userUUID = uuidv4(); // UUID 생성
-      addUser({ uuid: userUUID, socketId: socket.id }); // 사용자 추가
-      console.log(`새로운 유저입니다. 등록합니다. ${userUUID}`);
+      console.log('생성된 uuid', userUUID);
+      await userRedis.createUserData(userUUID, userData.userId, userData.password);
+      user = await userRedis.getUserData(userUUID);
+      console.log(`새로운 유저 ${user.user_id}님이 등록되었습니다.`);
     } else {
-      userUUID = user.uuid;
-      console.log(`기존 유저입니다. 연결합니다. ${userUUID}`);
+      console.log(`기존 유저 ${user.user_id}님이 접속했습니다.`);
     }
 
     handleConnection(socket, userUUID);

@@ -373,16 +373,7 @@ Promise.all([
   });
 
   serverSocket.on('connection', (data) => {
-    const user = window.localStorage.getItem('client');
-    if (user) {
-      console.log(`클라이언트 정보가 확인됐습니다. ${user}`);
-      userId = user;
-    } else {
-      userId = data.uuid;
-      window.localStorage.setItem('client', userId);
-      console.log(`클라이언트 정보가 확인되지 않았습니다. ${userId}`);
-    }
-
+    console.log(data);
     if (!isInitGame) {
       initGame();
     }
