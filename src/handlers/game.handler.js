@@ -1,13 +1,28 @@
-export const gameStart = (uuid, payload, socket) => {
-  // socket emit test
-  const { timeStamp } = payload;
+import { getGameAssets } from '../init/assets.js';
 
-  if (false) {
-    socket.emit('gameStart', { status: 'fail', message: '게임 시작 실패' });
-    return;
+export const gameStart = (uuid, payload, socket) => {
+  const { timeStamp, userGold, baseHp, numOfInitialTowers, score } = payload;
+  const { game } = getGameAssets();
+
+  const userGoldAsset = game.data.userGold;
+  const baseHpAsset = game.data.baseHp;
+  const numOfInitialTowersAsset = game.data.numOfinitialTowers;
+  const scoreAsset = game.data.score;
+
+  let verification = false;
+  if (
+    userGold === userGoldAsset &&
+    baseHp === baseHpAsset &&
+    numOfInitialTowers === numOfInitialTowersAsset &&
+    score === scoreAsset
+  ) {
+    verification = true;
   }
 
-  console.log(timeStamp);
+  if (!verification) {
+    socket.emit('gameStart', { status: 'fail', message: '게임 초기 정보 검증 실패' });
+    return;
+  }
 
   socket.emit('gameStart', { status: 'success', message: '게임 시작!' });
 };
