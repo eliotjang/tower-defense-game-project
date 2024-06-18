@@ -293,7 +293,39 @@ Promise.all([
     console.log(data);
   });
 
-  serverSocket.on('response', (data) => {
+  serverSocket.on('gameEnd', (data) => {
+    console.log(data);
+  });
+
+  serverSocket.on('monsterKill', (data) => {
+    console.log(data);
+  });
+
+  serverSocket.on('monsterPass', (data) => {
+    console.log(data);
+  });
+
+  serverSocket.on('goblinSpawn', (data) => {
+    console.log(data);
+  });
+
+  serverSocket.on('moveStage', (data) => {
+    console.log(data);
+  });
+
+  serverSocket.on('towerInitial', (data) => {
+    console.log(data);
+  });
+
+  serverSocket.on('towerPurchase', (data) => {
+    console.log(data);
+  });
+
+  serverSocket.on('towerRefund', (data) => {
+    console.log(data);
+  });
+
+  serverSocket.on('towerUpgrade', (data) => {
     console.log(data);
   });
 

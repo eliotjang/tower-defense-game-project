@@ -1,7 +1,8 @@
-export const moveStageHandler = (uuid, payload) => {
+export const moveStageHandler = (uuid, payload, socket) => {
   if (false) {
-    return { status: 'fail', message: '스테이지 이동 검증 실패' };
+    socket.emit('moveStage', { status: 'fail', message: '스테이지 이동 검증 실패' });
+    return;
   }
 
-  return { status: 'success', message: '스테이지 이동' };
+  socket.emit('moveStage', { status: 'success', message: '스테이지 이동' });
 };
