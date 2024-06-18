@@ -8,8 +8,8 @@ const GAME_FIELD_GOLD = 'user_gold';
 const GAME_FIELD_STAGE = 'stage_id';
 const GAME_FIELD_SCORE = 'score';
 const GAME_FIELD_TOWER = 'tower_coordinates';
-const GAME_FIELD_INITIAL_TOWER = 'initial_tower';
 const GAME_FIELD_BASE_HP = 'base_hp';
+// const GAME_FIELD_HIGHSCORE = 'highscore';
 const HIGHSCORE_PREFIX = 'highscore:';
 
 export const userRedis = {
@@ -92,10 +92,9 @@ export const gameRedis = {
    * @param {number} stageId 현재 스테이지 ID
    * @param {number} score 유저 점수
    * @param {Array<{x:number, y:number, tower_id:number}>} towerCoordinates 타워 좌표, {x:x좌표, y:y좌표, tower_id:타워ID} 형식의 객체들을 담은 배열
-   * @param {number} numOfInitialTowers 초기 타워 개수
    * @param {number} baseHp 기지의 HP
    */
-  createGameData: async function (uuid, gold, stageId, score, towerCoordinates, numOfInitialTowers, baseHp) {
+  createGameData: async function (uuid, gold, stageId, score, towerCoordinates, baseHp) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
       const data = await redisClient.hVals(key);
@@ -104,7 +103,6 @@ export const gameRedis = {
         await redisClient.hSet(key, `${GAME_FIELD_STAGE}`, `${stageId}`);
         await redisClient.hSet(key, `${GAME_FIELD_SCORE}`, `${score}`);
         await redisClient.hSet(key, `${GAME_FIELD_TOWER}`, JSON.stringify(towerCoordinates));
-        await redisClient.hSet(key, `${GAME_FIELD_INITIAL_TOWER}`, `${numOfInitialTowers}`);
         await redisClient.hSet(key, `${GAME_FIELD_BASE_HP}`, `${baseHp}`);
       }
     } catch (err) {
@@ -124,11 +122,10 @@ export const gameRedis = {
         return {
           uuid: uuid,
           [GAME_FIELD_GOLD]: +data[0],
-          [GAME_FIELD_STAGE]: JSON.parse(data[1]),
+          [GAME_FIELD_STAGE]: +data[1],
           [GAME_FIELD_SCORE]: +data[2],
           [GAME_FIELD_TOWER]: JSON.parse(data[3]),
-          [GAME_FIELD_INITIAL_TOWER]: +data[4],
-          [GAME_FIELD_BASE_HP]: +data[5],
+          [GAME_FIELD_BASE_HP]: +data[4],
         };
       }
     } catch (err) {
