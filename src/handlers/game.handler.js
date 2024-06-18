@@ -28,16 +28,24 @@ export const gameStart = async (uuid, payload, socket) => {
 };
 
 export const gameEnd = async (uuid, payload, socket) => {
-  const { score: currentScore } = payload;
+  const { timestamp, score } = payload;
 
-  if (false) {
+  const userGameData = await gameRedis.getGameData(uuid);
+  if (!userGameData) {
     socket.emit('gameEnd', { status: 'fail', message: '게임 오버 검증 실패' });
+    return;
   }
 
+  const prevScore = userGameData.score;
+  /* 검증 로직 구현 */
+
+  /* ----- */
+
+  /* highscore 갱신 */
   const isHighscore = await highscoreRedis.createHighscoreData(uuid, score);
   if (isHighscore && isHighscore[1]) {
     io.emit('highscore', { highscore: score });
   }
-
+  /* ----- */
   socket.emit('gameEnd', { status: 'success', message: '게임 오버' });
 };
