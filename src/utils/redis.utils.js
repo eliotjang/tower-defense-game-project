@@ -224,7 +224,7 @@ export const gameRedis = {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
       const exists = await redisClient.hExists(key, `${GAME_FIELD_GOLD}`);
       if (exists) {
-        await redisClient.hSet(key, `${fieldName}`, JSON.stringify(newGold));
+        await redisClient.hSet(key, `${GAME_FIELD_GOLD}`, JSON.stringify(newGold));
       }
     } catch (err) {
       console.error('Error patching game data: ', err);

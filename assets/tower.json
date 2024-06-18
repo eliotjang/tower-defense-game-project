@@ -6,7 +6,7 @@
       "id": 1,
       "attack_power": 40,
       "range": 300,
-      "cost": 0,
+      "cost": 500,
       "cooldown": 180,
       "beamDuration": 30,
       "width": 78,

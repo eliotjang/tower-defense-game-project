@@ -346,7 +346,9 @@ Promise.all([
 
   serverSocket.on('towerPurchase', (data) => {
     if (data.status === 'success') {
+      console.log('보유 금액', userGold);
       userGold = data.userGold;
+      console.log('타워 구매 후 잔액', userGold);
       placeNewTower(data.towerData.x, data.towerData.y);
     } else {
       alert('타워 구매 검증 실패');
@@ -403,7 +405,7 @@ buyTowerButton.style.cursor = 'pointer';
 buyTowerButton.addEventListener('click', () => {
   const { x, y } = getRandomPositionNearPath(200);
   // Redis 연동 시 userGold 삭제 후 Redis 데이터로 검증
-  sendEvent(31, { towerData: { x, y }, userGold });
+  sendEvent(31, { towerData: { x, y } });
 });
 
 document.body.appendChild(buyTowerButton);
