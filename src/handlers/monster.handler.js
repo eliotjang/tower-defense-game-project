@@ -29,7 +29,7 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
     if (stageField < user.score) {
       await gameRedis.patchGameDataEx(uuid, { stage_id: user.stage_id + 1 });
     }
-    socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', user:user.score });
+    socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', user: user.score });
   } catch (error) {
     console.log({ errorMessage: error.message });
   }
