@@ -1,4 +1,3 @@
-
 import monsterData from '../assets/monster.json' with { type: 'json' };
 
 let monsterPool = null;
@@ -42,7 +41,6 @@ export class Monster {
   static setMonsterPoolByStageId(stageId) {
     monsterPool = monsterData.data.filter((data) => data.stage_id == stageId);
     console.log('몬스터 풀 :', monsterPool);
-    
   }
 
   init(level) {
@@ -79,6 +77,6 @@ export class Monster {
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     ctx.font = '12px Arial';
     ctx.fillStyle = 'white';
-    ctx.fillText(`(레벨 ${this.level}) ${this.hp}/${this.maxHp}`, this.x, this.y - 5);
+    ctx.fillText(`(레벨 ${this.id % 10}) ${this.hp}/${this.maxHp}`, this.x, this.y - 5);
   }
 }

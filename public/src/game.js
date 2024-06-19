@@ -18,12 +18,12 @@ let baseHp = null; // 기지 체력
 
 let towerCost = towerData.data[0].cost; // 타워 구입 비용
 let numOfInitialTowers = null; // 초기 타워 개수
-let monsterLevel = 1; // 몬스터 레벨
 let monsterSpawnInterval = null; // 몬스터 생성 주기 (ms)
 let goblinMinInterval = null; // 고블린 생성 최소 주기 (ms)
 let goblinMaxInterval = null; // 고블린 생성 최대 주기 (ms)
 let currentStage = 100;
 let targetScore = 2000;
+let monsterLevel = currentStage-99; // 몬스터 레벨 = 스테이지 레벨
 
 const monsters = [];
 const towers = [];
@@ -193,7 +193,7 @@ function gameLoop() {
   ctx.fillStyle = 'yellow';
   ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
   ctx.fillStyle = 'black';
-  ctx.fillText(`현재 레벨: ${currentStage-99}`, 100, 200); // 최고 기록 표시
+  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
