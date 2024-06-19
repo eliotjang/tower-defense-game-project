@@ -4,10 +4,6 @@ import { Tower } from './tower.js';
 import towerData from '../assets/tower.json' with { type: 'json' };
 import { CLIENT_VERSION } from './Constants.js';
 
-/* 
-  어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
-*/
-
 let serverSocket; // 서버 웹소켓 객체
 let sendEvent;
 const canvas = document.getElementById('gameCanvas');
@@ -224,7 +220,6 @@ function gameLoop() {
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
-
 function initGame() {
   if (isInitGame) {
     return;
@@ -262,13 +257,13 @@ Promise.all([
   console.log('game.js 시작');
 
   let somewhere;
-  serverSocket = io('http://localhost:3000', {
+  serverSocket = io('localhost:3000', {
     query: {
       clientVersion: CLIENT_VERSION,
     },
-    /* auth: {
-      token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
-    }, */
+    auth: {
+      token: localStorage.getItem('accessToken'),
+    },
   });
 
   // 커넥션
@@ -288,6 +283,10 @@ Promise.all([
     console.log(data);
   });
 
+  serverSocket.on('authorization', (message) => {
+    alert(message);
+    window.location.href = 'index.html';
+  });
   serverSocket.on('gameStart', (data) => {
     if (data.status === 'success') {
       userGold = data.userGold;

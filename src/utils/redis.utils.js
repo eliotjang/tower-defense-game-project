@@ -1,7 +1,7 @@
 import redisClient from '../init/redis.js';
 
 const USER_PREFIX = 'user:';
-const USER_FIELD_USER_ID = 'user_id';
+const USER_FIELD_UUID = 'uuid';
 const USER_FIELD_PASSWORD = 'password';
 const GAME_DATA_PREFIX = 'game:';
 const GAME_FIELD_GOLD = 'user_gold';
@@ -22,12 +22,12 @@ export const userRedis = {
    */
   createUserData: async function (uuid, userId, hashedPassword) {
     try {
-      const key = `${USER_PREFIX}${uuid}`;
+      const key = `${USER_PREFIX}${userId}`;
       const data = await redisClient.hVals(key);
       if (data && data.length > 0) {
-        throw new Error('User data with the given uuid already exists.');
+        throw new Error('User data with the given userId already exists.');
       }
-      await redisClient.hSet(key, `${USER_FIELD_USER_ID}`, JSON.stringify(userId));
+      await redisClient.hSet(key, `${USER_FIELD_UUID}`, JSON.stringify(uuid));
       await redisClient.hSet(key, `${USER_FIELD_PASSWORD}`, JSON.stringify(hashedPassword));
     } catch (err) {
       console.error('Error creating user data: ', err);
@@ -35,19 +35,19 @@ export const userRedis = {
   },
   /**
    * 유저 ID를 이용하여 해당 유저의 데이터를 조회
-   * @param {uuid} uuid 유저의 UUID
+   * @param {userId} 유저의 userId
    * @returns 유저 데이터의 field 이름들을 key로 가지는 key-value가 담긴 객체, 혹은 에러 시 null
    */
-  getUserData: async function (uuid) {
+  getUserData: async function (userId) {
     try {
-      const key = `${USER_PREFIX}${uuid}`;
+      const key = `${USER_PREFIX}${userId}`;
       const data = await redisClient.hVals(key);
       if (!data || data.length === 0) {
         throw new Error(`User data doesn't exists.`);
       }
       return {
-        uuid: uuid,
-        [USER_FIELD_USER_ID]: data[0],
+        userId: userId,
+        [USER_FIELD_UUID]: data[0],
         [USER_FIELD_PASSWORD]: data[1],
       };
     } catch (err) {
@@ -70,7 +70,7 @@ export const userRedis = {
         key = key.substring(USER_PREFIX.length);
 
         acc[idx] = {
-          [USER_FIELD_USER_ID]: key,
+          [USER_FIELD_UUID]: key,
           [USER_FIELD_PASSWORD]: data[0],
         };
 
@@ -88,16 +88,16 @@ export const userRedis = {
 export const gameRedis = {
   /**
    * 유저의 게임 데이터 생성
-   * @param {uuid} uuid 유저의 UUID
+   * @param {userId} userId 유저의 userId
    * @param {number} gold 유저 보유 gold
    * @param {number} stageId 현재 스테이지 ID
    * @param {number} score 유저 점수
    * @param {number} numOfInitialTowers 초기 타워 개수
    * @param {number} baseHp 기지의 HP
    */
-  createGameData: async function (uuid, gold, stageId, score, numOfInitialTowers, baseHp) {
+  createGameData: async function (userId, gold, stageId, score, numOfInitialTowers, baseHp) {
     try {
-      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      const key = `${GAME_DATA_PREFIX}${userId}`;
       const data = await redisClient.hVals(key);
       if (!data || data.length === 0) {
         await redisClient.hSet(key, `${GAME_FIELD_GOLD}`, `${gold}`);
@@ -113,16 +113,16 @@ export const gameRedis = {
   },
   /**
    * 유저의 게임 정보 조회
-   * @param {uuid} uuid 유저의 UUID
+   * @param {userId} userId 유저의 userId
    * @returns 유저의 게임 데이터가 담긴 객체, 혹은 에러 시 null
    */
-  getGameData: async function (uuid) {
+  getGameData: async function (userId) {
     try {
-      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      const key = `${GAME_DATA_PREFIX}${userId}`;
       const data = await redisClient.hVals(key);
       if (data && data.length > 0) {
         return {
-          uuid: uuid,
+          userId: userId,
           [GAME_FIELD_GOLD]: +data[0],
           [GAME_FIELD_STAGE]: +data[1],
           [GAME_FIELD_SCORE]: +data[2],
@@ -138,13 +138,13 @@ export const gameRedis = {
   },
   /**
    * 범용 함수, Redis 데이터 테이블에 정의된 field 이름과 value 타입에 맞춰서 사용
-   * @param {uuid} uuid 유저의 UUID
+   * @param {userId} userId 유저의 userId
    * @param {string} fieldName Redis 데이터 테이블에 정의한 필드 이름 (예: "initial_tower")
    * @param {*} value Redis 데이터 테이블에 정의한 value (예: 3)
    */
-  patchGameData: async function (uuid, fieldName, value) {
+  patchGameData: async function (userId, fieldName, value) {
     try {
-      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      const key = `${GAME_DATA_PREFIX}${userId}`;
       const exists = await redisClient.hExists(key, `${fieldName}`);
       if (exists) {
         await redisClient.hSet(key, `${fieldName}`, JSON.stringify(value));
@@ -155,12 +155,12 @@ export const gameRedis = {
   },
   /**
    * 범용 함수, Redis 데이터 테이블의 field 이름과 value 타입에 맞춘 key-value 객체를 통해 업데이트
-   * @param {uuid} uuid 유저의 UUID
+   * @param {userId} userId 유저의 userId
    * @param {Object} data Redis 테이블의 field를 key로 가지는 key-value 페어를 담은 객체 (예: {stage_id: 100, gold:50})
    */
-  patchGameDataEx: async function (uuid, data) {
+  patchGameDataEx: async function (userId, data) {
     try {
-      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      const key = `${GAME_DATA_PREFIX}${userId}`;
       const properties = Object.keys(data);
       for (let i = 0; i < properties.length; i++) {
         const exists = await redisClient.hExists(key, `${properties[i]}`);
@@ -221,7 +221,7 @@ export const gameRedis = {
   },
   patchGameDataGold: async function (uuid, newGold) {
     try {
-      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      const key = `${GAME_DATA_PREFIX}${userId}`;
       const exists = await redisClient.hExists(key, `${GAME_FIELD_GOLD}`);
       if (exists) {
         await redisClient.hSet(key, `${GAME_FIELD_GOLD}`, JSON.stringify(newGold));
@@ -230,9 +230,9 @@ export const gameRedis = {
       console.error('Error patching game data: ', err);
     }
   },
-  patchGameDataStage: async function (uuid, newStage) {
+  patchGameDataStage: async function (userId, newStage) {
     try {
-      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      const key = `${GAME_DATA_PREFIX}${userId}`;
       const exists = await redisClient.hExists(key, `${GAME_FIELD_GOLD}`);
       if (exists) {
         await redisClient.hSet(key, `${fieldName}`, JSON.stringify(newGold));
@@ -243,12 +243,12 @@ export const gameRedis = {
   },
   /**
    * 유저의 게임 데이터 삭제
-   * @param {uuid} uuid 유저의 UUID
+   * @param {userId} userId 유저의 userId
    */
-  removeGameData: async function (uuid) {
+  removeGameData: async function (userId) {
     try {
-      const key = `${GAME_DATA_PREFIX}${uuid}`;
-      await redisClient.del(`${USER_PREFIX}${uuid}`);
+      const key = `${GAME_DATA_PREFIX}${userId}`;
+      await redisClient.del(`${USER_PREFIX}${userId}`);
     } catch (err) {
       console.error('Error removing game data: ', err);
     }
