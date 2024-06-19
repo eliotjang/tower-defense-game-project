@@ -214,7 +214,7 @@ function gameLoop() {
       /* 몬스터가 죽었을 때 */
       score += monster.score;
       // sendEvent() 몬스터 처치 이벤트
-      sendEvent(21,{monsterId:monster.id,timeStamp:Date.now(),score:monster.score})
+      sendEvent(21, { monsterId: monster.id, score: monster.score });
       //monsterId:1001,timeStamp:3450387
       monsters.splice(i, 1);
     }
@@ -308,7 +308,7 @@ Promise.all([
   serverSocket.on('gameEnd', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('실패 메시지 입력');
+      alert('gameEnd 실패 메시지 입력');
     }
     console.log(data);
   });
@@ -316,7 +316,7 @@ Promise.all([
   serverSocket.on('monsterKill', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('실패 메시지 입력');
+      alert('monsterKill 실패 메시지 입력');
     }
     console.log(data);
   });
@@ -324,7 +324,7 @@ Promise.all([
   serverSocket.on('monsterPass', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('실패 메시지 입력');
+      alert('monsterPass 실패 메시지 입력');
     }
     console.log(data);
   });
@@ -332,7 +332,7 @@ Promise.all([
   serverSocket.on('goblinSpawn', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('실패 메시지 입력');
+      alert('goblinSpawn 실패 메시지 입력');
     }
     console.log(data);
   });
@@ -340,7 +340,7 @@ Promise.all([
   serverSocket.on('moveStage', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('실패 메시지 입력');
+      alert('moveStage 실패 메시지 입력');
     }
     console.log(data);
   });
