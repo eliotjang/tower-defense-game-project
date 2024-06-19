@@ -19,13 +19,14 @@ let baseHp = null; // 기지 체력
 let towerCost = towerData.data[0].cost; // 타워 구입 비용
 let numOfInitialTowers = null; // 초기 타워 개수
 let monsterLevel = 1; // 몬스터 레벨
-let monsterSpawnInterval = 2000; // 몬스터 생성 주기 (ms)
+let monsterSpawnInterval = null; // 몬스터 생성 주기 (ms)
 const monsters = [];
 const towers = [];
 
 let score = null; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
+let towerIndex = 0;
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
@@ -205,8 +206,8 @@ function gameLoop() {
       const isDestroyed = monster.move(base);
       if (isDestroyed) {
         /* 게임 오버 */
+        sendEvent(3, { timeStamp: Date.now(), score });
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
-        // sendEvent() // 게임 오버 이벤트
         location.reload();
       }
       monster.draw(ctx);
@@ -226,15 +227,14 @@ function initGame() {
   if (isInitGame) {
     return;
   }
-  console.log('gamestart after');
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
-    sendEvent(30, { towerData: { x, y } });
+    sendEvent(30, { towerData: { x, y }, towerIndex });
+    towerIndex++;
   }
-  console.log('loop after');
 
   let initialStageId = 100; // 최초 스테이지 정보
   Monster.setMonsterPoolByStageId(initialStageId);
@@ -255,10 +255,6 @@ Promise.all([
   Object.values(towerImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
   Object.values(monsterImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  /* 서버 접속 코드 (여기도 완성해주세요!) */
-  console.log('game.js 시작');
-
-  let somewhere;
   serverSocket = io('localhost:3000', {
     query: {
       clientVersion: CLIENT_VERSION,
@@ -268,7 +264,6 @@ Promise.all([
     },
   });
 
-  // 커넥션
   let userId = null;
   serverSocket.on('connection', async (data) => {
     console.log(data);
@@ -294,8 +289,8 @@ Promise.all([
       userGold = data.userGold;
       baseHp = data.baseHp;
       numOfInitialTowers = data.numOfInitialTowers;
-      score = data.score;
-
+      score = +data.score;
+      monsterSpawnInterval = data.monsterSpawnInterval;
       if (!isInitGame) {
         initGame();
       }
@@ -347,7 +342,6 @@ Promise.all([
 
   serverSocket.on('towerPurchase', (data) => {
     if (data.status === 'success') {
-      console.log('보유 금액', userGold);
       userGold = data.userGold;
       console.log('타워 구매 후 잔액', userGold);
       placeNewTower(data.towerData.x, data.towerData.y);
@@ -405,8 +399,8 @@ buyTowerButton.style.cursor = 'pointer';
 
 buyTowerButton.addEventListener('click', () => {
   const { x, y } = getRandomPositionNearPath(200);
-  // Redis 연동 시 userGold 삭제 후 Redis 데이터로 검증
-  sendEvent(31, { towerData: { x, y } });
+  sendEvent(31, { towerData: { x, y }, towerIndex });
+  towerIndex++;
 });
 
 document.body.appendChild(buyTowerButton);

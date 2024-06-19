@@ -1,13 +1,13 @@
 {
-    "name": "stage",
-    "version": "1.0.0",
-    "data": [
-      { "id": 100, "target_score": 2000, "reward": 1000 },
-      { "id": 101, "target_score": 4000, "reward": 2000 },
-      { "id": 102, "target_score": 6000, "reward": 3000 },
-      { "id": 103, "target_score": 8000, "reward": 4000 },
-      { "id": 104, "target_score": 10000, "reward": 5000 },
-      { "id": 105, "target_score": 12000, "reward": 6000 },
-      { "id": 106, "target_score": 14000, "reward": 7000 }
-    ]
-  }
+  "name": "stage",
+  "version": "1.0.0",
+  "data": [
+    { "id": 100, "target_score": 2000, "reward": 1000 },
+    { "id": 101, "target_score": 4000, "reward": 2000 },
+    { "id": 102, "target_score": 6000, "reward": 3000 },
+    { "id": 103, "target_score": 8000, "reward": 4000 },
+    { "id": 104, "target_score": 10000, "reward": 5000 },
+    { "id": 105, "target_score": 12000, "reward": 6000 },
+    { "id": 106, "target_score": 14000, "reward": 7000 }
+  ]
+}
