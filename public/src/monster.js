@@ -1,3 +1,4 @@
+
 import monsterData from '../assets/monster.json' with { type: 'json' };
 
 let monsterPool = null;
@@ -40,7 +41,8 @@ export class Monster {
    */
   static setMonsterPoolByStageId(stageId) {
     monsterPool = monsterData.data.filter((data) => data.stage_id == stageId);
-    console.log('몬스터 풀 업그레이드 됨:', monsterPool);
+    console.log('몬스터 풀 :', monsterPool);
+    
   }
 
   init(level) {

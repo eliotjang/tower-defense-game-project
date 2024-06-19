@@ -23,13 +23,13 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
       await gameRedis.patchGameDataEx(uuid, { score: addScore }); // 몬스터 존재시 점수 증감
       await gameRedis.patchGameDataEx(uuid, { kill_count: user.kill_count + 1 });
     } else {
-      socket.emit('monsterKill', { status: 'fail', message: `'몬스터 처치 검증 실패${monsterId}가 처치됨"` });
+      socket.emit('monsterKill', { status: 'fail', message: `'몬스터 처치 검증 실패${monsterId}가 처치됨 ${monsterList} 현재 스폰 정보` });
       return;
     }
     if (stageField < user.score) {
       await gameRedis.patchGameDataEx(uuid, { stage_id: user.stage_id + 1 });
     }
-    socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', timeStamp });
+    socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', user:user.score });
   } catch (error) {
     console.log({ errorMessage: error.message });
   }

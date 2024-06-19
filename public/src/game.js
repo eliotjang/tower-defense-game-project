@@ -3,7 +3,6 @@ import { Monster } from './monster.js';
 import { Tower } from './tower.js';
 import towerData from '../assets/tower.json' with { type: 'json' };
 import { CLIENT_VERSION } from './Constants.js';
-import stageData from '../assets/stage.json' with { type: 'json' };
 
 let serverSocket; // 서버 웹소켓 객체
 let sendEvent;
@@ -194,7 +193,7 @@ function gameLoop() {
   ctx.fillStyle = 'yellow';
   ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
   ctx.fillStyle = 'black';
-  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+  ctx.fillText(`현재 레벨: ${currentStage-99}`, 100, 200); // 최고 기록 표시
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
@@ -365,13 +364,14 @@ Promise.all([
     console.log(data);
   });
 
-  serverSocket.on('moveStage', (data) => {
+  serverSocket.on('moveStage', async (data) => {
     if (data.status === 'success') {
-      currentStage = data.targetScore;
+      targetScore = data.targetScore;
       Monster.setMonsterPoolByStageId(data.stageId);
-      console.log('스테이지 이동 허용.현재 스테이지:', data.stageId, '목표 점수:', data.targetScore);
+      console.log('스테이지 이동 허용.현재 스테이지:', data.stageId - 99, '목표 점수:', data.targetScore);
+      userGold += 1000; //레벨이 오르면 유저에게 1000원 제공
     } else {
-      alert('moveStage 실패 메시지 입력');
+      alert(data.message);
     }
     console.log(data);
   });
