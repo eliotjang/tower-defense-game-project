@@ -3,6 +3,8 @@ import { moveStageHandler } from './stage.handler.js';
 import { monsterKillHandler, monsterPassHandler, goblinSpawnHandler } from './monster.handler.js';
 import { towerInitialHandler, towerPurchaseHandler, towerRefundHandler, towerUpgradeHandler } from './tower.handler.js';
 
+
+
 const handlerMappings = {
   2: gameStart,
   3: gameEnd,

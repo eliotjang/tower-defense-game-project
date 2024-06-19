@@ -1,8 +1,10 @@
 import express from 'express';
 import redisClient from '../init/redis.js';
-import bcrypt from 'bcrypt';
+import bcrypt, { hash } from 'bcrypt';
 import configs from '../utils/configs.js';
 import jwt from 'jsonwebtoken';
+import { userRedis } from '../utils/redis.utils.js';
+import { v4 as uuidv4 } from 'uuid';
 const USER_KEY_PREFIX = 'user:';
 const accountRouter = express.Router();
 
@@ -42,13 +44,10 @@ const signUp = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     //해시처리
+    console.log(hashedPassword);
 
-    const saveUser = async (user_id, hashedPassword) => {
-      //redis 데이터베이스에 저장
-      const key = USER_KEY_PREFIX + user_id;
-      await redisClient.set(key, hashedPassword);
-    };
-    await saveUser(user_id, hashedPassword);
+    const UUID = uuidv4();
+    await userRedis.createUserData(UUID, user_id, hashedPassword);
 
     return res.status(200).json({ message: '회원가입 완료' });
   } catch (err) {
@@ -56,7 +55,6 @@ const signUp = async (req, res, next) => {
     return res.status(400).json({ errorMessage: err.message });
   }
 };
-
 const signIn = async (req, res) => {
   try {
     const jwtSecret = configs.jwtSecret;
@@ -64,11 +62,14 @@ const signIn = async (req, res) => {
 
     // Redis에서 사용자 정보 조회
     const key = USER_KEY_PREFIX + user_id;
-    const hashedPassword = await redisClient.get(key);
+
+    const hashedPassword = await redisClient.hGet(key, 'password');
+
+    // const hashedPassword = await redisClient.get(`user:${user_id}:password`);
     if (!hashedPassword) {
       return res.status(409).json({ errorMessage: '존재하지 않는 아이디 입니다.' });
     }
-    const passwordMatch = await bcrypt.compare(password, hashedPassword);
+    const passwordMatch = await bcrypt.compare(password, hashedPassword.replace(/"/g, ''));
     if (!passwordMatch) {
       return res.status(401).json({ errorMessage: '비밀번호가 일치하지 않습니다.' });
     }
@@ -78,7 +79,7 @@ const signIn = async (req, res) => {
     });
     res.status(200).json({ message: '로그인 성공 인증토큰 발행 완료', token: token });
   } catch (error) {
-    console.log("에러",error);
+    console.log('에러', error);
     res.status(500).json({ errorMessage: error.message });
   }
 };

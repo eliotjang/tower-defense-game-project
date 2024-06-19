@@ -1,7 +1,5 @@
 import { CLIENT_VERSION } from '../constants.js';
 import handlerMappings from './handlerMapping.js';
-import jwt from 'jsonwebtoken';
-import configs from '../utils/configs.js';
 
 
 export const handleConnection = (socket, userUUID) => {
@@ -31,3 +29,5 @@ export const handleEvent = (io, socket, data) => {
   // 유저에게 메시지 전송
   handler(data.userId, data.payload, socket);
 };
+
+

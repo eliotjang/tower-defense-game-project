@@ -4,11 +4,6 @@ import { Tower } from './tower.js';
 import towerData from '../assets/tower.json' with { type: 'json' };
 import { CLIENT_VERSION } from './Constants.js';
 
-if(!localStorage.getItem('accessToken')){
-  alert("로그인이 필요합니다");
-  window.location.href = 'index.html';
-}
-
 let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -229,7 +224,6 @@ function gameLoop() {
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
-
 function initGame() {
   if (isInitGame) {
     return;
@@ -275,7 +269,7 @@ Promise.all([
     },
   });
 
-  serverSocket.on('unauthorized', (message) => {
+  serverSocket.on('authorization', (message) => {
     alert(message);
     window.location.href = 'index.html';
   });

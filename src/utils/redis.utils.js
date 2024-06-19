@@ -1,7 +1,7 @@
 import redisClient from '../init/redis.js';
 
 const USER_PREFIX = 'user:';
-const USER_FIELD_USER_ID = 'user_id';
+const USER_FIELD_UUID = 'uuid';
 const USER_FIELD_PASSWORD = 'password';
 const GAME_DATA_PREFIX = 'game:';
 const GAME_FIELD_GOLD = 'user_gold';
@@ -22,12 +22,12 @@ export const userRedis = {
    */
   createUserData: async function (uuid, userId, hashedPassword) {
     try {
-      const key = `${USER_PREFIX}${uuid}`;
+      const key = `${USER_PREFIX}${userId}`;
       const data = await redisClient.hVals(key);
       if (data && data.length > 0) {
-        throw new Error('User data with the given uuid already exists.');
+        throw new Error('User data with the given userId already exists.');
       }
-      await redisClient.hSet(key, `${USER_FIELD_USER_ID}`, JSON.stringify(userId));
+      await redisClient.hSet(key, `${USER_FIELD_UUID}`, JSON.stringify(uuid));
       await redisClient.hSet(key, `${USER_FIELD_PASSWORD}`, JSON.stringify(hashedPassword));
     } catch (err) {
       console.error('Error creating user data: ', err);
