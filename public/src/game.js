@@ -23,7 +23,7 @@ let goblinMinInterval = null; // 고블린 생성 최소 주기 (ms)
 let goblinMaxInterval = null; // 고블린 생성 최대 주기 (ms)
 let currentStage = 100;
 let targetScore = 2000;
-let monsterLevel = currentStage-99; // 몬스터 레벨 = 스테이지 레벨
+let monsterLevel = currentStage - 99; // 몬스터 레벨 = 스테이지 레벨
 
 const monsters = [];
 const towers = [];
@@ -253,6 +253,7 @@ function placeBase() {
 
 function spawnMonster(isGoblin) {
   monsters.push(new Monster(monsterPath, monsterImages, isGoblin));
+  sendEvent(22, isGoblin);
 }
 
 function gameLoop() {
@@ -421,10 +422,10 @@ Promise.all([
     //console.log(data);
   });
 
-  serverSocket.on('monsterSpawn', (data) => {
+  serverSocket.on('monsterSpawnHandler', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('monsterSpawn 실패 메시지 입력');
+      alert('monsterSpawnHandler 실패 메시지 입력');
     }
     console.log(data);
   });
@@ -445,7 +446,7 @@ Promise.all([
       Monster.setMonsterPoolByStageId(data.stageId);
       console.log('스테이지 이동 허용.현재 스테이지:', data.stageId - 99, '목표 점수:', data.targetScore);
       userGold += 1000; //레벨이 오르면 유저에게 1000원 제공
-      monsterLevel = data.stageId-99; //스테이지 레벨 변경
+      monsterLevel = data.stageId - 99; //스테이지 레벨 변경
     } else {
       alert(data.message);
     }
