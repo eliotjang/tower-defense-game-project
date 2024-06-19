@@ -26,7 +26,6 @@ const towers = [];
 let score = null; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
-let towerIndex = 0;
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
@@ -231,9 +230,7 @@ function initGame() {
 
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
-    sendEvent(30, { towerData: { x, y }, towerIndex });
-    towerIndex++;
-    console.log(towerIndex);
+    sendEvent(30, { towerData: { x, y } });
   }
   console.log('loop after');
 

@@ -1,14 +1,15 @@
 import { getGameAssets } from '../init/assets.js';
 import { gameRedis } from '../utils/redis.utils.js';
 
-let index = 0;
+let towerIndex = 0;
 export const towerInitialHandler = async (uuid, payload, socket) => {
-  const { towerData, towerIndex } = payload;
+  const { towerData } = payload;
 
-  console.log('1', towerData, index);
-  await gameRedis.patchGameDataTower(uuid, towerData, index++);
+  console.log('1', towerData, towerIndex);
+  await gameRedis.patchGameDataTower(uuid, towerData, towerIndex++);
 
-  const user = await gameRedis.getGameData(uuid);
+  //console.log(uuid);
+  //const user = await gameRedis.getGameData(uuid);
   const towers = await gameRedis.getGameDataTowerList(uuid);
   console.log('2', towers);
 

@@ -145,7 +145,6 @@ export const gameRedis = {
         return ret;
       }
     } catch (err) {
-      console.error('Error getting game data: ', err);
       return null;
     }
   },
