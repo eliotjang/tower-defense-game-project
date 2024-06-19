@@ -178,6 +178,7 @@ function placeBase() {
 
 function spawnMonster(isGoblin) {
   monsters.push(new Monster(monsterPath, monsterImages, isGoblin));
+  sendEvent()
 }
 
 function gameLoop() {
@@ -346,10 +347,10 @@ Promise.all([
     console.log(data);
   });
 
-  serverSocket.on('monsterPass', (data) => {
+  serverSocket.on('monsterSpawn', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('monsterPass 실패 메시지 입력');
+      alert('monsterSpawn 실패 메시지 입력');
     }
     console.log(data);
   });

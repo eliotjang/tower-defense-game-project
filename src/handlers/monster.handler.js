@@ -38,15 +38,15 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
 //리펙터링
 //getUserData를 통해 모든 필드를 불러온다
 
-export const monsterPassHandler = (uuid, payload, socket) => {
+export const monsterSpawnHandler = (uuid, payload, socket) => {
   const { monsterId } = payload;
 
   if (false) {
-    socket.emit('monsterPass', { status: 'fail', message: '몬스터 통과 검증 실패' });
+    socket.emit('monsterSpawn', { status: 'fail', message: '몬스터 생성 검증 실패' });
     return;
   }
 
-  socket.emit('monsterPass', { status: 'success', message: '몬스터 통과 성공' });
+  socket.emit('monsterSpawn', { status: 'success', message: '몬스터 생성 검증 성공' });
 };
 
 export const goblinSpawnHandler = async (uuid, payload, socket) => {
