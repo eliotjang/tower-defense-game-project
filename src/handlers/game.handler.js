@@ -13,6 +13,8 @@ export const gameStart = async (uuid, payload, socket) => {
     throw new CustomError('게임 초기 정보 검증 실패', 'gameStart');
   }
 
+  await gameRedis.deleteGameDataTowerlist(uuid);
+
   await gameRedis.removeGameData(uuid);
   await gameRedis.createGameData(
     uuid,

@@ -30,6 +30,9 @@ let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
 let towerIndex = 0;
 
+const print = document.querySelector('.print');
+let printHTML = ``;
+
 // 이미지 로딩 파트
 const backgroundImage = new Image();
 backgroundImage.src = 'images/bg.webp';
@@ -187,8 +190,56 @@ function upgradeTower() {
     return;
   }
 
-  sendEvent(33, { towerData: { x: targetTower.x, y: targetTower.y, level } });
+  sendEvent(33, { towerData: { x: targetTower.x, y: targetTower.y }, towerLevel: level });
   targetTower.upgrade();
+}
+
+const onClickTower = () => {
+  if (towers.length === 0) {
+    alert('업그레이드할 타워가 없습니다.');
+    return;
+  }
+
+  const x = event.offsetX;
+  const y = event.offsetY;
+
+  let checkClick = false;
+  for (const tower of towers) {
+    const left = tower.x;
+    const right = tower.x + tower.width;
+    const top = tower.y;
+    const bottom = tower.y + tower.height;
+    if (left <= x && x <= right && top <= y && y <= bottom) {
+      if (tower.level === 5) {
+        alert('해당 타워가 최대 레벨에 도달했습니다.');
+        return;
+      }
+      if (userGold < towerData.data[tower.level].cost) {
+        alert(`해당 타워의 업그레이드 비용이 부족합니다. 필요 골드 : ${towerData.data[tower.level].cost}`);
+        return;
+      }
+
+      sendEvent(33, { towerData: { x: tower.x, y: tower.y }, towerLevel: tower.getLevel() });
+
+      tower.upgrade();
+      checkClick = true;
+      printHTML = ``;
+      print.innerHTML = printHTML;
+      canvas.removeEventListener('click', onClickTower);
+      break;
+    }
+  }
+
+  if (!checkClick) {
+    alert('타워를 클릭하세요');
+  }
+  printHTML = ``;
+  print.innerHTML = printHTML;
+  canvas.removeEventListener('click', onClickTower);
+};
+
+function upgradeTargetTower() {
+  canvas.addEventListener('click', onClickTower);
 }
 
 function placeBase() {
@@ -359,7 +410,7 @@ Promise.all([
     } else {
       alert('monsterKill 실패 메시지 입력');
     }
-    console.log(data);
+    //console.log(data);
   });
 
   serverSocket.on('monsterPass', (data) => {
@@ -417,6 +468,14 @@ Promise.all([
     }
     console.log(data);
   });
+  serverSocket.on('targetTowerUpgrade', (data) => {
+    if (data.status === 'success') {
+      userGold = data.userGold;
+    } else {
+      alert('실패 메시지 입력');
+    }
+    console.log(data);
+  });
 
   serverSocket.on('highscore', (data) => {
     // TODO: update highscore
@@ -457,7 +516,7 @@ buyTowerButton.addEventListener('click', () => {
     return;
   }
 
-  sendEvent(31, { towerData: { x, y, index: towerIndex } });
+  sendEvent(31, { towerData: { x, y }, towerIndex });
   towerIndex++;
 });
 
@@ -502,3 +561,20 @@ upgradeRandomTowerButton.addEventListener('click', () => {
 });
 
 document.body.appendChild(upgradeRandomTowerButton);
+
+const upgradeTargetTowerButton = document.createElement('button');
+upgradeTargetTowerButton.textContent = '타워 업그레이드(지정)';
+upgradeTargetTowerButton.style.position = 'absolute';
+upgradeTargetTowerButton.style.top = '65px';
+upgradeTargetTowerButton.style.right = '220px';
+upgradeTargetTowerButton.style.padding = '10px 20px';
+upgradeTargetTowerButton.style.fontSize = '16px';
+upgradeTargetTowerButton.style.cursor = 'pointer';
+
+upgradeTargetTowerButton.addEventListener('click', () => {
+  printHTML = `업그레이드할 타워를 클릭하세요`;
+  print.innerHTML = printHTML;
+  upgradeTargetTower();
+});
+
+document.body.appendChild(upgradeTargetTowerButton);

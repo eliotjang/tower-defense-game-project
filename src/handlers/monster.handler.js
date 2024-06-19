@@ -39,12 +39,12 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
     currentStageId = user.stage_id;
     monsterList = monster_unlock.data.find((item) => item.stage_id == currentStageId).monster;
     stageField = stage.data.find((item) => item.id == currentStageId).target_score;
-    console.log('현재 점수', user.score);
+    //console.log('현재 점수', user.score);
     if (monsterList.includes(monsterId)) {
       const addScore = user.score + score;
       await gameRedis.patchGameDataEx(uuid, { score: addScore }); // 몬스터 존재시 점수 증감
       inMemoryUserData.killLog.push({ monsterId, timeStamp }); //킬로그에 저장
-      await gameRedis.patchGameDataEx(uuid,{kill_count:user.kill_count+1})
+      await gameRedis.patchGameDataEx(uuid, { kill_count: user.kill_count + 1 });
     } else {
       console.log('처치 검증 실패', monsterId, '가 처치됨');
       socket.emit('monsterKill', { status: 'fail', message: '몬스터 처치 검증 실패' });

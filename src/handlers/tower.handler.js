@@ -18,14 +18,14 @@ export const towerInitialHandler = async (uuid, payload, socket) => {
 };
 
 export const towerPurchaseHandler = async (uuid, payload, socket) => {
-  const { towerData } = payload;
+  const { towerData, towerIndex } = payload;
   const { tower } = getGameAssets();
 
   if (!towerData) {
     throw new CustomError('타워 구매 검증 실패', 'towerPurchase');
   }
 
-  await gameRedis.patchGameDataTower(uuid, towerData, towerData.index);
+  await gameRedis.patchGameDataTower(uuid, towerData, towerIndex);
 
   const user = await gameRedis.getGameData(uuid);
   let userGold = user.user_gold;
@@ -33,6 +33,9 @@ export const towerPurchaseHandler = async (uuid, payload, socket) => {
   userGold -= tower.data[0].cost;
 
   await gameRedis.patchGameDataGold(uuid, userGold);
+
+  const data = await gameRedis.getGameDataTowerList(uuid);
+  console.log(data);
 
   socket.emit('towerPurchase', { status: 'success', message: '타워 구매 완료', towerData, userGold });
 };
@@ -59,7 +62,7 @@ export const towerRefundHandler = async (uuid, payload, socket) => {
 };
 
 export const towerUpgradeHandler = async (uuid, payload, socket) => {
-  const { towerData } = payload;
+  const { towerData, towerLevel } = payload;
   const { tower } = getGameAssets();
 
   //console.log(towerData);
@@ -73,7 +76,7 @@ export const towerUpgradeHandler = async (uuid, payload, socket) => {
     throw new CustomError('타워 업그레이드 검증 실패', 'towerUpgrade');
   }
 
-  userGold -= tower.data[towerData.level].cost;
+  userGold -= tower.data[towerLevel].cost;
   await gameRedis.patchGameDataGold(uuid, userGold);
 
   socket.emit('towerUpgrade', { status: 'success', message: '타워 업그레이드 성공', userGold });
