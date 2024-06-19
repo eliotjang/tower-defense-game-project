@@ -25,13 +25,8 @@ export class Tower {
     this.beamDuration = towerData.data[index].beamDuration; // 타워 광선 지속 시간
   }
 
-  /**
-   * TODO: 업그레이드 기능, 서버로 이벤트 전송
-   */
   upgrade() {
-    // 바로 하지말고 서버 갔다와서 성공 시에만 핸들링 하기
-    // this.setStats(this.level + 1);
-    // sendEvent()
+    this.setStats(this.level + 1);
   }
 
   draw(ctx, towerImage) {
