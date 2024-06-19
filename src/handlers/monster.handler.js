@@ -1,3 +1,5 @@
+import { gameRedis } from '../utils/redis.utils.js';
+
 export const monsterKillHandler = (uuid, payload, socket) => {
   const { score: currentScore } = payload;
 
@@ -20,9 +22,15 @@ export const monsterPassHandler = (uuid, payload, socket) => {
   socket.emit('monsterPass', { status: 'success', message: '몬스터 통과 성공' });
 };
 
-export const goblinSpawnHandler = (uuid, payload, socket) => {
+export const goblinSpawnHandler = async (uuid, payload, socket) => {
   const { spawnTime } = payload;
 
+  const gameData = await gameRedis.getGameData(uuid);
+  const elapsedTime = spawnTime - gameData.start_time;
+
+  if (elapsedTime) {
+    //
+  }
   if (false) {
     socket.emit('goblinSpawn', { status: 'fail', message: '보물 고블린 소환 검증 실패' });
     return;
