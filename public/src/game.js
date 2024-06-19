@@ -19,7 +19,7 @@ let baseHp = null; // 기지 체력
 let towerCost = towerData.data[0].cost; // 타워 구입 비용
 let numOfInitialTowers = null; // 초기 타워 개수
 let monsterLevel = 1; // 몬스터 레벨
-let monsterSpawnInterval = 2000; // 몬스터 생성 주기 (ms)
+let monsterSpawnInterval = null; // 몬스터 생성 주기 (ms)
 const monsters = [];
 const towers = [];
 
@@ -205,8 +205,8 @@ function gameLoop() {
       const isDestroyed = monster.move(base);
       if (isDestroyed) {
         /* 게임 오버 */
+        sendEvent(3, { timeStamp: Date.now(), score });
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
-        // sendEvent() // 게임 오버 이벤트
         location.reload();
       }
       monster.draw(ctx);
@@ -293,7 +293,8 @@ Promise.all([
       baseHp = data.baseHp;
       numOfInitialTowers = data.numOfInitialTowers;
       score = data.score;
-
+      monsterSpawnInterval = data.monsterSpawnInterval;
+      console.log(monsterSpawnInterval);
       if (!isInitGame) {
         initGame();
       }
