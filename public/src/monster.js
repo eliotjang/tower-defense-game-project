@@ -30,6 +30,7 @@ export class Monster {
     this.attackPower = monsterPool[this.monsterNumber].attack_power;
     this.hp = this.maxHp;
     this.score = monsterPool[this.monsterNumber].score;
+    this.id=monsterPool[this.monsterNumber].id; //몬스터의 id
     // this.level = level; // 몬스터 레벨
     // this.init(level);
   }
