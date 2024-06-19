@@ -3,7 +3,7 @@ import monsterData from '../assets/monster.json' with { type: 'json' };
 let monsterPool = null;
 
 export class Monster {
-  constructor(path, monsterImages) {
+  constructor(path, monsterImages, isGoblin) {
     // 생성자 안에서 몬스터의 속성을 정의한다고 생각하시면 됩니다!
     if (!path || path.length <= 0) {
       throw new Error('몬스터가 이동할 경로가 필요합니다.');
@@ -12,7 +12,12 @@ export class Monster {
       throw new Error('생성할 몬스터 목록이 없습니다.');
     }
 
-    this.monsterNumber = Math.floor(Math.random() * (monsterPool.length - 1)); // 고블린 제외
+    if (isGoblin) {
+      this.monsterNumber = monsterPool.length - 1;
+    } else {
+      this.monsterNumber = Math.floor(Math.random() * (monsterPool.length - 1)); // 고블린 제외
+    }
+
     this.path = path; // 몬스터가 이동할 경로
     this.currentIndex = 0; // 몬스터가 이동 중인 경로의 인덱스
     this.x = path[0].x; // 몬스터의 x 좌표 (최초 위치는 경로의 첫 번째 지점)

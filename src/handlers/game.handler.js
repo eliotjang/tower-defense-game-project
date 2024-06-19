@@ -1,12 +1,11 @@
 import { getGameAssets } from '../init/assets.js';
 import { gameRedis, highscoreRedis } from '../utils/redis.utils.js';
 
-let startTime;
-
 export const gameStart = async (uuid, payload, socket) => {
   const { timeStamp } = payload;
   const { game, stage } = getGameAssets();
-  const { userGold, baseHp, numOfInitialTowers, score, monsterSpawnInterval } = game.data;
+  const { userGold, baseHp, numOfInitialTowers, score, monsterSpawnInterval, goblinMinInterval, goblinMaxInterval } =
+    game.data;
   const stageId = stage.data[0].id;
 
   if (!timeStamp) {
@@ -14,25 +13,33 @@ export const gameStart = async (uuid, payload, socket) => {
     return;
   }
 
-  startTime = timeStamp;
-
-  await gameRedis.deleteGameDataTowerlist(uuid);
-
   await gameRedis.removeGameData(uuid);
-  await gameRedis.createGameData(uuid, userGold, stageId, score, numOfInitialTowers, baseHp);
+  await gameRedis.createGameData(
+    uuid,
+    userGold,
+    stageId,
+    score,
+    numOfInitialTowers,
+    baseHp,
+    timeStamp,
+    monsterSpawnInterval,
+    timeStamp,
+    0
+  );
   const data = await gameRedis.getGameData(uuid);
 
-  // Redis 저장 데이터
-  //console.log('Redis 데이터', data);
+  console.log('Redis 데이터', data);
 
   socket.emit('gameStart', {
     status: 'success',
     message: '게임 시작!',
     userGold: data.user_gold,
     baseHp: data.base_hp,
-    numOfInitialTowers,
-    score: data.score,
-    monsterSpawnInterval,
+    numOfInitialTowers: data.initial_towers,
+    score,
+    monsterSpawnInterval: data.spawn_interval,
+    goblinMinInterval,
+    goblinMaxInterval,
   });
 };
 
@@ -43,8 +50,9 @@ export const gameEnd = async (uuid, payload, socket) => {
   const { attack_power: attackPower, speed } = monster.data[0];
   console.log('attackPower', attackPower);
   console.log('speed', speed);
+  const gameData = await gameRedis.getGameData(uuid);
 
-  const elapsedTime = (timeStamp - startTime) / 1000;
+  const elapsedTime = (timeStamp - gameData.start_time) / 1000;
   console.log('경과 시간', elapsedTime);
 
   const userGameData = await gameRedis.getGameData(uuid);
