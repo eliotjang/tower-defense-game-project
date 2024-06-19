@@ -15,7 +15,7 @@ app.use(express.static('public'));
 app.use(express.json());
 // content-type이 form인 경우, body data 가져옴
 app.use(express.urlencoded({ extended: false }));
-app.use('/api',accountRouter);
+app.use('/api', accountRouter);
 initSocket(server);
 
 app.get('/', (req, res) => {
@@ -28,7 +28,6 @@ server.listen(PORT, async () => {
     await loadGameAssets();
     console.log('게임 에셋 로드 성공');
     const data = getGameAssets();
-    console.log(data);
   } catch (error) {
     console.error('게임 에셋 로드 실패');
   }

@@ -168,6 +168,11 @@ function refundTower(x, y) {
 }
 
 function upgradeTower() {
+  if (towers.length === 0) {
+    alert('업그레이드를 할 타워가 없습니다.');
+    return;
+  }
+
   const upgradeIndex = Math.floor(Math.random() * towers.length);
   const targetTower = towers[upgradeIndex];
   const level = targetTower.getLevel();
@@ -241,7 +246,7 @@ function gameLoop() {
       /* 몬스터가 죽었을 때 */
       score += monster.score;
       // sendEvent() 몬스터 처치 이벤트
-      sendEvent(21, { monsterId: monster.id});
+      sendEvent(21, { monsterId: monster.id });
       //monsterId:1001,timeStamp:3450387
       monsters.splice(i, 1);
     }
@@ -445,8 +450,13 @@ buyTowerButton.style.cursor = 'pointer';
 
 buyTowerButton.addEventListener('click', () => {
   const { x, y } = getRandomPositionNearPath(200);
-  //const isExist = towers.findIndex()
-  sendEvent(31, { towerData: { x, y }, towerIndex });
+
+  if (userGold < towerData.data[0].cost) {
+    alert(`타워 구매 비용이 부족합니다. 필요 골드 : ${towerData.data[0].cost}`);
+    return;
+  }
+
+  sendEvent(31, { towerData: { x, y, index: towerIndex } });
   towerIndex++;
 });
 

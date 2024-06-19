@@ -18,28 +18,21 @@ export const towerInitialHandler = async (uuid, payload, socket) => {
 };
 
 export const towerPurchaseHandler = async (uuid, payload, socket) => {
-  const { towerData, towerIndex } = payload;
+  const { towerData } = payload;
   const { tower } = getGameAssets();
 
-  await gameRedis.patchGameDataTower(uuid, towerData, towerIndex);
+  if (!towerData) {
+    throw new CustomError('타워 구매 검증 실패', 'towerPurchase');
+  }
+
+  await gameRedis.patchGameDataTower(uuid, towerData, towerData.index);
 
   const user = await gameRedis.getGameData(uuid);
   let userGold = user.user_gold;
 
-  let verification = false;
-  if (userGold >= tower.data[0].cost) {
-    userGold -= tower.data[0].cost;
-    verification = true;
-    await gameRedis.patchGameDataGold(uuid, userGold);
-  }
+  userGold -= tower.data[0].cost;
 
-  if (!verification) {
-    socket.emit('towerPurchase', { status: 'fail', message: '타워 구매 검증 실패' });
-    return;
-  }
-
-  //const test = await gameRedis.getGameDataTowerList(uuid);
-  //console.log(test);
+  await gameRedis.patchGameDataGold(uuid, userGold);
 
   socket.emit('towerPurchase', { status: 'success', message: '타워 구매 완료', towerData, userGold });
 };
@@ -54,8 +47,7 @@ export const towerRefundHandler = async (uuid, payload, socket) => {
   const targetTower = await gameRedis.getGameDataTower(uuid, towerData);
 
   if (targetTower.constructor === Object && Object.keys(targetTower).length === 0) {
-    socket.emit('towerRefund', { status: 'fail', message: '타워 환불 검증 실패' });
-    return;
+    throw new CustomError('타워 환불 검증 실패', 'towerRefund');
   }
 
   userGold += tower.data[0].cost;
@@ -78,8 +70,7 @@ export const towerUpgradeHandler = async (uuid, payload, socket) => {
   const targetTower = await gameRedis.getGameDataTower(uuid, towerData);
 
   if (targetTower.constructor === Object && Object.keys(targetTower).length === 0) {
-    socket.emit('towerRefund', { status: 'fail', message: '타워 업그레이드 검증 실패' });
-    return;
+    throw new CustomError('타워 업그레이드 검증 실패', 'towerUpgrade');
   }
 
   userGold -= tower.data[towerData.level].cost;
