@@ -1,6 +1,6 @@
 import { gameStart, gameEnd } from './game.handler.js';
 import { moveStageHandler } from './stage.handler.js';
-import { monsterKillHandler, monsterPassHandler, goblinSpawnHandler } from './monster.handler.js';
+import { monsterKillHandler, monsterSpawnHandler, goblinSpawnHandler } from './monster.handler.js';
 import { towerInitialHandler, towerPurchaseHandler, towerRefundHandler, towerUpgradeHandler } from './tower.handler.js';
 
 const handlerMappings = {
@@ -8,7 +8,7 @@ const handlerMappings = {
   3: gameEnd,
   11: moveStageHandler,
   21: monsterKillHandler,
-  22: monsterPassHandler,
+  22: monsterSpawnHandler,
   23: goblinSpawnHandler,
   30: towerInitialHandler,
   31: towerPurchaseHandler,

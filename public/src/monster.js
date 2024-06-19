@@ -30,8 +30,7 @@ export class Monster {
     this.attackPower = monsterPool[this.monsterNumber].attack_power;
     this.hp = this.maxHp;
     this.score = monsterPool[this.monsterNumber].score;
-    this.id=monsterPool[this.monsterNumber].id; //몬스터의 id
-    // this.level = level; // 몬스터 레벨
+    this.id = monsterPool[this.monsterNumber].id; //몬스터의 id
     // this.init(level);
   }
 
@@ -40,7 +39,8 @@ export class Monster {
    * @param {Number} stageId 스테이지 ID
    */
   static setMonsterPoolByStageId(stageId) {
-    monsterPool = monsterData.data.filter((data) => data.stage_id === stageId);
+    monsterPool = monsterData.data.filter((data) => data.stage_id == stageId);
+    console.log('몬스터 풀 :', monsterPool);
   }
 
   init(level) {
@@ -77,6 +77,6 @@ export class Monster {
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     ctx.font = '12px Arial';
     ctx.fillStyle = 'white';
-    ctx.fillText(`(레벨 ${this.level}) ${this.hp}/${this.maxHp}`, this.x, this.y - 5);
+    ctx.fillText(`(레벨 ${this.id % 10}) ${this.hp}/${this.maxHp}`, this.x, this.y - 5);
   }
 }
