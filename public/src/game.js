@@ -166,8 +166,8 @@ function placeBase() {
   base.draw(ctx, baseImage);
 }
 
-function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages));
+function spawnMonster(isGoblin) {
+  monsters.push(new Monster(monsterPath, monsterImages, isGoblin));
 }
 
 function gameLoop() {
@@ -207,8 +207,8 @@ function gameLoop() {
       if (isDestroyed) {
         /* 게임 오버 */
         sendEvent(3, { timeStamp: Date.now(), score });
-        alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
         location.reload();
+        alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
       }
       monster.draw(ctx);
     } else {
@@ -237,11 +237,24 @@ function initGame() {
   let initialStageId = 100; // 최초 스테이지 정보
   Monster.setMonsterPoolByStageId(initialStageId);
 
-  setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
+  setInterval(() => {
+    spawnMonster(false);
+  }, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
 
   placeBase(); // 기지 배치
+  setGoblinSpawnRequest(5000, 10000); // 고블린 스폰 인터벌 설정
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
+}
+
+async function setGoblinSpawnRequest(minInterval, maxInterval) {
+  const diff = maxInterval - minInterval;
+  const interval = Math.floor(Math.random() * diff + minInterval);
+  setTimeout(() => {
+    console.log('GOBLIN SPAWN REQUEST');
+    sendEvent(23, { spawnTime: Date.now() });
+    setGoblinSpawnRequest(minInterval, maxInterval);
+  }, interval);
 }
 
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
@@ -324,6 +337,7 @@ Promise.all([
 
   serverSocket.on('goblinSpawn', (data) => {
     if (data.status === 'success') {
+      spawnMonster(true);
     } else {
       alert('실패 메시지 입력');
     }
