@@ -65,11 +65,12 @@ const signIn = async (req, res) => {
 
     const hashedPassword = await redisClient.hGet(key, 'password');
 
-    // const hashedPassword = await redisClient.get(`user:${user_id}:password`);
     if (!hashedPassword) {
       return res.status(409).json({ errorMessage: '존재하지 않는 아이디 입니다.' });
     }
-    const passwordMatch = await bcrypt.compare(password, hashedPassword.replace(/"/g, ''));
+    const sanitizedPassword = hashedPassword.replace(/"/g, '');
+    //hGet 메서드로 받아온 hashedPassword에서 ("",'')를 제거한 값을 저장
+    const passwordMatch = await bcrypt.compare(password, sanitizedPassword);
     if (!passwordMatch) {
       return res.status(401).json({ errorMessage: '비밀번호가 일치하지 않습니다.' });
     }
