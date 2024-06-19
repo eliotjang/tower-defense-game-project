@@ -27,7 +27,6 @@ const registerHandler = (io) => {
       socket.disconnect(true);
     }
 
-
     handleConnection(socket, user);
 
     // 모든 서비스 이벤트 처리

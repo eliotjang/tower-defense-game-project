@@ -1,7 +1,6 @@
 import { CLIENT_VERSION } from '../constants.js';
 import handlerMappings from './handlerMapping.js';
 
-
 export const handleConnection = (socket, userUUID) => {
   socket.emit('connection', { uuid: userUUID });
 };
@@ -29,5 +28,3 @@ export const handleEvent = (io, socket, data) => {
   // 유저에게 메시지 전송
   handler(data.userId, data.payload, socket);
 };
-
-
