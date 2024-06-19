@@ -19,15 +19,16 @@ export const gameStart = async (uuid, payload, socket) => {
   await gameRedis.createGameData(uuid, userGold, stageId, score, numOfInitialTowers, baseHp);
   const data = await gameRedis.getGameData(uuid);
 
-  //console.log('Redis 데이터', data);
+  // Redis 저장 데이터
+  // console.log('Redis 데이터', data);
 
   socket.emit('gameStart', {
     status: 'success',
     message: '게임 시작!',
-    userGold,
-    baseHp,
+    userGold: data.user_gold,
+    baseHp: data.base_hp,
     numOfInitialTowers,
-    score,
+    score: data.score,
     monsterSpawnInterval,
   });
 };

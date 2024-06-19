@@ -224,7 +224,6 @@ function initGame() {
   if (isInitGame) {
     return;
   }
-  console.log('gamestart after');
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -232,7 +231,6 @@ function initGame() {
     const { x, y } = getRandomPositionNearPath(200);
     sendEvent(30, { towerData: { x, y } });
   }
-  console.log('loop after');
 
   let initialStageId = 100; // 최초 스테이지 정보
   Monster.setMonsterPoolByStageId(initialStageId);
@@ -253,10 +251,6 @@ Promise.all([
   Object.values(towerImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
   Object.values(monsterImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  /* 서버 접속 코드 (여기도 완성해주세요!) */
-  console.log('game.js 시작');
-
-  let somewhere;
   serverSocket = io('localhost:3000', {
     query: {
       clientVersion: CLIENT_VERSION,
@@ -266,7 +260,6 @@ Promise.all([
     },
   });
 
-  // 커넥션
   let userId = null;
   serverSocket.on('connection', async (data) => {
     console.log(data);
@@ -292,7 +285,7 @@ Promise.all([
       userGold = data.userGold;
       baseHp = data.baseHp;
       numOfInitialTowers = data.numOfInitialTowers;
-      score = data.score;
+      score = +data.score;
       monsterSpawnInterval = data.monsterSpawnInterval;
       console.log(monsterSpawnInterval);
       if (!isInitGame) {
@@ -346,7 +339,6 @@ Promise.all([
 
   serverSocket.on('towerPurchase', (data) => {
     if (data.status === 'success') {
-      console.log('보유 금액', userGold);
       userGold = data.userGold;
       console.log('타워 구매 후 잔액', userGold);
       placeNewTower(data.towerData.x, data.towerData.y);
@@ -404,7 +396,6 @@ buyTowerButton.style.cursor = 'pointer';
 
 buyTowerButton.addEventListener('click', () => {
   const { x, y } = getRandomPositionNearPath(200);
-  // Redis 연동 시 userGold 삭제 후 Redis 데이터로 검증
   sendEvent(31, { towerData: { x, y } });
 });
 
