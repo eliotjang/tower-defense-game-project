@@ -21,12 +21,12 @@ export const monsterPassHandler = (uuid, payload, socket) => {
 };
 
 export const goblinSpawnHandler = (uuid, payload, socket) => {
-  const { goblinId, spawnTime } = payload;
+  const { spawnTime } = payload;
 
   if (false) {
     socket.emit('goblinSpawn', { status: 'fail', message: '보물 고블린 소환 검증 실패' });
     return;
   }
 
-  socket.emit('goblinSpawn', { status: 'success', message: '보물 고블린 소환', score });
+  socket.emit('goblinSpawn', { status: 'success', message: '보물 고블린 소환' });
 };
