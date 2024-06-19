@@ -5,7 +5,7 @@ export const handleError = async (error, socket, uuid) => {
     console.error(error);
     await gameRedis.removeGameData(uuid);
     // TODO: remove tower data
-    socket.emit('error', { status: 'fail', message: error.message });
+    socket.emit(error.namespace || 'error', { status: 'fail', message: error.message });
   } catch (err) {
     console.error(err);
   } finally {
