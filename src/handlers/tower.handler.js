@@ -5,13 +5,10 @@ let towerIndex = 0;
 export const towerInitialHandler = async (uuid, payload, socket) => {
   const { towerData } = payload;
 
-  console.log('1', towerData, towerIndex);
   await gameRedis.patchGameDataTower(uuid, towerData, towerIndex++);
 
-  //console.log(uuid);
-  //const user = await gameRedis.getGameData(uuid);
-  const towers = await gameRedis.getGameDataTowerList(uuid);
-  console.log('2', towers);
+  // 타워 좌표 저장 확인
+  // await gameRedis.getGameDataTowerList(uuid);
 
   if (!towerData) {
     socket.emit('towerInitial', { status: 'fail', message: '최초 타워 추가 검증 실패' });
@@ -25,10 +22,11 @@ export const towerPurchaseHandler = async (uuid, payload, socket) => {
   const { towerData } = payload;
   const { tower } = getGameAssets();
 
-  const user = await gameRedis.getGameData(uuid);
-  let userGold = user.user_gold;
+  //const user = await gameRedis.getGameData(uuid);
+  console.log(uuid);
+  //let userGold = user.user_gold;
 
-  let verification = false;
+  /* let verification = false;
   if (userGold >= tower.data[0].cost) {
     userGold -= tower.data[0].cost;
     verification = true;
@@ -40,7 +38,7 @@ export const towerPurchaseHandler = async (uuid, payload, socket) => {
     return;
   }
 
-  socket.emit('towerPurchase', { status: 'success', message: '타워 구매 완료', towerData, userGold });
+  socket.emit('towerPurchase', { status: 'success', message: '타워 구매 완료', towerData, userGold }); */
 };
 
 export const towerRefundHandler = (uuid, payload, socket) => {
