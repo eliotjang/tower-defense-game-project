@@ -167,6 +167,25 @@ function refundTower(x, y) {
   towers.splice(index, 1);
 }
 
+function upgradeTower() {
+  const upgradeIndex = Math.floor(Math.random() * towers.length);
+  const targetTower = towers[upgradeIndex];
+  const level = targetTower.getLevel();
+
+  if (level === 5) {
+    alert('해당 타워가 최대 레벨에 도달했습니다.');
+    return;
+  }
+
+  if (userGold < towerData.data[level].cost) {
+    alert(`해당 타워의 업그레이드 비용이 부족합니다. 필요 골드 : ${towerData.data[level].cost}`);
+    return;
+  }
+
+  sendEvent(33, { towerData: { x: targetTower.x, y: targetTower.y, level } });
+  targetTower.upgrade();
+}
+
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
   base = new Base(lastPoint.x, lastPoint.y, baseHp);
@@ -385,6 +404,7 @@ Promise.all([
 
   serverSocket.on('towerUpgrade', (data) => {
     if (data.status === 'success') {
+      userGold = data.userGold;
     } else {
       alert('실패 메시지 입력');
     }
@@ -453,3 +473,18 @@ refundTowerButton.addEventListener('click', () => {
 });
 
 document.body.appendChild(refundTowerButton);
+
+const upgradeRandomTowerButton = document.createElement('button');
+upgradeRandomTowerButton.textContent = '타워 업그레이드(랜덤)';
+upgradeRandomTowerButton.style.position = 'absolute';
+upgradeRandomTowerButton.style.top = '65px';
+upgradeRandomTowerButton.style.right = '10px';
+upgradeRandomTowerButton.style.padding = '10px 20px';
+upgradeRandomTowerButton.style.fontSize = '16px';
+upgradeRandomTowerButton.style.cursor = 'pointer';
+
+upgradeRandomTowerButton.addEventListener('click', () => {
+  upgradeTower();
+});
+
+document.body.appendChild(upgradeRandomTowerButton);
