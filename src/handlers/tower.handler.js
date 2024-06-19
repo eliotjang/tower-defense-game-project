@@ -6,7 +6,7 @@ export const towerInitialHandler = async (uuid, payload, socket) => {
   const { towerData, towerIndex } = payload;
 
   console.log('1', towerData, index);
-  await gameRedis.patchGameDataTowerTest(uuid, towerData, index++);
+  await gameRedis.patchGameDataTower(uuid, towerData, index++);
 
   const user = await gameRedis.getGameData(uuid);
   const towers = await gameRedis.getGameDataTowerList(uuid);
