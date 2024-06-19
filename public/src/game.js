@@ -5,6 +5,7 @@ import towerData from '../assets/tower.json' with { type: 'json' };
 import { CLIENT_VERSION } from './Constants.js';
 
 let serverSocket; // 서버 웹소켓 객체
+let sendEvent;
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -152,12 +153,7 @@ function placeInitialTower(x, y) {
   tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
-function placeNewTower() {
-  /* 
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요! 
-  */
-  const { x, y } = getRandomPositionNearPath(200);
+function placeNewTower(x, y) {
   const tower = new Tower(x, y);
   towers.push(tower);
   tower.draw(ctx, towerImages[tower.getLevel()]);
@@ -228,8 +224,7 @@ function initGame() {
   if (isInitGame) {
     return;
   }
-  sendEvent(2, { timeStamp: Date.now() });
-
+  console.log('gamestart after');
   monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -237,16 +232,18 @@ function initGame() {
     const { x, y } = getRandomPositionNearPath(200);
     sendEvent(30, { towerData: { x, y } });
   }
+  console.log('loop after');
 
   let initialStageId = 100; // 최초 스테이지 정보
   Monster.setMonsterPoolByStageId(initialStageId);
 
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
 
+  placeBase(); // 기지 배치
+  gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
 
-let sendEvent;
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
@@ -269,6 +266,23 @@ Promise.all([
     },
   });
 
+  // 커넥션
+  let userId = null;
+  serverSocket.on('connection', async (data) => {
+    console.log(data);
+    userId = data.uuid;
+    sendEvent(2, { timeStamp: Date.now() });
+  });
+
+  serverSocket.on('towerInitial', (data) => {
+    if (data.status === 'success') {
+      placeInitialTower(data.towerData.x, data.towerData.y); // 설정된 초기 타워 개수만큼 사전에 타워 배치
+    } else {
+      alert('최초 타워 추가 검증 실패');
+    }
+    console.log(data);
+  });
+
   serverSocket.on('authorization', (message) => {
     alert(message);
     window.location.href = 'index.html';
@@ -279,9 +293,10 @@ Promise.all([
       baseHp = data.baseHp;
       numOfInitialTowers = data.numOfInitialTowers;
       score = data.score;
-      placeBase(); // 기지 배치
 
-      gameLoop(); // 게임 루프 최초 실행
+      if (!isInitGame) {
+        initGame();
+      }
     } else {
       alert('게임 초기 정보 검증에 실패했습니다.');
     }
@@ -328,20 +343,16 @@ Promise.all([
     console.log(data);
   });
 
-  serverSocket.on('towerInitial', (data) => {
-    if (data.status === 'success') {
-      placeInitialTower(data.towerData.x, data.towerData.y); // 설정된 초기 타워 개수만큼 사전에 타워 배치
-    } else {
-      alert('최초 타워 추가 검증 실패');
-    }
-    console.log(data);
-  });
-
   serverSocket.on('towerPurchase', (data) => {
     if (data.status === 'success') {
+      console.log('보유 금액', userGold);
+      userGold = data.userGold;
+      console.log('타워 구매 후 잔액', userGold);
+      placeNewTower(data.towerData.x, data.towerData.y);
     } else {
-      alert('실패 메시지 입력');
+      alert('타워 구매 검증 실패');
     }
+
     console.log(data);
   });
 
@@ -361,14 +372,8 @@ Promise.all([
     console.log(data);
   });
 
-  // 커넥션
-  let userId = null;
-  serverSocket.on('connection', async (data) => {
+  serverSocket.on('highscore', (data) => {
     console.log(data);
-    userId = data.uuid;
-    if (!isInitGame) {
-      initGame();
-    }
   });
 
   sendEvent = (handlerId, payload) => {
@@ -396,6 +401,10 @@ buyTowerButton.style.padding = '10px 20px';
 buyTowerButton.style.fontSize = '16px';
 buyTowerButton.style.cursor = 'pointer';
 
-buyTowerButton.addEventListener('click', placeNewTower);
+buyTowerButton.addEventListener('click', () => {
+  const { x, y } = getRandomPositionNearPath(200);
+  // Redis 연동 시 userGold 삭제 후 Redis 데이터로 검증
+  sendEvent(31, { towerData: { x, y } });
+});
 
 document.body.appendChild(buyTowerButton);

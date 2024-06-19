@@ -172,12 +172,59 @@ export const gameRedis = {
       console.error('Error patching game data: ', err);
     }
   },
-  patchGameDataGold: async function (userId, newGold) {
+  // 임시
+  getGameDataTower: async function (uuid) {
+    try {
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      const data = await redisClient.hVals(key);
+      if (data && data.length > 0) {
+        return {
+          [GAME_FIELD_TOWER]: JSON.parse(data[3]),
+        };
+      }
+    } catch (err) {
+      console.error('Error getting game data: ', err);
+      return null;
+    }
+  },
+  // 임시
+  patchGameDataTower: async function (uuid, towerData) {
+    try {
+      const tower = await this.getGameDataTower(uuid);
+      const baseData = tower[GAME_FIELD_TOWER];
+
+      console.log('baseData : ', baseData);
+
+      if (baseData !== '[]') {
+        console.log('베이스 없음');
+        const key = `${GAME_DATA_PREFIX}${uuid}`;
+        const exists = await redisClient.hExists(key, `${GAME_FIELD_TOWER}`);
+        if (exists) {
+          console.log('존재함');
+          await redisClient.hSet(key, `${GAME_FIELD_TOWER}`, JSON.stringify(towerData));
+        }
+      } else {
+        console.log('베이스 있음');
+        /* const key = `${GAME_DATA_PREFIX}${uuid}`;
+        const exists = await redisClient.hExists(key, `${GAME_FIELD_TOWER}`);
+        if (exists) {
+          const newData = JSON.parse(baseData[GAME_FIELD_TOWER]);
+          console.log('newData', newData);
+          newData.push(towerData);
+          console.log('pushed newData', newData);
+          await redisClient.hSet(key, `${GAME_FIELD_TOWER}`, JSON.stringify(newData));
+        } */
+      }
+    } catch (err) {
+      console.error('Error patching game data: ', err);
+    }
+  },
+  patchGameDataGold: async function (uuid, newGold) {
     try {
       const key = `${GAME_DATA_PREFIX}${userId}`;
       const exists = await redisClient.hExists(key, `${GAME_FIELD_GOLD}`);
       if (exists) {
-        await redisClient.hSet(key, `${fieldName}`, JSON.stringify(newGold));
+        await redisClient.hSet(key, `${GAME_FIELD_GOLD}`, JSON.stringify(newGold));
       }
     } catch (err) {
       console.error('Error patching game data: ', err);
@@ -204,6 +251,123 @@ export const gameRedis = {
       await redisClient.del(`${USER_PREFIX}${userId}`);
     } catch (err) {
       console.error('Error removing game data: ', err);
+    }
+  },
+};
+
+export const highscoreRedis = {
+  /**
+   * 주어진 인자를 기반으로 유저의 최고 점수 정보 갱신을 시도합니다.
+   * @param {uuid} uuid 유저의 uuid
+   * @param {score} score 유저의 점수
+   * @return boolean 배열 (0: 개인 최고 기록 갱신 여부, 1: 전체 최고 기록 갱신 여부), 혹은 에러 시 null 반환
+   */
+  createHighscoreData: async function (uuid, score) {
+    try {
+      const key = `${HIGHSCORE_PREFIX}all`;
+      const highscoreData = await redisClient.sendCommand(['ZREVRANGE', key, '0', '-1', 'WITHSCORES']);
+      if (!highscoreData || highscoreData.length === 0) {
+        // 최고 점수 내역이 없음
+        await redisClient.zAdd(key, [
+          {
+            score: score,
+            value: `${uuid}`,
+          },
+        ]);
+        return [true, true];
+      }
+
+      if (score > +highscoreData[1]) {
+        // 전체 최고 점수 갱신
+        await redisClient.zAdd(key, [
+          {
+            score: score,
+            value: `${uuid}`,
+          },
+        ]);
+        return [true, true];
+      }
+
+      const index = highscoreData.findIndex((data) => data === uuid);
+      if (index === -1) {
+        // 개인 최고 점수 기록이 없음
+        await redisClient.zAdd(key, [
+          {
+            score: score,
+            value: `${uuid}`,
+          },
+        ]);
+        return [true, false];
+      }
+
+      if (score > highscoreData[index + 1]) {
+        // 개인 최고 기록보다 높음
+        await redisClient.zAdd(key, [
+          {
+            score: score,
+            value: `${uuid}`,
+          },
+        ]);
+        return [true, false];
+      }
+
+      return [false, false];
+    } catch (err) {
+      console.error('Error creating highscore data: ', err);
+      return null;
+    }
+  },
+  /**
+   * 최고 점수 유저의 점수 정보 조회
+   * @returns 최고 점수 유저의 uuid와 score를 담은 객체 (예: {uuid:'waf2-2r01-...', score: 1600}), 혹은 에러 시 null 반환
+   */
+  getHighscoreData: async function () {
+    try {
+      const key = `${HIGHSCORE_PREFIX}all`;
+      // const data = await redisClient.zRange(key, 0, -1, 'WITHSCORES');
+      const data = await redisClient.sendCommand(['ZREVRANGE', key, '0', '-1', 'WITHSCORES']);
+      // const score = await redisClient.get(key, `${data[0]}`);
+
+      if (!data || data.length === 0) {
+        throw new Error('No highscore data exists');
+      }
+      return {
+        uuid: data[0],
+        [GAME_FIELD_SCORE]: +data[1],
+      };
+    } catch (err) {
+      console.error('Error getting highscore data: ', err);
+      return null;
+    }
+  },
+  /**
+   * 특정 유저의 최고 점수 기록을 확인합니다.
+   * @param {uuid} uuid 유저의 uuid
+   * @returns 유저의 highscore 데이터를 담은 객체 (예: {uuid:'waf2-2r01-...', score: 1600}), 혹은 에러 시 null 반환
+   */
+  getUserHighscoreData: async function (uuid) {
+    try {
+      const key = `${HIGHSCORE_PREFIX}all`;
+      // const data = await redisClient.zRange(key, 0, -1, 'WITHSCORES');
+      const data = await redisClient.sendCommand(['ZREVRANGE', key, '0', '-1', 'WITHSCORES']);
+      // const score = await redisClient.get(key, `${data[0]}`);
+
+      if (!data || data.length === 0) {
+        throw new Error('No highscore data exists');
+      }
+
+      const index = data.findIndex((item) => item === `${uuid}`);
+      if (index === -1) {
+        throw new Error('No highscore data for the user.');
+      }
+
+      return {
+        uuid: data[index],
+        [GAME_FIELD_SCORE]: +data[index + 1],
+      };
+    } catch (err) {
+      console.error('Error getting highscore data: ', err);
+      return null;
     }
   },
 };
