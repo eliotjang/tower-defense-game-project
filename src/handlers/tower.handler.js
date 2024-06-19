@@ -3,7 +3,7 @@ import { gameRedis } from '../utils/redis.utils.js';
 
 let index = 0;
 export const towerInitialHandler = async (uuid, payload, socket) => {
-  const { towerData } = payload;
+  const { towerData, towerIndex } = payload;
 
   console.log('1', towerData, index);
   await gameRedis.patchGameDataTowerTest(uuid, towerData, index++);
