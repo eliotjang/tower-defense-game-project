@@ -10,6 +10,7 @@ const GAME_FIELD_SCORE = 'score';
 const GAME_FIELD_TOWER = 'tower_coordinates';
 const GAME_FIELD_INITIAL_TOWERS = 'initial_towers';
 const GAME_FIELD_BASE_HP = 'base_hp';
+const TOWERS_PREFIX = 'towers:';
 // const GAME_FIELD_HIGHSCORE = 'highscore';
 const HIGHSCORE_PREFIX = 'highscore:';
 
@@ -70,8 +71,9 @@ export const userRedis = {
         key = key.substring(USER_PREFIX.length);
 
         acc[idx] = {
-          [USER_FIELD_USER_ID]: key,
-          [USER_FIELD_PASSWORD]: data[0],
+          uuid: key,
+          [USER_FIELD_USER_ID]: data[0],
+          [USER_FIELD_PASSWORD]: data[1],
         };
 
         return acc;
@@ -99,16 +101,27 @@ export const gameRedis = {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
       const data = await redisClient.hVals(key);
+      await redisClient.watch(key);
+      const transaction = redisClient.multi();
       if (!data || data.length === 0) {
-        await redisClient.hSet(key, `${GAME_FIELD_GOLD}`, `${gold}`);
-        await redisClient.hSet(key, `${GAME_FIELD_STAGE}`, `${stageId}`);
-        await redisClient.hSet(key, `${GAME_FIELD_SCORE}`, `${score}`);
-        await redisClient.hSet(key, `${GAME_FIELD_TOWER}`, '[]');
-        await redisClient.hSet(key, `${GAME_FIELD_INITIAL_TOWERS}`, `${numOfInitialTowers}`);
-        await redisClient.hSet(key, `${GAME_FIELD_BASE_HP}`, `${baseHp}`);
+        transaction.hSet(key, `${GAME_FIELD_GOLD}`, `${gold}`);
+        transaction.hSet(key, `${GAME_FIELD_STAGE}`, `${stageId}`);
+        transaction.hSet(key, `${GAME_FIELD_SCORE}`, `${score}`);
+        // transaction.hSet(key, `${GAME_FIELD_TOWER}`, '[]');
+        transaction.hSet(key, `${GAME_FIELD_INITIAL_TOWERS}`, `${numOfInitialTowers}`);
+        transaction.hSet(key, `${GAME_FIELD_BASE_HP}`, `${baseHp}`);
+        while (true) {
+          const result = await transaction.exec();
+          if (result) {
+            console.log('createGameData successful.');
+            break;
+          }
+        }
       }
     } catch (err) {
       console.error('Error creating game data: ', err);
+    } finally {
+      await redisClient.unwatch();
     }
   },
   /**
@@ -119,17 +132,17 @@ export const gameRedis = {
   getGameData: async function (uuid) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
-      const data = await redisClient.hVals(key);
+      const data = await redisClient.hGetAll(key);
+      console.log('NO DATA? ', data);
       if (data && data.length > 0) {
-        return {
-          uuid: uuid,
-          [GAME_FIELD_GOLD]: +data[0],
-          [GAME_FIELD_STAGE]: +data[1],
-          [GAME_FIELD_SCORE]: +data[2],
-          [GAME_FIELD_TOWER]: JSON.parse(data[3]),
-          [GAME_FIELD_INITIAL_TOWERS]: +data[4],
-          [GAME_FIELD_BASE_HP]: +data[5],
-        };
+        console.log('passed');
+        const ret = {};
+        ret.uuid = uuid;
+        for (let i = 0; i < data.length; i = i + 2) {
+          ret[data[i]] = data[i + 1];
+        }
+        console.log('GAME DATA:', ret);
+        return ret;
       }
     } catch (err) {
       console.error('Error getting game data: ', err);
@@ -217,6 +230,71 @@ export const gameRedis = {
       }
     } catch (err) {
       console.error('Error patching game data: ', err);
+    }
+  },
+  patchGameDataTowerArr: async function (uuid, newTowers) {
+    try {
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      const gameData = await this.getGameData(uuid);
+      if (!gameData) {
+        throw new Error('No game data exists for the user.');
+      }
+      const towers = gameData[GAME_FIELD_TOWER];
+      towers.push(...newTowers);
+
+      await redisClient.hSet(key, GAME_FIELD_TOWER, JSON.stringify(towers));
+    } catch (err) {
+      console.error('Error patching game data (tower arr): ', err);
+    }
+  },
+  patchGameDataTowerTest: async function (uuid, towerData) {
+    try {
+      const key = `${TOWERS_PREFIX}${uuid}`;
+      await redisClient.rPush(key, JSON.stringify(towerData));
+    } catch (err) {
+      console.error('Error patching game data (tower test): ', err);
+    }
+  },
+  patchGameDataTowerEx: async function (uuid, towerData) {
+    try {
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      while (true) {
+        await redisClient.watch(key);
+
+        const gameData = await this.getGameData(uuid);
+        if (!gameData) {
+          throw new Error("User's game data not found.");
+        }
+
+        const towers = gameData[GAME_FIELD_TOWER];
+        towers.push(towerData);
+        const transaction = redisClient.multi();
+        transaction.hSet(key, GAME_FIELD_TOWER, JSON.stringify(towers));
+        // while (true) {
+        const result = await transaction.exec();
+        if (result) {
+          console.log('Patch game data (towers Ex) successful.');
+          break;
+        }
+        // }
+      }
+
+      // const transaction = redisClient.multi().hVals(key);
+      // const gameData = await transaction.hVals(key);
+      // if (!gameData) {
+      //   throw new Error('temp');
+      // }
+      // const towerArr = gameData[GAME_FIELD_TOWER];
+      // console.log('타워 목록: ', towerArr);
+      // towerArr.push(towerData);
+
+      // transaction.hSet(key, GAME_FIELD_TOWER, JSON.stringify(towerArr));
+
+      // await transaction.exec();
+    } catch (err) {
+      console.error('Error patching game data (towerEx): ', err);
+    } finally {
+      await redisClient.unwatch();
     }
   },
   patchGameDataGold: async function (uuid, newGold) {
