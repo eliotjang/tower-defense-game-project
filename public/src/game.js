@@ -18,10 +18,13 @@ let baseHp = null; // 기지 체력
 
 let towerCost = towerData.data[0].cost; // 타워 구입 비용
 let numOfInitialTowers = null; // 초기 타워 개수
-let monsterLevel = 1; // 몬스터 레벨
 let monsterSpawnInterval = null; // 몬스터 생성 주기 (ms)
 let goblinMinInterval = null; // 고블린 생성 최소 주기 (ms)
 let goblinMaxInterval = null; // 고블린 생성 최대 주기 (ms)
+let currentStage = 100;
+let targetScore = 2000;
+let monsterLevel = currentStage-99; // 몬스터 레벨 = 스테이지 레벨
+
 const monsters = [];
 const towers = [];
 
@@ -245,7 +248,12 @@ function gameLoop() {
     } else {
       /* 몬스터가 죽었을 때 */
       score += monster.score;
-      // sendEvent() 몬스터 처치 이벤트
+
+      if (score > targetScore) {
+        //스코어가 일정 이상이면 스테이지 이동요청
+        sendEvent(11, { currentStage });
+      }
+
       sendEvent(21, { monsterId: monster.id });
       //monsterId:1001,timeStamp:3450387
       monsters.splice(i, 1);
@@ -357,15 +365,15 @@ Promise.all([
   serverSocket.on('monsterKill', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('monsterKill 실패 메시지 입력');
+      alert(data.message);
     }
     console.log(data);
   });
 
-  serverSocket.on('monsterPass', (data) => {
+  serverSocket.on('monsterSpawn', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('monsterPass 실패 메시지 입력');
+      alert('monsterSpawn 실패 메시지 입력');
     }
     console.log(data);
   });
@@ -380,10 +388,15 @@ Promise.all([
     console.log(data);
   });
 
-  serverSocket.on('moveStage', (data) => {
+  serverSocket.on('moveStage', async (data) => {
     if (data.status === 'success') {
+      targetScore = data.targetScore;
+      Monster.setMonsterPoolByStageId(data.stageId);
+      console.log('스테이지 이동 허용.현재 스테이지:', data.stageId - 99, '목표 점수:', data.targetScore);
+      userGold += 1000; //레벨이 오르면 유저에게 1000원 제공
+      monsterLevel = data.stageId-99; //스테이지 레벨 변경
     } else {
-      alert('moveStage 실패 메시지 입력');
+      alert(data.message);
     }
     console.log(data);
   });
