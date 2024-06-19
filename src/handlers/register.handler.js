@@ -3,6 +3,7 @@ import configs from '../utils/configs.js';
 import jwt from 'jsonwebtoken';
 import { userRedis } from '../utils/redis.utils.js';
 import redisClient from '../init/redis.js';
+import { RedisFlushModes } from 'redis';
 
 const registerHandler = (io) => {
   io.on('connection', async (socket) => {
@@ -26,14 +27,18 @@ const registerHandler = (io) => {
       console.error('JWT 검증중 오류 발생', error);
       socket.disconnect(true);
     }
+    const USER_KEY_PREFIX = 'user:';
+    const key = USER_KEY_PREFIX + socket.data.user_id;
+    const UUID = await redisClient.hGet(key, 'uuid');
+    const sanitizedUUID = UUID.replace(/"/g, '');
 
-    handleConnection(socket, user);
+    handleConnection(socket, sanitizedUUID);
 
     // 모든 서비스 이벤트 처리
     socket.on('event', (data) => handleEvent(io, socket, data));
 
     // 접속 해제시 이벤트 처리
-    socket.on('disconnect', () => handleDisconnect(socket, user));
+    socket.on('disconnect', () => handleDisconnect(socket, sanitizedUUID));
   });
 };
 
