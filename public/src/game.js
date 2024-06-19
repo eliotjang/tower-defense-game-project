@@ -214,6 +214,8 @@ function gameLoop() {
       /* 몬스터가 죽었을 때 */
       score += monster.score;
       // sendEvent() 몬스터 처치 이벤트
+      sendEvent(21,{monsterId:monster.id,timeStamp:Date.now(),score:monster.score})
+      //monsterId:1001,timeStamp:3450387
       monsters.splice(i, 1);
     }
   }
