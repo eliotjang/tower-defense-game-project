@@ -13,17 +13,17 @@ export const handleDisconnect = (socket, uuid) => {
   console.log(`uuid : ${uuid}, socket id : ${socket.id}`);
 };
 
-export const handleEvent = (io, socket, data) => {
+export const handleEvent = async (io, socket, data) => {
   try {
     // 클라이언트 버전 체크
     if (!CLIENT_VERSION.includes(data.clientVersion)) {
-      throw new Error('클라이언트 버전 미일치');
+      throw new CustomError('클라이언트 버전 미일치');
     }
 
     // 핸들러 맵핑
     const handler = handlerMappings[data.handlerId];
     if (!handler) {
-      throw new Error('유효하지 않은 핸들러');
+      throw new CustomError('유효하지 않은 핸들러');
     }
 
     // 유저에게 메시지 전송
@@ -32,6 +32,6 @@ export const handleEvent = (io, socket, data) => {
       io.emit(result.broadcast.namespace, result.broadcast[namespace]);
     }
   } catch (err) {
-    handleError(err, socket, data.userId);
+    await handleError(err, socket, data.userId);
   }
 };
