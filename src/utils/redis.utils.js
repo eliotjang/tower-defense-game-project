@@ -132,14 +132,10 @@ export const gameRedis = {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
       const data = await redisClient.hGetAll(key);
-      if (data && data.length > 0) {
-        const ret = {};
-        ret.uuid = uuid;
-        for (let i = 0; i < data.length; i = i + 2) {
-          ret[data[i]] = data[i + 1];
-        }
-        return ret;
+      if (Object.keys(data).length === 0) {
+        throw new Error('No data exists for the user.');
       }
+      return data;
     } catch (err) {
       console.error('Error getting game data: ', err);
       return null;
