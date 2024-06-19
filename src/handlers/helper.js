@@ -1,6 +1,7 @@
 import { CLIENT_VERSION } from '../constants.js';
 import { handleError } from './error.handler.js';
 import handlerMappings from './handlerMapping.js';
+import CustomError from '../utils/errors/classes/custom.error.js';
 
 export const handleConnection = (socket, userUUID) => {
   socket.emit('connection', { uuid: userUUID });
@@ -16,15 +17,13 @@ export const handleEvent = (io, socket, data) => {
   try {
     // 클라이언트 버전 체크
     if (!CLIENT_VERSION.includes(data.clientVersion)) {
-      socket.emit('response', { status: 'fail', message: '클라이언트 버전 미일치' });
-      return;
+      throw new Error('클라이언트 버전 미일치');
     }
 
     // 핸들러 맵핑
     const handler = handlerMappings[data.handlerId];
     if (!handler) {
-      socket.emit('response', { status: 'fail', message: '유효하지 않은 핸들러' });
-      return;
+      throw new Error('유효하지 않은 핸들러');
     }
 
     // 유저에게 메시지 전송

@@ -1,6 +1,7 @@
 import { getGameAssets } from '../init/assets.js';
 import { gameRedis } from '../utils/redis.utils.js';
 import { constants } from '../constants.js';
+import CustomError from '../utils/errors/classes/custom.error.js';
 
 export const monsterKillHandler = (uuid, payload, socket) => {
   const { score: currentScore } = payload;
@@ -32,13 +33,11 @@ export const goblinSpawnHandler = async (uuid, payload, socket) => {
   const data = getGameAssets().game.data;
 
   if (elapsedTime < data.goblinMinInterval - constants.GOBLIN_SPAWN_INTERVAL_TOLERANCE) {
-    socket.emit('goblinSpawn', { status: 'fail', message: '보물 고블린 소환 검증 실패: 너무 빨리 소환됨' });
-    return;
+    throw new CustomError('보물 고블린 소환 검증 실패: 너무 빨리 소환됨', 'goblinSpawn');
   }
 
   if (false) {
-    socket.emit('goblinSpawn', { status: 'fail', message: '보물 고블린 소환 검증 실패' });
-    return;
+    throw new CustomError('보물 고블린 소환 검증 실패', 'goblinSpawn');
   }
 
   socket.emit('goblinSpawn', { status: 'success', message: '보물 고블린 소환' });
