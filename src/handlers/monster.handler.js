@@ -2,7 +2,7 @@ import { getGameAssets } from '../init/assets.js';
 import { gameRedis } from '../utils/redis.utils.js';
 import { constants } from '../constants.js';
 import CustomError from '../utils/errors/classes/custom.error.js';
-
+import { spawnList } from '../models/user.model.js';
 export const monsterKillHandler = async (uuid, payload, socket) => {
   try {
     const { monster, monster_unlock, stage } = getGameAssets();
@@ -29,7 +29,7 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
     if (stageField < user.score) {
       await gameRedis.patchGameDataEx(uuid, { stage_id: user.stage_id + 1 });
     }
-    socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', user:user.score });
+    socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', user: user.score });
   } catch (error) {
     console.log({ errorMessage: error.message });
   }
@@ -38,15 +38,33 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
 //리펙터링
 //getUserData를 통해 모든 필드를 불러온다
 
-export const monsterSpawnHandler = (uuid, payload, socket) => {
-  const { monsterId } = payload;
-
-  if (false) {
-    socket.emit('monsterSpawn', { status: 'fail', message: '몬스터 생성 검증 실패' });
+export const monsterSpawnHandler = async (uuid, payload, socket) => {
+  const { isGoblin } = payload;
+  if (isGoblin) {
+    // 고블린의 검증은 다른 곳에서 수행됨
     return;
   }
 
-  socket.emit('monsterSpawn', { status: 'success', message: '몬스터 생성 검증 성공' });
+  const gameData = await gameRedis.getGameData(uuid);
+  const interval = gameData.spawn_interval; // 스폰 간격
+  const timeStamp = Date.now();
+
+  let existsSpawnList = spawnList.findSpawnList(uuid);
+  if (!existsSpawnList) {
+    spawnList.addSpawnList(uuid, timeStamp);
+    existsSpawnList = spawnList.findSpawnList(uuid);
+  }
+
+  const pastTimeStamp = spawnList.popSpawnList(uuid);
+  if (pastTimeStamp) {
+    const timeDifference = timeStamp - pastTimeStamp;
+    if (timeDifference < interval - 1000) {
+      // 인터벌보다 1초가량 더 빠르면
+      socket.emit('monsterSpawnHandler', { status: 'fail', message: '몬스터 생성 검증 실패' });
+    }
+  }
+
+  spawnList.addSpawnList(uuid, timeStamp);
 };
 
 export const goblinSpawnHandler = async (uuid, payload, socket) => {

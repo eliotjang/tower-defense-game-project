@@ -3,6 +3,31 @@
 // { uuid: string; socketId: string };
 
 const users = [];
+const monsterSpawnList = {};
+
+export const spawnList = {
+  addSpawnList: (uuid, timestamp) => {
+    if (!monsterSpawnList[uuid]) {
+      monsterSpawnList[uuid] = [];
+    }
+    monsterSpawnList[uuid].push(timestamp);
+  },
+
+  popSpawnList: (uuid) => {
+    if (monsterSpawnList[uuid] && monsterSpawnList[uuid].length > 0) {
+      return monsterSpawnList[uuid].pop();
+    }
+    return null;
+  },
+
+  findSpawnList: (uuid) => {
+    return monsterSpawnList[uuid] || null;
+  },
+
+  removeMonsterSpawnList: (uuid) => {
+    delete monsterSpawnList[uuid];
+  },
+};
 
 export const addUser = async (user) => {
   users.push(user);
