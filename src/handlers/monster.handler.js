@@ -3,25 +3,6 @@ import { gameRedis } from '../utils/redis.utils.js';
 import { constants } from '../constants.js';
 import CustomError from '../utils/errors/classes/custom.error.js';
 
-const userData = [];
-const getUser = (socketId) => {
-  return userData.find((user) => user.socketId === socketId);
-};
-
-const initializeUser = (socketId) => {
-  //킬로그를 저장하는 인메모리 저장공간
-  let user = getUser(socketId);
-  if (!user) {
-    user = {
-      socketId: socketId,
-      killLog: [],
-    };
-    userData.push(user);
-    console.log(`유저 정보가 생성되었습니다 socketId: ${socketId}`);
-  }
-  return user;
-};
-
 export const monsterKillHandler = async (uuid, payload, socket) => {
   try {
     const { monster, monster_unlock, stage } = getGameAssets();
@@ -43,8 +24,7 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
       await gameRedis.patchGameDataEx(uuid, { score: addScore }); // 몬스터 존재시 점수 증감
       await gameRedis.patchGameDataEx(uuid, { kill_count: user.kill_count + 1 });
     } else {
-      socket.emit('monsterKill', { status: 'fail', message: `'몬스터 처치 검증 실패${monsterId}가 처치됨 ${monsterList} 현재 스폰 정보` });
-      return;
+      throw new CustomError(`'몬스터 처치 검증 실패${monsterId}가 처치됨 ${monsterList} 현재 스폰 정보`, 'monsterKill');
     }
     if (stageField < user.score) {
       await gameRedis.patchGameDataEx(uuid, { stage_id: user.stage_id + 1 });

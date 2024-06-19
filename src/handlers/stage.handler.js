@@ -1,5 +1,7 @@
 import { getGameAssets } from '../init/assets.js';
 import { gameRedis } from '../utils/redis.utils.js';
+import CustomError from '../utils/errors/classes/custom.error.js';
+
 
 export const moveStageHandler = async (uuid, payload, socket) => {
   const tolerance = 100; //오차값
@@ -14,7 +16,7 @@ export const moveStageHandler = async (uuid, payload, socket) => {
       status: 'success',
       message: '마지막 스테이지 입니다.',
       stageId: user.stage_id,
-      targetScore: 99999999,
+      targetScore: 99999999, //하드 코딩 
     });
     return;
   }
@@ -29,6 +31,13 @@ export const moveStageHandler = async (uuid, payload, socket) => {
     });
     return;
   }
-  socket.emit('moveStage', { status: 'fail', message: '스테이지 이동 검증 실패' });
-  return;
+  throw new CustomError('스테이지 이동 검증 실패', 'moveStage');
+
+
+
+
+
+
+
+
 };
