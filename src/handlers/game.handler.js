@@ -79,11 +79,14 @@ export const gameEnd = async (uuid, payload, socket) => {
     socket.emit('gameEnd', { status: 'fail', message: '게임 오버 검증 실패' });
     return;
   }
+
+  socket.emit('gameEnd', { status: 'success', message: '게임 오버', elapsedTime, score });
+
   /* highscore 갱신 */
   const isHighscore = await highscoreRedis.createHighscoreData(uuid, score);
+
   if (isHighscore && isHighscore[1]) {
-    io.emit('highscore', { highscore: score });
+    return { broadcast: { namespace: 'highscore', highscore: score } };
   }
   /* ----- */
-  socket.emit('gameEnd', { status: 'success', message: '게임 오버', elapsedTime, score });
 };
