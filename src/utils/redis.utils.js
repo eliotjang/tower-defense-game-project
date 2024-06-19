@@ -90,16 +90,16 @@ export const userRedis = {
 export const gameRedis = {
   /**
    * 유저의 게임 데이터 생성
-   * @param {userId} userId 유저의 userId
+   * @param {userId} uuid 유저의 UUID
    * @param {number} gold 유저 보유 gold
    * @param {number} stageId 현재 스테이지 ID
    * @param {number} score 유저 점수
    * @param {number} numOfInitialTowers 초기 타워 개수
    * @param {number} baseHp 기지의 HP
    */
-  createGameData: async function (userId, gold, stageId, score, numOfInitialTowers, baseHp) {
+  createGameData: async function (uuid, gold, stageId, score, numOfInitialTowers, baseHp) {
     try {
-      const key = `${GAME_DATA_PREFIX}${userId}`;
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
       const data = await redisClient.hVals(key);
       await redisClient.watch(key);
       const transaction = redisClient.multi();
@@ -107,7 +107,6 @@ export const gameRedis = {
         transaction.hSet(key, `${GAME_FIELD_GOLD}`, `${gold}`);
         transaction.hSet(key, `${GAME_FIELD_STAGE}`, `${stageId}`);
         transaction.hSet(key, `${GAME_FIELD_SCORE}`, `${score}`);
-        // transaction.hSet(key, `${GAME_FIELD_TOWER}`, '[]');
         transaction.hSet(key, `${GAME_FIELD_INITIAL_TOWERS}`, `${numOfInitialTowers}`);
         transaction.hSet(key, `${GAME_FIELD_BASE_HP}`, `${baseHp}`);
         while (true) {
@@ -126,37 +125,30 @@ export const gameRedis = {
   },
   /**
    * 유저의 게임 정보 조회
-   * @param {userId} userId 유저의 userId
+   * @param {userId} uuid 유저의 UUID
    * @returns 유저의 게임 데이터가 담긴 객체, 혹은 에러 시 null
    */
-  getGameData: async function (userId) {
+  getGameData: async function (uuid) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
       const data = await redisClient.hGetAll(key);
-      console.log('NO DATA? ', data);
-      if (data && data.length > 0) {
-        console.log('passed');
-        const ret = {};
-        ret.uuid = uuid;
-        for (let i = 0; i < data.length; i = i + 2) {
-          ret[data[i]] = data[i + 1];
-        }
-        console.log('GAME DATA:', ret);
-        return ret;
+      if (Object.keys(data).length === 0) {
+        throw new Error('No data exists for the user.');
       }
+      return data;
     } catch (err) {
       return null;
     }
   },
   /**
    * 범용 함수, Redis 데이터 테이블에 정의된 field 이름과 value 타입에 맞춰서 사용
-   * @param {userId} userId 유저의 userId
+   * @param {uuid} uuid 유저의 UUID
    * @param {string} fieldName Redis 데이터 테이블에 정의한 필드 이름 (예: "initial_tower")
    * @param {*} value Redis 데이터 테이블에 정의한 value (예: 3)
    */
-  patchGameData: async function (userId, fieldName, value) {
+  patchGameData: async function (uuid, fieldName, value) {
     try {
-      const key = `${GAME_DATA_PREFIX}${userId}`;
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
       const exists = await redisClient.hExists(key, `${fieldName}`);
       if (exists) {
         await redisClient.hSet(key, `${fieldName}`, JSON.stringify(value));
@@ -167,12 +159,12 @@ export const gameRedis = {
   },
   /**
    * 범용 함수, Redis 데이터 테이블의 field 이름과 value 타입에 맞춘 key-value 객체를 통해 업데이트
-   * @param {userId} userId 유저의 userId
+   * @param {uuid} uuid 유저의 UUID
    * @param {Object} data Redis 테이블의 field를 key로 가지는 key-value 페어를 담은 객체 (예: {stage_id: 100, gold:50})
    */
-  patchGameDataEx: async function (userId, data) {
+  patchGameDataEx: async function (uuid, data) {
     try {
-      const key = `${GAME_DATA_PREFIX}${userId}`;
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
       const properties = Object.keys(data);
       for (let i = 0; i < properties.length; i++) {
         const exists = await redisClient.hExists(key, `${properties[i]}`);
@@ -197,23 +189,20 @@ export const gameRedis = {
     try {
       const pattern = `${TOWERS_PREFIX}${uuid}*`;
       const keys = await redisClient.keys(pattern);
-      // const values = await Promise.all(
-      //   keys.map(async (key) => {
-      //     return JSON.parse(await redisClient.get(key));
-      //   })
-      // );
+
       const values = {};
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i].replace(`${TOWERS_PREFIX}${uuid}`, '');
         values[key] = JSON.parse(await redisClient.get(keys[i]));
       }
-      console.log('values: ', values);
       return values;
     } catch (err) {
       console.error('Error patching game data (tower test): ', err);
     }
   },
   /* ------------ */
+
+  /* (보류) rpush 사용할 시 변경될 함수 */
   patchGameDataTowerEx: async function (uuid, towerData) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
@@ -258,7 +247,7 @@ export const gameRedis = {
   },
   patchGameDataGold: async function (uuid, newGold) {
     try {
-      const key = `${GAME_DATA_PREFIX}${userId}`;
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
       const exists = await redisClient.hExists(key, `${GAME_FIELD_GOLD}`);
       if (exists) {
         await redisClient.hSet(key, `${GAME_FIELD_GOLD}`, JSON.stringify(newGold));
@@ -267,9 +256,9 @@ export const gameRedis = {
       console.error('Error patching game data: ', err);
     }
   },
-  patchGameDataStage: async function (userId, newStage) {
+  patchGameDataStage: async function (uuid, newStage) {
     try {
-      const key = `${GAME_DATA_PREFIX}${userId}`;
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
       const exists = await redisClient.hExists(key, `${GAME_FIELD_GOLD}`);
       if (exists) {
         await redisClient.hSet(key, `${fieldName}`, JSON.stringify(newGold));
@@ -280,12 +269,12 @@ export const gameRedis = {
   },
   /**
    * 유저의 게임 데이터 삭제
-   * @param {userId} userId 유저의 userId
+   * @param {uuid} uuid 유저의 UUID
    */
-  removeGameData: async function (userId) {
+  removeGameData: async function (uuid) {
     try {
-      const key = `${GAME_DATA_PREFIX}${userId}`;
-      await redisClient.del(`${USER_PREFIX}${userId}`);
+      const key = `${GAME_DATA_PREFIX}${uuid}`;
+      await redisClient.del(`${USER_PREFIX}${uuid}`);
     } catch (err) {
       console.error('Error removing game data: ', err);
     }
@@ -361,9 +350,7 @@ export const highscoreRedis = {
   getHighscoreData: async function () {
     try {
       const key = `${HIGHSCORE_PREFIX}all`;
-      // const data = await redisClient.zRange(key, 0, -1, 'WITHSCORES');
       const data = await redisClient.sendCommand(['ZREVRANGE', key, '0', '-1', 'WITHSCORES']);
-      // const score = await redisClient.get(key, `${data[0]}`);
 
       if (!data || data.length === 0) {
         throw new Error('No highscore data exists');
@@ -385,9 +372,7 @@ export const highscoreRedis = {
   getUserHighscoreData: async function (uuid) {
     try {
       const key = `${HIGHSCORE_PREFIX}all`;
-      // const data = await redisClient.zRange(key, 0, -1, 'WITHSCORES');
       const data = await redisClient.sendCommand(['ZREVRANGE', key, '0', '-1', 'WITHSCORES']);
-      // const score = await redisClient.get(key, `${data[0]}`);
 
       if (!data || data.length === 0) {
         throw new Error('No highscore data exists');
