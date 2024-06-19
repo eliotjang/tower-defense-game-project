@@ -137,7 +137,6 @@ export const gameRedis = {
       }
       return data;
     } catch (err) {
-      console.error('Error getting game data: ', err);
       return null;
     }
   },
@@ -275,7 +274,7 @@ export const gameRedis = {
   removeGameData: async function (uuid) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
-      await redisClient.del(`${USER_PREFIX}${uuid}`);
+      await redisClient.del(`${GAME_DATA_PREFIX}${uuid}`);
     } catch (err) {
       console.error('Error removing game data: ', err);
     }
