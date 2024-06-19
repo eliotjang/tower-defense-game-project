@@ -386,6 +386,7 @@ Promise.all([
   });
 
   serverSocket.on('highscore', (data) => {
+    // TODO: update highscore
     console.log(data);
   });
 
@@ -398,7 +399,7 @@ Promise.all([
     });
   };
 
-  serverSocket.on('broadcast', (data) => {
+  serverSocket.on('error', (data) => {
     console.log(data);
   });
 });
