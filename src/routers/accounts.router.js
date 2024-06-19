@@ -32,7 +32,7 @@ const signUp = async (req, res, next) => {
     }
     const isExistsUser = async (user_id) => {
       const key = USER_KEY_PREFIX + user_id;
-      const user = await redisClient.get(key);
+      const user = await redisClient.hGet(key,'uuid');
       return user == null ? false : true;
     };
 
