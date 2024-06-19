@@ -16,6 +16,8 @@ export const gameStart = async (uuid, payload, socket) => {
 
   startTime = timeStamp;
 
+  await gameRedis.deleteGameDataTowerlist(uuid);
+
   await gameRedis.removeGameData(uuid);
   await gameRedis.createGameData(uuid, userGold, stageId, score, numOfInitialTowers, baseHp);
   const data = await gameRedis.getGameData(uuid);
