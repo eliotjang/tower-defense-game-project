@@ -370,6 +370,7 @@ Promise.all([
       Monster.setMonsterPoolByStageId(data.stageId);
       console.log('스테이지 이동 허용.현재 스테이지:', data.stageId - 99, '목표 점수:', data.targetScore);
       userGold += 1000; //레벨이 오르면 유저에게 1000원 제공
+      monsterLevel = data.stageId-99; //스테이지 레벨 변경
     } else {
       alert(data.message);
     }
