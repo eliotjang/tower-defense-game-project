@@ -247,14 +247,27 @@ export const gameRedis = {
       console.error('Error patching game data (tower arr): ', err);
     }
   },
-  patchGameDataTowerTest: async function (uuid, towerData) {
+  /* ------------ */
+  patchGameDataTowerTest: async function (uuid, towerData, index) {
     try {
-      const key = `${TOWERS_PREFIX}${uuid}`;
-      await redisClient.rPush(key, JSON.stringify(towerData));
+      const key = `${TOWERS_PREFIX}${uuid}${index}`;
+      await redisClient.set(key, JSON.stringify(towerData));
     } catch (err) {
       console.error('Error patching game data (tower test): ', err);
     }
   },
+  getGameDataTowerList: async function (uuid) {
+    try {
+      const pattern = `${TOWERS_PREFIX}${uuid}*`;
+      const keys = await redisClient.keys(pattern);
+      const values = await Promise.all(keys.map((key) => redisClient.get(key)));
+      console.log('values: ', values);
+      return values;
+    } catch (err) {
+      console.error('Error patching game data (tower test): ', err);
+    }
+  },
+  /* ------------ */
   patchGameDataTowerEx: async function (uuid, towerData) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
