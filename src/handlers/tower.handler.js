@@ -1,15 +1,16 @@
 import { getGameAssets } from '../init/assets.js';
 import { gameRedis } from '../utils/redis.utils.js';
 
+let index = 0;
 export const towerInitialHandler = async (uuid, payload, socket) => {
-  const { towerData } = payload;
+  const { towerData, towerIndex } = payload;
 
-  console.log('1', towerData);
-
-  await gameRedis.patchGameDataTower(uuid, towerData);
+  console.log('1', towerData, index);
+  await gameRedis.patchGameDataTower(uuid, towerData, index++);
 
   const user = await gameRedis.getGameData(uuid);
-  console.log('2', user.tower_coordinates);
+  const towers = await gameRedis.getGameDataTowerList(uuid);
+  console.log('2', towers);
 
   if (!towerData) {
     socket.emit('towerInitial', { status: 'fail', message: '최초 타워 추가 검증 실패' });
