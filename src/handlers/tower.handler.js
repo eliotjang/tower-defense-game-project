@@ -6,10 +6,10 @@ export const towerInitialHandler = async (uuid, payload, socket) => {
 
   console.log('1', towerData);
 
-  await gameRedis.patchGameDataTower(uuid, towerData);
+  await gameRedis.patchGameDataTowerTest(uuid, towerData);
 
   const user = await gameRedis.getGameData(uuid);
-  console.log('2', user.tower_coordinates);
+  console.log('2', user);
 
   if (!towerData) {
     socket.emit('towerInitial', { status: 'fail', message: '최초 타워 추가 검증 실패' });
