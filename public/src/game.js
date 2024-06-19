@@ -3,6 +3,7 @@ import { Monster } from './monster.js';
 import { Tower } from './tower.js';
 import towerData from '../assets/tower.json' with { type: 'json' };
 import { CLIENT_VERSION } from './Constants.js';
+import stageData from '../assets/stage.json' with { type: 'json' };
 
 let serverSocket; // 서버 웹소켓 객체
 let sendEvent;
@@ -22,6 +23,9 @@ let monsterLevel = 1; // 몬스터 레벨
 let monsterSpawnInterval = null; // 몬스터 생성 주기 (ms)
 let goblinMinInterval = null; // 고블린 생성 최소 주기 (ms)
 let goblinMaxInterval = null; // 고블린 생성 최대 주기 (ms)
+let currentStage = 100;
+let targetScore = 2000;
+
 const monsters = [];
 const towers = [];
 
@@ -221,8 +225,13 @@ function gameLoop() {
     } else {
       /* 몬스터가 죽었을 때 */
       score += monster.score;
-      // sendEvent() 몬스터 처치 이벤트
-      sendEvent(21, { monsterId: monster.id});
+
+      if (score > targetScore) {
+        //스코어가 일정 이상이면 스테이지 이동요청
+        sendEvent(11, { currentStage });
+      }
+
+      sendEvent(21, { monsterId: monster.id });
       //monsterId:1001,timeStamp:3450387
       monsters.splice(i, 1);
     }
@@ -333,7 +342,7 @@ Promise.all([
   serverSocket.on('monsterKill', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('monsterKill 실패 메시지 입력');
+      alert(data.message);
     }
     console.log(data);
   });
@@ -358,6 +367,9 @@ Promise.all([
 
   serverSocket.on('moveStage', (data) => {
     if (data.status === 'success') {
+      currentStage = data.targetScore;
+      Monster.setMonsterPoolByStageId(data.stageId);
+      console.log('스테이지 이동 허용.현재 스테이지:', data.stageId, '목표 점수:', data.targetScore);
     } else {
       alert('moveStage 실패 메시지 입력');
     }
