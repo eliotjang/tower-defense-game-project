@@ -26,6 +26,7 @@ const towers = [];
 let score = null; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
+let towerIndex = 0;
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
@@ -229,7 +230,8 @@ function initGame() {
 
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
-    sendEvent(30, { towerData: { x, y } });
+    sendEvent(30, { towerData: { x, y }, towerIndex });
+    towerIndex++;
   }
 
   let initialStageId = 100; // 최초 스테이지 정보
@@ -287,7 +289,6 @@ Promise.all([
       numOfInitialTowers = data.numOfInitialTowers;
       score = +data.score;
       monsterSpawnInterval = data.monsterSpawnInterval;
-      console.log(monsterSpawnInterval);
       if (!isInitGame) {
         initGame();
       }
@@ -396,7 +397,8 @@ buyTowerButton.style.cursor = 'pointer';
 
 buyTowerButton.addEventListener('click', () => {
   const { x, y } = getRandomPositionNearPath(200);
-  sendEvent(31, { towerData: { x, y } });
+  sendEvent(31, { towerData: { x, y }, towerIndex });
+  towerIndex++;
 });
 
 document.body.appendChild(buyTowerButton);

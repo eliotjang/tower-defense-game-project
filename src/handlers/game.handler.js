@@ -16,11 +16,12 @@ export const gameStart = async (uuid, payload, socket) => {
 
   startTime = timeStamp;
 
+  await gameRedis.removeGameData(uuid);
   await gameRedis.createGameData(uuid, userGold, stageId, score, numOfInitialTowers, baseHp);
   const data = await gameRedis.getGameData(uuid);
 
   // Redis 저장 데이터
-  // console.log('Redis 데이터', data);
+  //console.log('Redis 데이터', data);
 
   socket.emit('gameStart', {
     status: 'success',
