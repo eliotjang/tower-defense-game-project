@@ -1,5 +1,6 @@
 import { getGameAssets } from '../init/assets.js';
 import { gameRedis, highscoreRedis } from '../utils/redis.utils.js';
+import CustomError from '../utils/errors/classes/custom.error.js';
 
 export const gameStart = async (uuid, payload, socket) => {
   const { timeStamp } = payload;
@@ -9,8 +10,7 @@ export const gameStart = async (uuid, payload, socket) => {
   const stageId = stage.data[0].id;
 
   if (!timeStamp) {
-    socket.emit('gameStart', { status: 'fail', message: '게임 초기 정보 검증 실패' });
-    return;
+    throw new CustomError('게임 초기 정보 검증 실패', 'gameStart');
   }
 
   await gameRedis.removeGameData(uuid);
@@ -76,14 +76,16 @@ export const gameEnd = async (uuid, payload, socket) => {
   console.log('totalDamagePerInterval', totalDamagePerInterval);
 
   if (!verification) {
-    socket.emit('gameEnd', { status: 'fail', message: '게임 오버 검증 실패' });
-    return;
+    throw new CustomError('게임 오버 검증 실패', 'gameEnd');
   }
+
+  socket.emit('gameEnd', { status: 'success', message: '게임 오버', elapsedTime, score });
+
   /* highscore 갱신 */
   const isHighscore = await highscoreRedis.createHighscoreData(uuid, score);
+
   if (isHighscore && isHighscore[1]) {
-    io.emit('highscore', { highscore: score });
+    return { broadcast: { namespace: 'highscore', highscore: score } };
   }
   /* ----- */
-  socket.emit('gameEnd', { status: 'success', message: '게임 오버', elapsedTime, score });
 };

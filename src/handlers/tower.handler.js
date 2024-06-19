@@ -1,4 +1,5 @@
 import { getGameAssets } from '../init/assets.js';
+import CustomError from '../utils/errors/classes/custom.error.js';
 import { gameRedis } from '../utils/redis.utils.js';
 
 export const towerInitialHandler = async (uuid, payload, socket) => {
@@ -10,8 +11,7 @@ export const towerInitialHandler = async (uuid, payload, socket) => {
   // await gameRedis.getGameDataTowerList(uuid);
 
   if (!towerData) {
-    socket.emit('towerInitial', { status: 'fail', message: '최초 타워 추가 검증 실패' });
-    return;
+    throw new CustomError('최초 타워 추가 검증 실패', 'towerInitial');
   }
 
   socket.emit('towerInitial', { status: 'success', message: '최초 타워 추가 완료', towerData });
