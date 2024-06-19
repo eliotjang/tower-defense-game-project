@@ -73,5 +73,5 @@ export const gameEnd = async (uuid, payload, socket) => {
     io.emit('highscore', { highscore: score });
   }
   /* ----- */
-  socket.emit('gameEnd', { status: 'success', message: '게임 오버', elapsedTime });
+  socket.emit('gameEnd', { status: 'success', message: '게임 오버', elapsedTime, score });
 };
