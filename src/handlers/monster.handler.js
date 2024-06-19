@@ -1,6 +1,5 @@
-import { loadGameAssets } from '../init/assets.js';
-
-const gameAssets = await loadGameAssets(); // 검증을 위한 게임 에셋을 로드
+import { getGameAssets } from '../init/assets.js';
+import { gameRedis } from '../utils/redis.utils.js';
 const userData = []; //유저의 정보를 소켓id 기반 인메모리 방식으로 임시 저장
 
 const getUser = (socketId) => {
@@ -8,51 +7,63 @@ const getUser = (socketId) => {
 };
 
 const initializeUser = (socketId) => {
+  //킬로그를 저장하는 인메모리 저장공간
   let user = getUser(socketId);
   if (!user) {
     user = {
+      count: 0,
       socketId: socketId,
-      totalScore: 0,
-      currentStageId: 100,
       killLog: [],
     };
     userData.push(user);
     console.log(`유저 정보가 생성되었습니다 socketId: ${socketId}`);
-  } else {
-    console.log(`기존 유저를 불러옵니다 socketId: ${socketId}`);
-  }
+  } 
   return user;
 };
 
-export const monsterKillHandler = (uuid, payload, socket) => {
+export const monsterKillHandler = async (uuid, payload, socket) => {
   try {
-    const { monsterId, score } = payload;
+    const { monster, monster_unlock, stage } = getGameAssets();
+    const { monsterId } = payload; //클라이언트로 부터 몬스터 id 데이터 받아옴
+    const score = monster.data.find((item) => item.id === monsterId).score; // 몬스터의 점수 찾기
     const timeStamp = Date.now();
-    const user = initializeUser(socket.id);
-    //유저 스테이지 값을 기준으로 몹 리스트 가져와서 전부 넣어줌
-    const currentStageId = user.currentStageId;
-    const monsterData = gameAssets.monster_unlock.data.find((item) => item.stage_id === currentStageId);
-    const monsterList = monsterData.monster; //출현 가능 몬스터의 목록
-    //스테지에 해당하는 몹이 있는지
-    if (monsterList.includes(monsterId)) {
-      user.totalScore += score; // 몬스터 존재시 점수 증감
-      user.killLog.push({ monsterId, timeStamp }); //킬로그에 저장
-    } else {
-      console.log('처치 검증 실패', monsterId, '가 처치됨');
-      socket.emit('monsterKill', { status: 'fail', message: '몬스터 처치 검증 실패' });
-      return;
-    }
-    //점수 증감 기준으로 스테이지 이동에 대한 로직도 구현
-    const stageProgress = Math.floor(user.totalScore / 2000); //stage.json 의 targetScore에 대한 하드코딩
-    if (stageProgress > user.currentStageId - 100) {
-      user.currentStageId++;
-    }
-
-    socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', timeStamp });
+    const inMemoryUserData = initializeUser(socket.id);
+    let currentStageId; //redis 데이터 기준 유저의 현재 스테이지
+    let monsterList; //현재 있는 스테이지에 출현 가능한 몬스터 목록
+    let stageField; //현재 스테이지의 정보
+    await gameRedis.getGameData(uuid).then((user) => {
+      if (!user) {
+        throw new Error('정보를 찾을 수 없습니다');
+      }
+      currentStageId = user.stage_id;
+      monsterList = monster_unlock.data.find((item) => item.stage_id == currentStageId).monster;
+      stageField = stage.data.find((item) => item.id == currentStageId).target_score;
+      console.log('현재 점수', user.score);
+      console.log('현재 스테이지', currentStageId);
+      if (monsterList.includes(monsterId)) {
+        
+        const addScore = user.score + score;
+        console.log("추가되는 점수",addScore);
+        gameRedis.patchGameData(uuid, score, addScore); // 몬스터 존재시 점수 증감
+        inMemoryUserData.killLog.push({ monsterId, timeStamp }); //킬로그에 저장
+        inMemoryUserData.count++;
+      } else {
+        console.log('처치 검증 실패', monsterId, '가 처치됨');
+        socket.emit('monsterKill', { status: 'fail', message: '몬스터 처치 검증 실패' });
+        return;
+      }
+      if (stageField < user.score) {
+        gameRedis.patchGameData(uuid, stage_id, user.stage_id + 1);
+      }
+      socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', timeStamp });
+    });
   } catch (error) {
     console.log({ errorMessage: error.message });
   }
 };
+
+//리펙터링
+//getUserData를 통해 모든 필드를 불러온다
 
 export const monsterPassHandler = (uuid, payload, socket) => {
   const { monsterId } = payload;
