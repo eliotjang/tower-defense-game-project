@@ -4,7 +4,8 @@ import { gameRedis, highscoreRedis } from '../utils/redis.utils.js';
 export const gameStart = async (uuid, payload, socket) => {
   const { timeStamp } = payload;
   const { game, stage } = getGameAssets();
-  const { userGold, baseHp, numOfInitialTowers, score, monsterSpawnInterval } = game.data;
+  const { userGold, baseHp, numOfInitialTowers, score, monsterSpawnInterval, goblinMinInterval, goblinMaxInterval } =
+    game.data;
   const stageId = stage.data[0].id;
 
   if (!timeStamp) {
@@ -12,6 +13,7 @@ export const gameStart = async (uuid, payload, socket) => {
     return;
   }
 
+  await gameRedis.removeGameData(uuid);
   await gameRedis.createGameData(
     uuid,
     userGold,
@@ -20,7 +22,9 @@ export const gameStart = async (uuid, payload, socket) => {
     numOfInitialTowers,
     baseHp,
     timeStamp,
-    monsterSpawnInterval
+    monsterSpawnInterval,
+    timeStamp,
+    0
   );
   const data = await gameRedis.getGameData(uuid);
 
@@ -32,8 +36,10 @@ export const gameStart = async (uuid, payload, socket) => {
     userGold: data.user_gold,
     baseHp: data.base_hp,
     numOfInitialTowers: data.initial_towers,
-    score: data.score,
+    score,
     monsterSpawnInterval: data.spawn_interval,
+    goblinMinInterval,
+    goblinMaxInterval,
   });
 };
 
