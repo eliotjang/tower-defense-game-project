@@ -10,6 +10,10 @@ const GAME_FIELD_SCORE = 'score';
 const GAME_FIELD_TOWER = 'tower_coordinates';
 const GAME_FIELD_INITIAL_TOWERS = 'initial_towers';
 const GAME_FIELD_BASE_HP = 'base_hp';
+const GAME_FIELD_START_TIME = 'start_time';
+const GAME_FIELD_SPAWN_INTERVAL = 'spawn_interval';
+const GAME_FIELD_KILL_COUNT = 'kill_count';
+const GAME_FIELD_GOBLIN_TIME = 'goblin_time';
 const TOWERS_PREFIX = 'towers:';
 // const GAME_FIELD_HIGHSCORE = 'highscore';
 const HIGHSCORE_PREFIX = 'highscore:';
@@ -90,14 +94,29 @@ export const userRedis = {
 export const gameRedis = {
   /**
    * 유저의 게임 데이터 생성
-   * @param {userId} uuid 유저의 UUID
+   * @param {uuid} uuid 유저의 UUID
    * @param {number} gold 유저 보유 gold
    * @param {number} stageId 현재 스테이지 ID
    * @param {number} score 유저 점수
    * @param {number} numOfInitialTowers 초기 타워 개수
    * @param {number} baseHp 기지의 HP
+   * @param {number} startTime 게임 시작 시간(클라이언트 기준, Date.now())
+   * @param {number} spawnInterval 몬스터 소환 interval in millis
+   * @param {number} lastGoblinSpawnTime 마지막 고블린 스폰 시간 (클라 기준, Date.now())
+   * @param {number} killCount 몬스터 킬 카운트
    */
-  createGameData: async function (uuid, gold, stageId, score, numOfInitialTowers, baseHp) {
+  createGameData: async function (
+    uuid,
+    gold,
+    stageId,
+    score,
+    numOfInitialTowers,
+    baseHp,
+    startTime,
+    spawnInterval,
+    lastGoblinSpawnTime,
+    killCount
+  ) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
       const data = await redisClient.hVals(key);
@@ -109,6 +128,10 @@ export const gameRedis = {
         transaction.hSet(key, `${GAME_FIELD_SCORE}`, `${score}`);
         transaction.hSet(key, `${GAME_FIELD_INITIAL_TOWERS}`, `${numOfInitialTowers}`);
         transaction.hSet(key, `${GAME_FIELD_BASE_HP}`, `${baseHp}`);
+        transaction.hSet(key, `${GAME_FIELD_START_TIME}`, `${startTime}`);
+        transaction.hSet(key, `${GAME_FIELD_SPAWN_INTERVAL}`, `${spawnInterval}`);
+        transaction.hSet(key, `${GAME_FIELD_GOBLIN_TIME}`, `${lastGoblinSpawnTime}`);
+        transaction.hSet(key, `${GAME_FIELD_KILL_COUNT}`, `${killCount}`);
         while (true) {
           const result = await transaction.exec();
           if (result) {
@@ -126,15 +149,20 @@ export const gameRedis = {
   /**
    * 유저의 게임 정보 조회
    * @param {userId} uuid 유저의 UUID
-   * @returns 유저의 게임 데이터가 담긴 객체, 혹은 에러 시 null
+   * @returns 유저의 게임 데이터가 담긴 객체 (key 이름은 redis에 매핑된 이름 사용), 혹은 에러 시 null
    */
   getGameData: async function (uuid) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
       const data = await redisClient.hGetAll(key);
-      if (Object.keys(data).length === 0) {
+      const keys = Object.keys(data);
+      if (keys.length === 0) {
         throw new Error('No data exists for the user.');
       }
+      for (let i = 0; i < keys.length; i++) {
+        data[keys[i]] = +data[keys[i]];
+      }
+
       return data;
     } catch (err) {
       console.error('Error getting game data: ', err);
