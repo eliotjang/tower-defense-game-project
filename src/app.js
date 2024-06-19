@@ -27,8 +27,6 @@ server.listen(PORT, async () => {
   try {
     await loadGameAssets();
     console.log('게임 에셋 로드 성공');
-    const data = getGameAssets();
-    console.log(data);
   } catch (error) {
     console.error('게임 에셋 로드 실패');
   }
