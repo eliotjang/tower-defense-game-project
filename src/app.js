@@ -1,7 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import initSocket from './init/socket.js';
-import { loadGameAssets } from './init/assets.js';
+import { loadGameAssets, getGameAssets } from './init/assets.js';
 import config from './utils/configs.js';
 import cors from 'cors';
 import accountRouter from './routers/accounts.router.js';
@@ -27,6 +27,8 @@ server.listen(PORT, async () => {
   try {
     await loadGameAssets();
     console.log('게임 에셋 로드 성공');
+    const data = getGameAssets();
+    console.log(data);
   } catch (error) {
     console.error('게임 에셋 로드 실패');
   }

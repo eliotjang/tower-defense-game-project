@@ -162,6 +162,11 @@ function placeNewTower(x, y) {
   tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
+function refundTower(x, y) {
+  const index = towers.findIndex((e) => e.x === x && e.y === y);
+  towers.splice(index, 1);
+}
+
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
   base = new Base(lastPoint.x, lastPoint.y, baseHp);
@@ -217,6 +222,8 @@ function gameLoop() {
       /* 몬스터가 죽었을 때 */
       score += monster.score;
       // sendEvent() 몬스터 처치 이벤트
+      sendEvent(21, { monsterId: monster.id});
+      //monsterId:1001,timeStamp:3450387
       monsters.splice(i, 1);
     }
   }
@@ -318,7 +325,7 @@ Promise.all([
   serverSocket.on('gameEnd', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('실패 메시지 입력');
+      alert('gameEnd 실패 메시지 입력');
     }
     console.log(data);
   });
@@ -326,7 +333,7 @@ Promise.all([
   serverSocket.on('monsterKill', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('실패 메시지 입력');
+      alert('monsterKill 실패 메시지 입력');
     }
     console.log(data);
   });
@@ -334,7 +341,7 @@ Promise.all([
   serverSocket.on('monsterPass', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('실패 메시지 입력');
+      alert('monsterPass 실패 메시지 입력');
     }
     console.log(data);
   });
@@ -352,7 +359,7 @@ Promise.all([
   serverSocket.on('moveStage', (data) => {
     if (data.status === 'success') {
     } else {
-      alert('실패 메시지 입력');
+      alert('moveStage 실패 메시지 입력');
     }
     console.log(data);
   });
@@ -371,8 +378,9 @@ Promise.all([
 
   serverSocket.on('towerRefund', (data) => {
     if (data.status === 'success') {
+      userGold = data.userGold;
     } else {
-      alert('실패 메시지 입력');
+      alert('타워 환불 검증에 실패했습니다.');
     }
     console.log(data);
   });
@@ -417,8 +425,34 @@ buyTowerButton.style.cursor = 'pointer';
 
 buyTowerButton.addEventListener('click', () => {
   const { x, y } = getRandomPositionNearPath(200);
+  //const isExist = towers.findIndex()
   sendEvent(31, { towerData: { x, y }, towerIndex });
   towerIndex++;
 });
 
 document.body.appendChild(buyTowerButton);
+
+const refundTowerButton = document.createElement('button');
+refundTowerButton.textContent = '타워 판매(랜덤)';
+refundTowerButton.style.position = 'absolute';
+refundTowerButton.style.top = '10px';
+refundTowerButton.style.right = '130px';
+refundTowerButton.style.padding = '10px 20px';
+refundTowerButton.style.fontSize = '16px';
+refundTowerButton.style.cursor = 'pointer';
+
+refundTowerButton.addEventListener('click', () => {
+  if (towers.length === 0) {
+    alert('환불할 타워가 없습니다');
+    return;
+  }
+
+  const refundIndex = Math.floor(Math.random() * towers.length);
+  const targetTower = towers[refundIndex];
+
+  refundTower(targetTower.x, targetTower.y);
+  sendEvent(32, { towerData: { x: targetTower.x, y: targetTower.y } });
+  towerIndex++;
+});
+
+document.body.appendChild(refundTowerButton);

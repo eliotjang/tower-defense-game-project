@@ -213,6 +213,34 @@ export const gameRedis = {
       console.error('Error patching game data (tower test): ', err);
     }
   },
+  deleteGameDataTower: async function (uuid, towerData) {
+    try {
+      const pattern = `${TOWERS_PREFIX}${uuid}*`;
+      const keys = await redisClient.keys(pattern);
+
+      for (let i = 0; i < keys.length; i++) {
+        const value = JSON.parse(await redisClient.get(keys[i]));
+
+        if (towerData.x === value.x && towerData.y === value.y) {
+          await redisClient.del(keys[i]);
+        }
+      }
+    } catch (err) {
+      console.error('Error delete game data (tower): ', err);
+    }
+  },
+  deleteGameDataTowerlist: async function (uuid) {
+    try {
+      const pattern = `${TOWERS_PREFIX}${uuid}*`;
+      const keys = await redisClient.keys(pattern);
+
+      for (let i = 0; i < keys.length; i++) {
+        await redisClient.del(keys[i]);
+      }
+    } catch (err) {
+      console.error('Error delete game data (tower list): ', err);
+    }
+  },
   getGameDataTowerList: async function (uuid) {
     try {
       const pattern = `${TOWERS_PREFIX}${uuid}*`;
@@ -225,7 +253,26 @@ export const gameRedis = {
       }
       return values;
     } catch (err) {
-      console.error('Error patching game data (tower test): ', err);
+      console.error('Error get game data (tower list): ', err);
+    }
+  },
+  getGameDataTower: async function (uuid, towerData) {
+    try {
+      const pattern = `${TOWERS_PREFIX}${uuid}*`;
+      const keys = await redisClient.keys(pattern);
+
+      const values = {};
+      for (let i = 0; i < keys.length; i++) {
+        const value = JSON.parse(await redisClient.get(keys[i]));
+
+        if (towerData.x === value.x && towerData.y === value.y) {
+          const key = keys[i].replace(`${TOWERS_PREFIX}${uuid}`, '');
+          values[key] = JSON.parse(await redisClient.get(keys[i]));
+        }
+      }
+      return values;
+    } catch (err) {
+      console.error('Error get game data (tower): ', err);
     }
   },
   /* ------------ */
