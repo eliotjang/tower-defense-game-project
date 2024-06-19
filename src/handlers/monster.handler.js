@@ -1,6 +1,26 @@
 import { getGameAssets } from '../init/assets.js';
 import { gameRedis } from '../utils/redis.utils.js';
 import { constants } from '../constants.js';
+import CustomError from '../utils/errors/classes/custom.error.js';
+
+const userData = [];
+const getUser = (socketId) => {
+  return userData.find((user) => user.socketId === socketId);
+};
+
+const initializeUser = (socketId) => {
+  //킬로그를 저장하는 인메모리 저장공간
+  let user = getUser(socketId);
+  if (!user) {
+    user = {
+      socketId: socketId,
+      killLog: [],
+    };
+    userData.push(user);
+    console.log(`유저 정보가 생성되었습니다 socketId: ${socketId}`);
+  }
+  return user;
+};
 
 export const monsterKillHandler = async (uuid, payload, socket) => {
   try {
@@ -57,13 +77,11 @@ export const goblinSpawnHandler = async (uuid, payload, socket) => {
   const data = getGameAssets().game.data;
 
   if (elapsedTime < data.goblinMinInterval - constants.GOBLIN_SPAWN_INTERVAL_TOLERANCE) {
-    socket.emit('goblinSpawn', { status: 'fail', message: '보물 고블린 소환 검증 실패: 너무 빨리 소환됨' });
-    return;
+    throw new CustomError('보물 고블린 소환 검증 실패: 너무 빨리 소환됨', 'goblinSpawn');
   }
 
   if (false) {
-    socket.emit('goblinSpawn', { status: 'fail', message: '보물 고블린 소환 검증 실패' });
-    return;
+    throw new CustomError('보물 고블린 소환 검증 실패', 'goblinSpawn');
   }
 
   socket.emit('goblinSpawn', { status: 'success', message: '보물 고블린 소환' });
