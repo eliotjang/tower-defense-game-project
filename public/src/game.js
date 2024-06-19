@@ -202,7 +202,6 @@ function placeBase() {
 
 function spawnMonster(isGoblin) {
   monsters.push(new Monster(monsterPath, monsterImages, isGoblin));
-  sendEvent()
 }
 
 function gameLoop() {
