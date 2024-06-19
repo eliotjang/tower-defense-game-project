@@ -1,5 +1,13 @@
 {
   "name": "game",
   "version": "1.0.0",
-  "data": { "userGold": 3000, "baseHp": 200, "numOfInitialTowers": 3, "score": 0, "monsterSpawnInterval": 2000 }
+  "data": {
+    "userGold": 3000,
+    "baseHp": 200,
+    "numOfInitialTowers": 3,
+    "score": 0,
+    "monsterSpawnInterval": 2000,
+    "goblinMinInterval": 20000,
+    "goblinMaxInterval": 30000
+  }
 }
