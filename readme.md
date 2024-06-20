@@ -22,8 +22,7 @@
 
 📁 [Code Convention](https://teamsparta.notion.site/Code-Convention-43e5b060f8dd4a4590a083768393ff21?pvs=25)
 
-## 패킷 구조 설계
-⚙️ [타워 디펜스 게임 프로젝트 패킷 구조 설계](https://eliotjang.notion.site/212e9e10bfdb41bfbfe93662bb5ff3c8?pvs=25)
+## 패킷 명세서
 
 📝 [타워 디펜스 게임 프로젝트 패킷 명세서](https://www.notion.so/2fed892d7d3a4fde9e6423cd13afd820)
 
