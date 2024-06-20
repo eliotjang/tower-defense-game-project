@@ -75,7 +75,11 @@ export class Monster {
   }
 
   draw(ctx) {
-    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    ctx.save();
+    ctx.translate(this.x + this.width / 2, this.y + this.height);
+    ctx.drawImage(this.image, -this.width / 2, -this.height, this.width, this.height);
+    // ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    ctx.restore();
     ctx.font = '12px Arial';
     ctx.fillStyle = 'white';
     ctx.fillText(`(레벨 ${this.id % 10}) ${this.hp}/${this.maxHp}`, this.x, this.y - 5);
