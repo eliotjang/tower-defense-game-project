@@ -13,6 +13,11 @@ export class Tower {
     return this.level;
   }
 
+  movePosition(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
   setStats(level) {
     this.level = level; // 타워 레벨
     const index = this.level - 1;

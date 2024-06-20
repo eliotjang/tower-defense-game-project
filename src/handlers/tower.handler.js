@@ -81,3 +81,24 @@ export const towerUpgradeHandler = async (uuid, payload, socket) => {
 
   socket.emit('towerUpgrade', { status: 'success', message: '타워 업그레이드 성공', userGold });
 };
+
+export const towerMoveHandler = async (uuid, payload, socket) => {
+  const { towerData, towerLevel } = payload;
+  const { tower } = getGameAssets();
+
+  //console.log(towerData);
+
+  /*   const user = await gameRedis.getGameData(uuid);
+  let userGold = +user.user_gold;
+
+  const targetTower = await gameRedis.getGameDataTower(uuid, towerData); */
+
+  if (targetTower.constructor === Object && Object.keys(targetTower).length === 0) {
+    throw new CustomError('타워 이동 검증 실패', 'towerMove');
+  }
+
+  /*   userGold -= tower.data[towerLevel].cost;
+  await gameRedis.patchGameDataGold(uuid, userGold); */
+
+  socket.emit('towerMove', { status: 'success', message: '타워 이동 성공' });
+};
