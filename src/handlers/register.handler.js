@@ -33,7 +33,18 @@ const registerHandler = (io) => {
       handleConnection(socket, sanitizedUUID);
 
       // 모든 서비스 이벤트 처리
-      socket.on('event', (data) => handleEvent(io, socket, data));
+      socket.on('event', (data) => {
+        if (data?.timestamp) {
+          const timestamp = Date.now();
+          const tolerance = 1000;
+          const diff = timestamp - data.timestamp;
+          if (diff > tolerance) {
+            throw new CustomError('Timestamp 검증 실패');
+          }
+        }
+
+        handleEvent(io, socket, data);
+      });
 
       // 접속 해제시 이벤트 처리
       socket.on('disconnect', () => handleDisconnect(socket, sanitizedUUID));
