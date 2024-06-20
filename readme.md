@@ -33,6 +33,10 @@
 
 - [Figma 와이어프레임 링크](https://www.figma.com/design/0AaF6o6BYZ0O7Kf2Gti03h/%ED%83%80%EC%9B%8C-%EB%94%94%ED%8E%9C%EC%8A%A4-%EA%B2%8C%EC%9E%84-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%99%80%EC%9D%B4%EC%96%B4%ED%94%84%EB%A0%88%EC%9E%84?node-id=0-1&t=stKLOtPYeCqIhrWz-0)
 
+### 에셋 스프라이트
+
+![Untitled](https://github.com/eliotjang/tower-defense-game-project/assets/images/images.png)
+
 ### 스킬 스택
 
 ![bcrypt](https://img.shields.io/badge/bcrypt-5.1.1-blue?logo=npm)
