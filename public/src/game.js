@@ -665,19 +665,25 @@ buySelectTowerButton.style.padding = '10px 20px';
 buySelectTowerButton.style.fontSize = '16px';
 buySelectTowerButton.style.cursor = 'pointer';
 
+const buttonClickHandler = (event) => {
+  const { x, y } = getRandomPositionNearPath(200); // 이벤트 리스너 내부에서 좌표를 받아오도록 수정
+  const buttonValue = event.target.textContent;
+  sendEvent(31, { towerData: { x, y }, towerIndex, towerLevel: buttonValue });
+  towerIndex++;
+  towerModal.style.display = 'none';
+};
+
 buySelectTowerButton.addEventListener('click', () => {
-  const { x, y } = getRandomPositionNearPath(200);
   towerModal.style.display = 'block';
   document.querySelectorAll('.btn').forEach((items) => {
-    items.addEventListener('click', () => {
-      const buttonValue = items.textContent;
-      sendEvent(31, { towerData: { x, y }, towerIndex, towerLevel: buttonValue });
-      towerIndex++;
-      towerModal.style.display = 'none';
-    });
+    // 기존 이벤트 리스너 제거
+    items.removeEventListener('click', buttonClickHandler);
+    // 새 이벤트 리스너 등록
+    items.addEventListener('click', buttonClickHandler);
   });
 });
 document.body.appendChild(buySelectTowerButton);
+
 
 const refundTowerButton = document.createElement('button');
 refundTowerButton.textContent = '타워 판매(랜덤)';
