@@ -4,9 +4,6 @@ import { Tower } from './tower.js';
 import towerData from '../assets/tower.json' with { type: 'json' };
 import { CLIENT_VERSION } from './Constants.js';
 
-
-
-
 let serverSocket; // 서버 웹소켓 객체
 let sendEvent;
 const canvas = document.getElementById('gameCanvas');
@@ -18,6 +15,15 @@ const NUM_OF_MONSTERS = 31; // 몬스터 이미지 개수
 let userGold = null; // 유저 골드
 let base; // 기지 객체
 let baseHp = null; // 기지 체력
+const modal = document.querySelector('.modal');
+const popUpAlert = (message) => {
+  const messageElement = document.querySelector('.message');
+  messageElement.textContent = message;
+  modal.classList.add('show');
+  setTimeout(() => {
+    modal.classList.remove('show');
+  }, 2000);
+};
 
 if (!sessionStorage.getItem('accessToken')) {
   //엑세스 토큰이 없다면 메인화면으로 돌려보냄
@@ -234,16 +240,18 @@ const onClickUpgradeTower = () => {
       checkClick = true;
       printHTML = ``;
       print.innerHTML = printHTML;
+      print.style.display ="none";
       canvas.removeEventListener('click', onClickUpgradeTower);
       break;
     }
   }
 
   if (!checkClick) {
-    popUpAlert('타워를 클릭하세요');
+    popUpAlert('타워가 클릭되지 않았습니다.');
   }
   printHTML = ``;
   print.innerHTML = printHTML;
+  print.style.display ="none";
   canvas.removeEventListener('click', onClickUpgradeTower);
 };
 
@@ -268,6 +276,7 @@ const onClickRefundTower = () => {
       checkClick = true;
       printHTML = ``;
       print.innerHTML = printHTML;
+      print.style.display ="none";
       canvas.removeEventListener('click', onClickRefundTower);
       break;
     }
@@ -278,6 +287,7 @@ const onClickRefundTower = () => {
   }
   printHTML = ``;
   print.innerHTML = printHTML;
+  print.style.display ="none";
   canvas.removeEventListener('click', onClickRefundTower);
 };
 
@@ -299,6 +309,7 @@ const onClickSelectPosition = (tower) => {
 
   printHTML = ``;
   print.innerHTML = printHTML;
+  print.style.display ="none";
 };
 
 const onClickMoveTower = () => {
@@ -320,15 +331,16 @@ const onClickMoveTower = () => {
   }
 
   if (!checkClick) {
-    popUpAlert('타워를 클릭하세요');
+    popUpAlert('타워가 지정되지 않았습니다');
   }
   printHTML = ``;
   print.innerHTML = printHTML;
+  print.style.display ="none";
   canvas.removeEventListener('click', onClickMoveTower);
 };
 
 function moveTower() {
-  canvas.addEventListener('mousedown', onClickMoveTower);
+  canvas.addEventListener('mouseclick', onClickMoveTower);
 }
 
 function placeBase() {
@@ -398,7 +410,7 @@ function gameLoop() {
         /* 게임 오버 */
         sendEvent(3, { timeStamp: Date.now(), score });
         location.reload();
-        popUpAlert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
+        alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
         setInterval(() => {
           window.location.href = 'index.html';
         }, 5000);
@@ -490,7 +502,9 @@ Promise.all([
 
   serverSocket.on('authorization', (message) => {
     popUpAlert(message);
-    window.location.href = 'index.html';
+    setInterval(() => {
+      window.location.href = 'index.html';
+    }, 2000);
   });
   serverSocket.on('gameStart', (data) => {
     if (data.status === 'success') {
@@ -697,8 +711,8 @@ upgradeTargetTowerButton.addEventListener('click', () => {
   }
   printHTML = `업그레이드할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
-  upgradeTargetTower();
   customStyle();
+  upgradeTargetTower();
 });
 
 document.body.appendChild(upgradeTargetTowerButton);
@@ -750,21 +764,21 @@ document.body.appendChild(moveTowerButton);
 
 const customStyle = () => {
   //css추가할 속성 목록
+  print.style.paddingLeft = '10px';
+  print.style.opacity = 1;
+  print.style.paddingRight = '10px';
   print.style.position = 'absolute';
-  print.style.top = '20vh';
-  print.style.fontSize = '50px';
-  print.style.color = 'black';
-  print.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-  print.style.boxShadow = '4px 4px 8px rgba(0, 0, 0, 0.3)';
+  print.style.display = 'flex';
+  print.style.justifyContent = 'center';
+  print.style.alignItems = 'center';
+  print.style.top = ' 10%';
+  print.style.width = 'auto';
+  print.style.height = '80px';
+  print.style.fontSize = '25px';
+  print.style.backgroundColor = 'white';
   print.style.borderRadius = '10px';
-};
-
-const modal = document.querySelector('.modal');
-const popUpAlert = (message) => {
-  const messageElement = document.querySelector('.message');
-  messageElement.textContent = message;
-  modal.classList.add('show');
-  setTimeout(() => {
-    modal.classList.remove('show');
-  }, 2000);
+  print.style.border = '1px solid black';
+  print.style.boxShadow = '3px 3px 10px black';
+  print.style.color = 'black';
+  print.style.transition = 'opacity 2s ease;'
 };
