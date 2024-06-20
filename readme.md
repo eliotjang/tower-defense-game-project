@@ -32,8 +32,6 @@
 ## Redis 데이터 & 데이터 테이블
 📊 [Redis 데이터 & 데이터 테이블](https://eliotjang.notion.site/Redis-acfa00b6d8b1466ea124f76bc33ec525)
 
-![image](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/0dc837d2-b3de-4cdf-baf1-96f5309f19d4)
-
 ## 게임 진행 및 검증
 ☑️ [Tower Defense Game Project 상세 문서](https://docs.google.com/document/d/1Kfs5g0g0XMkyDwW2GVRBIsG0SxAwl0vEWPsYPVKqRkc/edit?usp=sharing)
 
