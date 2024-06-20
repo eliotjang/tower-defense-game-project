@@ -342,7 +342,7 @@ const onClickMoveTower = (event) => {
 };
 
 function moveTower() {
-  canvas.addEventListener('mouseclick', onClickMoveTower);
+  canvas.addEventListener('click', onClickMoveTower);
 }
 
 function placeBase() {
@@ -757,6 +757,7 @@ moveTowerButton.addEventListener('click', () => {
   printHTML = `이동할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
   moveTower();
+
   customStyle();
 });
 
