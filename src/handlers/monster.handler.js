@@ -12,24 +12,30 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
     let currentStageId; //redis 데이터 기준 유저의 현재 스테이지
     let monsterList; //현재 있는 스테이지에 출현 가능한 몬스터 목록
     let stageField; //현재 스테이지의 정보
-    const user = await gameRedis.getGameData(uuid);
-    if (!user) {
+    const userGameData = await gameRedis.getGameData(uuid);
+
+    if (!userGameData) {
       throw new Error('정보를 찾을 수 없습니다');
     }
-    currentStageId = user.stage_id;
+
+    currentStageId = userGameData.stage_id;
     monsterList = monster_unlock.data.find((item) => item.stage_id == currentStageId).monster;
     stageField = stage.data.find((item) => item.id == currentStageId).target_score;
     if (monsterList.includes(monsterId)) {
-      const addScore = user.score + score;
+      const addScore = userGameData.score + score;
       await gameRedis.patchGameDataEx(uuid, { score: addScore }); // 몬스터 존재시 점수 증감
-      await gameRedis.patchGameDataEx(uuid, { kill_count: user.kill_count + 1 });
+      if (monsterId > 2000) {
+        await gameRedis.patchGameDataEx(uuid, { goblin_kill_count: userGameData.goblin_kill_count + 1 });
+      } else {
+        await gameRedis.patchGameDataEx(uuid, { kill_count: userGameData.kill_count + 1 });
+      }
     } else {
       throw new CustomError(`'몬스터 처치 검증 실패${monsterId}가 처치됨 ${monsterList} 현재 스폰 정보`, 'monsterKill');
     }
-    if (stageField < user.score) {
-      await gameRedis.patchGameDataEx(uuid, { stage_id: user.stage_id + 1 });
+    if (stageField < userGameData.score) {
+      await gameRedis.patchGameDataEx(uuid, { stage_id: userGameData.stage_id + 1 });
     }
-    socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', user: user.score });
+    socket.emit('monsterKill', { status: 'success', message: '몬스터 처치 성공', user: userGameData.score });
   } catch (error) {
     console.log({ errorMessage: error.message });
   }
@@ -39,7 +45,7 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
 //getUserData를 통해 모든 필드를 불러온다
 
 export const monsterSpawnHandler = async (uuid, payload, socket) => {
-  const { isGoblin } = payload;
+  const { isGoblin, timeStamp } = payload;
   if (isGoblin) {
     // 고블린의 검증은 다른 곳에서 수행됨
     return;
@@ -47,20 +53,13 @@ export const monsterSpawnHandler = async (uuid, payload, socket) => {
 
   const gameData = await gameRedis.getGameData(uuid);
   const interval = gameData.spawn_interval; // 스폰 간격
-  const timeStamp = Date.now();
-
-  let existsSpawnList = spawnList.findSpawnList(uuid);
-  if (!existsSpawnList) {
-    spawnList.addSpawnList(uuid, timeStamp);
-    existsSpawnList = spawnList.findSpawnList(uuid);
-  }
 
   const pastTimeStamp = spawnList.popSpawnList(uuid);
   if (pastTimeStamp) {
     const timeDifference = timeStamp - pastTimeStamp;
     if (timeDifference < interval - 1000) {
       // 인터벌보다 1초가량 더 빠르면
-      socket.emit('monsterSpawnHandler', { status: 'fail', message: '몬스터 생성 검증 실패' });
+      throw new CustomError('몬스터 생성 검증 실패', 'monsterSpawnHandler');
     }
   }
 
@@ -76,10 +75,6 @@ export const goblinSpawnHandler = async (uuid, payload, socket) => {
 
   if (elapsedTime < data.goblinMinInterval - constants.GOBLIN_SPAWN_INTERVAL_TOLERANCE) {
     throw new CustomError('보물 고블린 소환 검증 실패: 너무 빨리 소환됨', 'goblinSpawn');
-  }
-
-  if (false) {
-    throw new CustomError('보물 고블린 소환 검증 실패', 'goblinSpawn');
   }
 
   socket.emit('goblinSpawn', { status: 'success', message: '보물 고블린 소환' });
