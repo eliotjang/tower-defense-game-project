@@ -337,20 +337,38 @@ function spawnMonster(isGoblin) {
   sendEvent(22, { isGoblin, timeStamp: Date.now() });
 }
 
+const drawTextWithBackground = (ctx, text, x, y, textColor, backgroundColor) => {
+  const textMetrics = ctx.measureText(text);
+  const textWidth = textMetrics.width;
+  const textHeight = parseInt(ctx.font, 10);
+
+  // 박스의 크기와 위치 계산
+  const paddingX = 5;
+  const paddingY = 1;
+  const boxX = x - paddingX;
+  const boxY = y - textHeight + paddingY;
+  const boxWidth = textWidth + 2 * paddingX;
+  const boxHeight = textHeight + 2 * paddingY;
+
+  // 박스 그리기
+  ctx.fillStyle = backgroundColor;
+  ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+  // 텍스트 그리기
+  ctx.fillStyle = textColor;
+  ctx.fillText(text, x, y);
+};
+
 function gameLoop() {
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
 
   ctx.font = '25px Times New Roman';
-  ctx.fillStyle = 'skyblue';
-  ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
-  ctx.fillStyle = 'white';
-  ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
-  ctx.fillStyle = 'yellow';
-  ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
-  ctx.fillStyle = 'black';
-  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+  drawTextWithBackground(ctx, `최고 기록: ${highScore}`, 100, 50, 'skyblue', 'rgba(0, 0, 0, 0.8)');
+  drawTextWithBackground(ctx, `점수: ${score}`, 100, 100, 'white', 'rgba(0, 0, 0, 0.8)');
+  drawTextWithBackground(ctx, `골드: ${userGold}`, 100, 150, 'yellow', 'rgba(0, 0, 0, 0.8)');
+  drawTextWithBackground(ctx, `현재 레벨: ${monsterLevel}`, 100, 200, 'white', 'rgba(0, 0, 0, 0.8)');
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
