@@ -34,10 +34,10 @@ const registerHandler = (io) => {
 
       // 모든 서비스 이벤트 처리
       socket.on('event', (data) => {
-        if (data?.timestamp) {
-          const timestamp = Date.now();
+        if (data?.timeStamp) {
+          const timeStamp = Date.now();
           const tolerance = 1000;
-          const diff = timestamp - data.timestamp;
+          const diff = timeStamp - data.timeStamp;
           if (diff > tolerance) {
             throw new CustomError('Timestamp 검증 실패');
           }
