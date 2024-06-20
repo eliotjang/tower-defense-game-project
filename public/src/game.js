@@ -18,8 +18,10 @@ let baseHp = null; // 기지 체력
 
 if (!localStorage.getItem('accessToken')) {
   //엑세스 토큰이 없다면 메인화면으로 돌려보냄
-  alert('로그인이 필요합니다');
-  window.location.href = 'index.html';
+  popUpAlert('로그인이 필요합니다');
+  setTimeout(() => {
+    window.location.href = 'index.html';
+  }, 2000);
 }
 
 let towerCost = towerData.data[0].cost; // 타워 구입 비용
@@ -456,7 +458,7 @@ Promise.all([
   Object.values(towerImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
   Object.values(monsterImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  serverSocket = io('eliotjang.shop:3000', {
+  serverSocket = io('http://localhost:3000/', {
     query: {
       clientVersion: CLIENT_VERSION,
     },
@@ -481,7 +483,7 @@ Promise.all([
   });
 
   serverSocket.on('authorization', (message) => {
-    alert(message);
+    popUpAlert(message);
     window.location.href = 'index.html';
   });
   serverSocket.on('gameStart', (data) => {
@@ -510,7 +512,7 @@ Promise.all([
 
   serverSocket.on('monsterKill', (data) => {
     if (data.status === 'success') {
-      if(data.reward>0){
+      if (data.reward > 0) {
         userGold += 500;
       }
     } else {
@@ -741,7 +743,7 @@ moveTowerButton.addEventListener('click', () => {
 document.body.appendChild(moveTowerButton);
 
 const customStyle = () => {
-  //추가할 속성 목록
+  //css추가할 속성 목록
   print.style.position = 'absolute';
   print.style.top = '20vh';
   print.style.fontSize = '50px';
@@ -749,4 +751,14 @@ const customStyle = () => {
   print.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
   print.style.boxShadow = '4px 4px 8px rgba(0, 0, 0, 0.3)';
   print.style.borderRadius = '10px';
+};
+
+const modal = document.querySelector('.modal');
+const popUpAlert = (message) => {
+  const messageElement = document.querySelector('.message');
+  messageElement.textContent = message;
+  modal.classList.add('show');
+  setTimeout(() => {
+    modal.classList.remove('show');
+  }, 2000);
 };
