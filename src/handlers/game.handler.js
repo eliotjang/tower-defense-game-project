@@ -60,7 +60,6 @@ export const gameEnd = async (uuid, payload, socket) => {
   const elapsedTime = timeStamp - userGameData.start_time;
   console.log('경과 시간', elapsedTime);
 
-  const totalScore = userGameData.score;
   /* 검증 로직 */
   // 일반 몬스터 kill count 검증
   const maxPossibleSpawn = elapsedTime / game.data.monsterSpawnInterval;
@@ -73,11 +72,7 @@ export const gameEnd = async (uuid, payload, socket) => {
   if (maxPossibleGoblinSpawn < userGameData.goblin_kill_count) {
     throw new CustomError('고블린 kill count 검증 실패');
   }
-
-  /* ------ */
-
   socket.emit('gameEnd', { status: 'success', message: '게임 오버', elapsedTime, score });
-
   /* highscore 갱신 */
   const isHighscore = await highscoreRedis.createHighscoreData(uuid, score);
 
