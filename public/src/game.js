@@ -179,8 +179,9 @@ function placeInitialTower(x, y) {
   tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
-function placeNewTower(x, y) {
+function placeNewTower(x, y, level) {
   const tower = new Tower(x, y);
+  tower.level = level;
   towers.push(tower);
   tower.draw(ctx, towerImages[tower.getLevel()]);
 }
@@ -573,7 +574,7 @@ Promise.all([
     if (data.status === 'success') {
       userGold = data.userGold;
       // console.log('타워 구매 후 잔액', userGold); 테스트용 코드
-      placeNewTower(data.towerData.x, data.towerData.y);
+      placeNewTower(data.towerData.x, data.towerData.y, data.towerLevel);
     } else {
       popUpAlert('타워 구매 검증 실패');
     }
@@ -653,14 +654,36 @@ buyTowerButton.addEventListener('click', () => {
   sendEvent(31, { towerData: { x, y }, towerIndex });
   towerIndex++;
 });
-
 document.body.appendChild(buyTowerButton);
+const towerModal = document.querySelector('.towerModal');
+const buySelectTowerButton = document.createElement('button');
+buySelectTowerButton.textContent = '타워 구입(선택)';
+buySelectTowerButton.style.position = 'absolute';
+buySelectTowerButton.style.top = '10px';
+buySelectTowerButton.style.right = '130px';
+buySelectTowerButton.style.padding = '10px 20px';
+buySelectTowerButton.style.fontSize = '16px';
+buySelectTowerButton.style.cursor = 'pointer';
+
+buySelectTowerButton.addEventListener('click', () => {
+  const { x, y } = getRandomPositionNearPath(200);
+  towerModal.style.display = 'block';
+  document.querySelectorAll('.btn').forEach((items) => {
+    items.addEventListener('click', () => {
+      const buttonValue = items.textContent;
+      sendEvent(31, { towerData: { x, y }, towerIndex, towerLevel: buttonValue });
+      towerIndex++;
+      towerModal.style.display = 'none';
+    });
+  });
+});
+document.body.appendChild(buySelectTowerButton);
 
 const refundTowerButton = document.createElement('button');
 refundTowerButton.textContent = '타워 판매(랜덤)';
 refundTowerButton.style.position = 'absolute';
-refundTowerButton.style.top = '10px';
-refundTowerButton.style.right = '130px';
+refundTowerButton.style.top = '65px';
+refundTowerButton.style.right = '430px';
 refundTowerButton.style.padding = '10px 20px';
 refundTowerButton.style.fontSize = '16px';
 refundTowerButton.style.cursor = 'pointer';
@@ -721,8 +744,8 @@ document.body.appendChild(upgradeTargetTowerButton);
 const refundTargetTowerButton = document.createElement('button');
 refundTargetTowerButton.textContent = '타워 판매(지정)';
 refundTargetTowerButton.style.position = 'absolute';
-refundTargetTowerButton.style.top = '10px';
-refundTargetTowerButton.style.right = '290px';
+refundTargetTowerButton.style.top = '65px';
+refundTargetTowerButton.style.right = '595px';
 refundTargetTowerButton.style.padding = '10px 20px';
 refundTargetTowerButton.style.fontSize = '16px';
 refundTargetTowerButton.style.cursor = 'pointer';
