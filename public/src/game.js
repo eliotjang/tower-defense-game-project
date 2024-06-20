@@ -651,7 +651,7 @@ buyTowerButton.addEventListener('click', () => {
     return;
   }
 
-  sendEvent(31, { towerData: { x, y }, towerIndex });
+  sendEvent(31, { towerData: { x, y }, towerIndex, towerLevel: 1 });
   towerIndex++;
 });
 document.body.appendChild(buyTowerButton);
