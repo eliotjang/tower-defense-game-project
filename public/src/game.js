@@ -684,6 +684,7 @@ upgradeTargetTowerButton.addEventListener('click', () => {
   printHTML = `업그레이드할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
   upgradeTargetTower();
+  customStyle;
 });
 
 document.body.appendChild(upgradeTargetTowerButton);
@@ -705,6 +706,7 @@ refundTargetTowerButton.addEventListener('click', () => {
   printHTML = `환불할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
   refundTargetTower();
+  customStyle;
 });
 
 document.body.appendChild(refundTargetTowerButton);
@@ -727,6 +729,17 @@ moveTowerButton.addEventListener('click', () => {
   printHTML = `이동할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
   moveTower();
+  customStyle;
 });
 
 document.body.appendChild(moveTowerButton);
+
+
+const customStyle = () => {
+  //추가할 속성 목록
+  print.style.position = 'absolute';
+  print.style.top = '20vh';
+  print.fontSize = '50px';
+  print.style.color = 'black';
+  print.style.textShadow = '2px 2px 4px rgba(0, 0, 0, 0.5)';
+};
