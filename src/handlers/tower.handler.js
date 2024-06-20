@@ -79,7 +79,7 @@ export const towerUpgradeHandler = async (uuid, payload, socket) => {
   }
 
   if (userGold < tower.data[towerLevel].cost) {
-    socket.emit('towerPurchase', { status: 'fail', message: '타워 구매 검증 실패' });
+    socket.emit('towerUpgrade', { status: 'fail', message: '타워 구매 검증 실패' });
   }
 
   userGold -= tower.data[towerLevel].cost;
