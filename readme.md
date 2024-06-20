@@ -9,8 +9,7 @@
 - 📄 [프로젝트 기획 및 설계 회의록](https://eliotjang.notion.site/2ac80fb1c240424fad064ddc8e101f53)
 - :octocat: [깃허브 규칙](https://teamsparta.notion.site/Github-Rules-8d16ade1fe354cf0b5152b1f60e916b6?pvs=25)
 - 📁 [코드 컨벤션](https://teamsparta.notion.site/Code-Convention-43e5b060f8dd4a4590a083768393ff21?pvs=25)
-- [프로젝트 발표 대본]()
-- [프로젝트 포트폴리오]()
+- [프로젝트 포트폴리오](https://docs.google.com/presentation/d/16CnsQqkdcBKKpK8ztdzdH4NmM0T4rZ3PMLtDoXfXEaU/edit#slide=id.g2e3233e2a6e_0_78)
 - [프로젝트 시연영상](https://youtu.be/qURxWc9FWu0)
 
 ### 프로젝트 패킷 명세서
@@ -35,7 +34,7 @@
 
 ### 에셋 스프라이트
 
-![Untitled](https://github.com/eliotjang/tower-defense-game-project/assets/images/images.png)
+![Untitled]([https://github.com/eliotjang/tower-defense-game-project/assets/images/images.png](https://github.com/eliotjang/tower-defense-game-project/blob/dev/public/images/images.png))
 
 ### 스킬 스택
 
