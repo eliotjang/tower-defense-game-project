@@ -1,12 +1,37 @@
-# WebSocket Real-Time Game Server
+## 타워 디펜스 게임 프로젝트
 
-### 타워 디펜스 게임 배포 링크
+![image](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/12c5333d-ee4c-4f55-996f-002b881694e5)
 
-### 패킷 구조 설계
+프로젝트 제작 기간 : 2024.6.17.(월) ~ 2024.6.20.(목)
 
-### 데이터 테이블
+### 타워 디펜스 게임 프로젝트 기획 및 설계
 
-### 구현 내용
+- 📄 [프로젝트 기획 및 설계 회의록](https://eliotjang.notion.site/2ac80fb1c240424fad064ddc8e101f53)
+- :octocat: [깃허브 규칙](https://teamsparta.notion.site/Github-Rules-8d16ade1fe354cf0b5152b1f60e916b6?pvs=25)
+- 📁 [코드 컨벤션](https://teamsparta.notion.site/Code-Convention-43e5b060f8dd4a4590a083768393ff21?pvs=25)
+- [프로젝트 발표 대본]()
+- [프로젝트 포트폴리오]()
+- [프로젝트 시연영상](https://youtu.be/qURxWc9FWu0)
+
+### 프로젝트 패킷 명세서
+
+![Untitled (1)](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/042f0ea0-5f09-4da6-97f1-f18c95ffa2cb)
+
+- 📝 [프로젝트 패킷 명세서 링크](https://www.notion.so/2fed892d7d3a4fde9e6423cd13afd820)
+
+### Redis 데이터 & 데이터 테이블
+
+- 📊 [Redis 데이터 & 데이터 테이블 링크](https://eliotjang.notion.site/Redis-acfa00b6d8b1466ea124f76bc33ec525)
+
+### 게임 진행 및 검증
+
+- ☑️ [게임 진행 및 검증 문서 링크](https://docs.google.com/document/d/1Kfs5g0g0XMkyDwW2GVRBIsG0SxAwl0vEWPsYPVKqRkc/edit?usp=sharing)
+
+### 와이어프레임
+
+![Untitled](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/0928c553-00c7-495e-acfd-2a497ee5b80d)
+
+- [Figma 와이어프레임 링크](https://www.figma.com/design/0AaF6o6BYZ0O7Kf2Gti03h/%ED%83%80%EC%9B%8C-%EB%94%94%ED%8E%9C%EC%8A%A4-%EA%B2%8C%EC%9E%84-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%99%80%EC%9D%B4%EC%96%B4%ED%94%84%EB%A0%88%EC%9E%84?node-id=0-1&t=stKLOtPYeCqIhrWz-0)
 
 ### 스킬 스택
 
@@ -113,49 +138,6 @@ tower-defense-game-project
                 └── custom.error.js
 ```
 
-### 게임 진행
-#### 회원가입 및 로그인
-- 회원가입 후 로그인을 한다.
-- 로그인 후 JWT 토큰을 발급받아 게임 시작 버튼을 누르면 게임이 즉시 시작된다.
+### 프로젝트 제작 인원
 
-### 규칙
-#### 몬스터 출현 및 기지 방어
-- 왼쪽에서 몬스터가 정해진 시간마다 출현하며, 오른쪽에 있는 기지에 도달하여 기지의 체력이 0이 되면 게임오버가 된다.
-- 기지의 체력은 기지의 상단에 숫자로 표기되어 있으며 초기 체력은 200이다.
-
-#### 점수 및 스테이지 변화
-- 몬스터 1마리를 잡을 시 100점이 추가된다.
-- 누적 점수를 2000점 달성할 때마다 스테이지가 변경된다.
-- 스테이지는 총 7개가 존재한다.
-- 스테이지가 올라갈수록 몬스터의 체력, 속도, 기지에 주는 피해가 증가한다.
-- 스테이지가 올라가면 1000원을 받는다.
-
-#### 초기 설정
-- 처음 시작 시 기본 소지금은 3000원이다.
-
-### 타워
-#### 타워 생성
-- 게임을 시작하면 3개의 타워가 랜덤 위치에서 생성된다.
-
-#### 타워의 역할
-- 타워는 몬스터가 가까이 오면 자동으로 공격한다.
-
-#### 타워 구매
-- 보유한 골드를 소비해 새로운 타워를 구매할 수 있다.
-- 타워는 총 5개의 단계를 가지며 높은 단계의 타워일수록 강한 공격력을 가진다.
-- 타워 구매 시 원하는 단계의 타워를 선택해 구매할 수 있다.
-- 타워의 구매 가격은 원하는 타워의 단계 * 1000원이 든다.
-
-#### 타워 업그레이드
-- 우측 상단의 타워 업그레이드 버튼을 누르고 업그레이드를 원하는 타워를 누르면 1000원 차감 후 타워가 업그레이드된다.
-
-#### 타워 환불 및 이동
-- 게임 인터페이스 오른쪽 상단에 있는 버튼을 통해 타워 구매, 타워 환불, 타워 이동을 할 수 있다.
-
-### 몬스터
-- 몬스터는 총 5종류가 있으며 스테이지가 올라갈 때마다 강해진다.
-- 랜덤하게 보물고블린이 출현하는데, 보물고블린은 일반 몬스터보다 높은 체력을 가지고 있지만, 처치 시 1000골드를 준다.
-
-#### 게임 오버 이후
-- 최고 기록을 갱신하게 되면 서버에 최고 기록이 저장된다.
-- 새로고침을 통해 게임을 다시 시작할 수 있다.
+- [장성원](https://github.com/eliotjang/), [안홍걸](https://github.com/4cozm/), [김동균](https://github.com/donkim1212/)
