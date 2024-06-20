@@ -34,7 +34,7 @@
 
 ### 에셋 스프라이트
 
-![Untitled]([https://github.com/eliotjang/tower-defense-game-project/assets/images/images.png](https://github.com/eliotjang/tower-defense-game-project/blob/dev/public/images/images.png))
+![](https://github.com/eliotjang/tower-defense-game-project/blob/dev/public/images/images.png)
 
 ### 스킬 스택
 
