@@ -423,7 +423,6 @@ async function setGoblinSpawnRequest(minInterval, maxInterval) {
   const diff = maxInterval - minInterval;
   const interval = Math.floor(Math.random() * diff + minInterval);
   setTimeout(() => {
-    console.log('GOBLIN SPAWN REQUEST');
     sendEvent(23, { spawnTime: Date.now() });
     setGoblinSpawnRequest(minInterval, maxInterval);
   }, interval);
@@ -438,7 +437,7 @@ Promise.all([
   Object.values(towerImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
   Object.values(monsterImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  serverSocket = io('13.209.73.219:3000', {
+  serverSocket = io('http://localhost:3000/', {
     query: {
       clientVersion: CLIENT_VERSION,
     },
@@ -449,7 +448,7 @@ Promise.all([
 
   let userId = null;
   serverSocket.on('connection', async (data) => {
-    console.log(data);
+    console.log("서버와 연결되었습니다",data);
     userId = data.uuid;
     sendEvent(2, { timeStamp: Date.now() });
   });
@@ -460,7 +459,7 @@ Promise.all([
     } else {
       alert('최초 타워 추가 검증 실패');
     }
-    console.log(data);
+
   });
 
   serverSocket.on('authorization', (message) => {
@@ -482,7 +481,7 @@ Promise.all([
     } else {
       alert('게임 초기 정보 검증에 실패했습니다.');
     }
-    console.log(data);
+
   });
 
   serverSocket.on('gameEnd', (data) => {
@@ -490,7 +489,7 @@ Promise.all([
     } else {
       alert('gameEnd 실패 메시지 입력');
     }
-    console.log(data);
+
   });
 
   serverSocket.on('monsterKill', (data) => {
@@ -498,7 +497,6 @@ Promise.all([
     } else {
       alert(data.message);
     }
-    //console.log(data);
   });
 
   serverSocket.on('monsterSpawnHandler', (data) => {
@@ -506,7 +504,7 @@ Promise.all([
     } else {
       alert('monsterSpawnHandler 실패 메시지 입력');
     }
-    console.log(data);
+
   });
 
   serverSocket.on('goblinSpawn', (data) => {
@@ -516,32 +514,31 @@ Promise.all([
       location.reload();
       alert('고블린 소환 실패: 클라이언트 변조 탐지');
     }
-    console.log(data);
+
   });
 
   serverSocket.on('moveStage', async (data) => {
     if (data.status === 'success') {
       targetScore = data.targetScore;
       Monster.setMonsterPoolByStageId(data.stageId);
-      console.log('스테이지 이동 허용.현재 스테이지:', data.stageId - 99, '목표 점수:', data.targetScore);
+      // console.log('스테이지 이동 허용.현재 스테이지:', data.stageId - 99, '목표 점수:', data.targetScore); 테스트용 코드
       userGold += 1000; //레벨이 오르면 유저에게 1000원 제공
       monsterLevel = data.stageId - 99; //스테이지 레벨 변경
     } else {
       alert(data.message);
     }
-    console.log(data);
+
   });
 
   serverSocket.on('towerPurchase', (data) => {
     if (data.status === 'success') {
       userGold = data.userGold;
-      console.log('타워 구매 후 잔액', userGold);
+      // console.log('타워 구매 후 잔액', userGold); 테스트용 코드
       placeNewTower(data.towerData.x, data.towerData.y);
     } else {
       alert('타워 구매 검증 실패');
     }
 
-    console.log(data);
   });
 
   serverSocket.on('towerRefund', (data) => {
@@ -550,7 +547,7 @@ Promise.all([
     } else {
       alert('타워 환불 검증에 실패했습니다.');
     }
-    console.log(data);
+
   });
 
   serverSocket.on('towerUpgrade', (data) => {
@@ -559,7 +556,7 @@ Promise.all([
     } else {
       alert('실패 메시지 입력');
     }
-    console.log(data);
+
   });
 
   serverSocket.on('targetTowerUpgrade', (data) => {
@@ -568,7 +565,7 @@ Promise.all([
     } else {
       alert('실패 메시지 입력');
     }
-    console.log(data);
+
   });
 
   serverSocket.on('towerMove', (data) => {
@@ -577,12 +574,12 @@ Promise.all([
     } else {
       alert('실패 메시지 입력');
     }
-    console.log(data);
+
   });
 
   serverSocket.on('highscore', (data) => {
     // TODO: update highscore
-    console.log(data);
+
     highScore = data.highscore;
   });
 

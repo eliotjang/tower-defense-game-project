@@ -44,7 +44,6 @@ const signUp = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     //해시처리
-    console.log(hashedPassword);
 
     const UUID = uuidv4();
     await userRedis.createUserData(UUID, user_id, hashedPassword);
