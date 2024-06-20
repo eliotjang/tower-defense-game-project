@@ -10,7 +10,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 const NUM_OF_TOWERS = 5; // 타워 이미지 개수
-const NUM_OF_MONSTERS = 6; // 몬스터 이미지 개수
+const NUM_OF_MONSTERS = 31; // 몬스터 이미지 개수
 
 let userGold = null; // 유저 골드
 let base; // 기지 객체
