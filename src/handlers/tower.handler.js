@@ -27,7 +27,7 @@ export const towerPurchaseHandler = async (uuid, payload, socket) => {
 
   const user = await gameRedis.getGameData(uuid);
   let userGold = user.user_gold;
-  if (userGold < tower.data[0].cost) {
+  if (userGold < tower.data[towerLevel - 1].cost) {
     throw new CustomError('타워 구매 검증 실패', 'towerPurchase');
   }
   await gameRedis.patchGameDataTower(uuid, towerData, towerIndex);
