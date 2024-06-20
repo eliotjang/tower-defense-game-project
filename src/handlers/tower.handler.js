@@ -36,7 +36,6 @@ export const towerPurchaseHandler = async (uuid, payload, socket) => {
 
   const data = await gameRedis.getGameDataTowerList(uuid);
 
-
   socket.emit('towerPurchase', { status: 'success', message: '타워 구매 완료', towerData, userGold });
 };
 

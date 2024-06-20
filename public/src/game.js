@@ -240,7 +240,7 @@ const onClickUpgradeTower = () => {
       checkClick = true;
       printHTML = ``;
       print.innerHTML = printHTML;
-      print.style.display ="none";
+      print.style.display = 'none';
       canvas.removeEventListener('click', onClickUpgradeTower);
       break;
     }
@@ -251,7 +251,7 @@ const onClickUpgradeTower = () => {
   }
   printHTML = ``;
   print.innerHTML = printHTML;
-  print.style.display ="none";
+  print.style.display = 'none';
   canvas.removeEventListener('click', onClickUpgradeTower);
 };
 
@@ -276,7 +276,7 @@ const onClickRefundTower = () => {
       checkClick = true;
       printHTML = ``;
       print.innerHTML = printHTML;
-      print.style.display ="none";
+      print.style.display = 'none';
       canvas.removeEventListener('click', onClickRefundTower);
       break;
     }
@@ -287,7 +287,7 @@ const onClickRefundTower = () => {
   }
   printHTML = ``;
   print.innerHTML = printHTML;
-  print.style.display ="none";
+  print.style.display = 'none';
   canvas.removeEventListener('click', onClickRefundTower);
 };
 
@@ -309,7 +309,7 @@ const onClickSelectPosition = (tower) => {
 
   printHTML = ``;
   print.innerHTML = printHTML;
-  print.style.display ="none";
+  print.style.display = 'none';
 };
 
 const onClickMoveTower = () => {
@@ -335,7 +335,7 @@ const onClickMoveTower = () => {
   }
   printHTML = ``;
   print.innerHTML = printHTML;
-  print.style.display ="none";
+  print.style.display = 'none';
   canvas.removeEventListener('click', onClickMoveTower);
 };
 
@@ -780,5 +780,5 @@ const customStyle = () => {
   print.style.border = '1px solid black';
   print.style.boxShadow = '3px 3px 10px black';
   print.style.color = 'black';
-  print.style.transition = 'opacity 2s ease;'
+  print.style.transition = 'opacity 2s ease;';
 };
