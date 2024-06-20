@@ -9,8 +9,7 @@
 - 📄 [프로젝트 기획 및 설계 회의록](https://eliotjang.notion.site/2ac80fb1c240424fad064ddc8e101f53)
 - :octocat: [깃허브 규칙](https://teamsparta.notion.site/Github-Rules-8d16ade1fe354cf0b5152b1f60e916b6?pvs=25)
 - 📁 [코드 컨벤션](https://teamsparta.notion.site/Code-Convention-43e5b060f8dd4a4590a083768393ff21?pvs=25)
-- [프로젝트 발표 대본]()
-- [프로젝트 포트폴리오]()
+- [프로젝트 포트폴리오](https://docs.google.com/presentation/d/16CnsQqkdcBKKpK8ztdzdH4NmM0T4rZ3PMLtDoXfXEaU/edit#slide=id.g2e3233e2a6e_0_78)
 - [프로젝트 시연영상](https://youtu.be/qURxWc9FWu0)
 
 ### 프로젝트 패킷 명세서
@@ -32,6 +31,10 @@
 ![Untitled](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/0928c553-00c7-495e-acfd-2a497ee5b80d)
 
 - [Figma 와이어프레임 링크](https://www.figma.com/design/0AaF6o6BYZ0O7Kf2Gti03h/%ED%83%80%EC%9B%8C-%EB%94%94%ED%8E%9C%EC%8A%A4-%EA%B2%8C%EC%9E%84-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%99%80%EC%9D%B4%EC%96%B4%ED%94%84%EB%A0%88%EC%9E%84?node-id=0-1&t=stKLOtPYeCqIhrWz-0)
+
+### 에셋 스프라이트
+
+![](https://github.com/eliotjang/tower-defense-game-project/blob/dev/public/images/images.png)
 
 ### 스킬 스택
 
