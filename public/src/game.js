@@ -16,7 +16,7 @@ let userGold = null; // 유저 골드
 let base; // 기지 객체
 let baseHp = null; // 기지 체력
 
-if(!sessionStorage.getItem('accessToken')){ //엑세스 토큰이 없다면 메인화면으로 돌려보냄
+if(!localStorage.getItem('accessToken')){ //엑세스 토큰이 없다면 메인화면으로 돌려보냄
   alert("로그인이 필요합니다");
   window.location.href = 'index.html';
 }
@@ -447,7 +447,7 @@ Promise.all([
       clientVersion: CLIENT_VERSION,
     },
     auth: {
-      token: sessionStorage.getItem('accessToken'),
+      token: localStorage.getItem('accessToken'),
     },
   });
 
