@@ -1,4 +1,5 @@
-## 프로젝트명:타워 디펜스 게임 프로젝트
+## 프로젝트명:타워 디펜스 팀 프로젝트
+
 ![image](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/12c5333d-ee4c-4f55-996f-002b881694e5)
 
 - ### 프로젝트 제작 기간 : 2024.6.17.(월) ~ 2024.6.20.(목)
