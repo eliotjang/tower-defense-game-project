@@ -418,7 +418,7 @@ export const highscoreRedis = {
 
       return [false, false];
     } catch (err) {
-      console.error('Error creating highscore data: ', err);
+      // console.error('Error creating highscore data: ', err);
       return null;
     }
   },
@@ -439,7 +439,7 @@ export const highscoreRedis = {
         [GAME_FIELD_SCORE]: +data[1],
       };
     } catch (err) {
-      console.error('Error getting highscore data: ', err);
+      // console.error('Error getting highscore data: ', err);
       return null;
     }
   },

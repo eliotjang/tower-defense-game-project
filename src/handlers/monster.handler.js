@@ -59,7 +59,7 @@ export const monsterSpawnHandler = async (uuid, payload, socket) => {
     const timeDifference = timeStamp - pastTimeStamp;
     if (timeDifference < interval - 1000) {
       // 인터벌보다 1초가량 더 빠르면
-      throw new CustomError('몬스터 생성 검증 실패', 'monsterSpawnHandler');
+      throw new CustomError('몬스터 생성 검증 실패', 'monsterSpawn');
     }
   }
 
