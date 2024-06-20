@@ -495,6 +495,9 @@ Promise.all([
 
   serverSocket.on('monsterKill', (data) => {
     if (data.status === 'success') {
+      if(data.reward>0){
+        userGold += 500;
+      }
     } else {
       alert(data.message);
     }
