@@ -274,6 +274,57 @@ function refundTargetTower() {
   canvas.addEventListener('click', onClickRefundTower);
 }
 
+const onClickSelectPosition = (tower) => {
+  canvas.removeEventListener('click', onClickMoveTower);
+  canvas.removeEventListener('click', onClickSelectPosition);
+
+  printHTML = `옮길 위치를 클릭하세요`;
+  print.innerHTML = printHTML;
+  const posX = event.offsetX;
+  const posY = event.offsetY;
+
+  tower.movePosition(posX, posY);
+  tower.draw(ctx, towerImages[tower.getLevel()]);
+
+  printHTML = ``;
+  print.innerHTML = printHTML;
+};
+
+const onClickMoveTower = () => {
+  const x = event.offsetX;
+  const y = event.offsetY;
+
+  let checkClick = false;
+  for (const tower of towers) {
+    const left = tower.x;
+    const right = tower.x + tower.width;
+    const top = tower.y;
+    const bottom = tower.y + tower.height;
+    if (left <= x && x <= right && top <= y && y <= bottom) {
+      //sendEvent(34, { towerData: { x: tower.x, y: tower.y }, towerLevel: tower.getLevel() });
+
+      /* setTimeout(() => {
+        canvas.addEventListener('click', onClickSelectPosition(tower));
+      }, 1000); */
+      canvas.addEventListener('click', onClickSelectPosition(tower));
+
+      checkClick = true;
+      break;
+    }
+  }
+
+  if (!checkClick) {
+    alert('타워를 클릭하세요');
+  }
+  printHTML = ``;
+  print.innerHTML = printHTML;
+  canvas.removeEventListener('click', onClickMoveTower);
+};
+
+function moveTower() {
+  canvas.addEventListener('click', onClickMoveTower);
+}
+
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
   base = new Base(lastPoint.x, lastPoint.y, baseHp);
@@ -510,9 +561,19 @@ Promise.all([
     }
     console.log(data);
   });
+
   serverSocket.on('targetTowerUpgrade', (data) => {
     if (data.status === 'success') {
       userGold = data.userGold;
+    } else {
+      alert('실패 메시지 입력');
+    }
+    console.log(data);
+  });
+
+  serverSocket.on('towerMove', (data) => {
+    if (data.status === 'success') {
+      //
     } else {
       alert('실패 메시지 입력');
     }
@@ -645,3 +706,25 @@ refundTargetTowerButton.addEventListener('click', () => {
 });
 
 document.body.appendChild(refundTargetTowerButton);
+
+const moveTowerButton = document.createElement('button');
+moveTowerButton.textContent = '타워 이동(미완성)';
+moveTowerButton.style.position = 'absolute';
+moveTowerButton.style.top = '120px';
+moveTowerButton.style.right = '10px';
+moveTowerButton.style.padding = '10px 20px';
+moveTowerButton.style.fontSize = '16px';
+moveTowerButton.style.cursor = 'pointer';
+
+moveTowerButton.addEventListener('click', () => {
+  if (towers.length === 0) {
+    alert('이동할 타워가 없습니다.');
+    return;
+  }
+  //printHTML = `이동할 타워를 클릭하고, 옮길 위치를 클릭하세요`;
+  printHTML = `이동할 타워를 클릭하세요`;
+  print.innerHTML = printHTML;
+  moveTower();
+});
+
+document.body.appendChild(moveTowerButton);
