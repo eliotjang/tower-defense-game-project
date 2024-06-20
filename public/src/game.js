@@ -16,8 +16,9 @@ let userGold = null; // 유저 골드
 let base; // 기지 객체
 let baseHp = null; // 기지 체력
 
-if(!localStorage.getItem('accessToken')){ //엑세스 토큰이 없다면 메인화면으로 돌려보냄
-  alert("로그인이 필요합니다");
+if (!localStorage.getItem('accessToken')) {
+  //엑세스 토큰이 없다면 메인화면으로 돌려보냄
+  alert('로그인이 필요합니다');
   window.location.href = 'index.html';
 }
 
@@ -306,11 +307,6 @@ const onClickMoveTower = () => {
     const top = tower.y;
     const bottom = tower.y + tower.height;
     if (left <= x && x <= right && top <= y && y <= bottom) {
-      //sendEvent(34, { towerData: { x: tower.x, y: tower.y }, towerLevel: tower.getLevel() });
-
-      /* setTimeout(() => {
-        canvas.addEventListener('click', onClickSelectPosition(tower));
-      }, 1000); */
       canvas.addEventListener('click', onClickSelectPosition(tower));
 
       checkClick = true;
@@ -327,7 +323,7 @@ const onClickMoveTower = () => {
 };
 
 function moveTower() {
-  canvas.addEventListener('click', onClickMoveTower);
+  canvas.addEventListener('mousedown', onClickMoveTower);
 }
 
 function placeBase() {
@@ -453,7 +449,7 @@ Promise.all([
 
   let userId = null;
   serverSocket.on('connection', async (data) => {
-    console.log("서버와 연결되었습니다",data);
+    console.log('서버와 연결되었습니다', data);
     userId = data.uuid;
     sendEvent(2, { timeStamp: Date.now() });
   });
@@ -464,7 +460,6 @@ Promise.all([
     } else {
       alert('최초 타워 추가 검증 실패');
     }
-
   });
 
   serverSocket.on('authorization', (message) => {
@@ -486,7 +481,6 @@ Promise.all([
     } else {
       alert('게임 초기 정보 검증에 실패했습니다.');
     }
-
   });
 
   serverSocket.on('gameEnd', (data) => {
@@ -494,7 +488,6 @@ Promise.all([
     } else {
       alert('gameEnd 실패 메시지 입력');
     }
-
   });
 
   serverSocket.on('monsterKill', (data) => {
@@ -509,7 +502,6 @@ Promise.all([
     } else {
       alert('monsterSpawnHandler 실패 메시지 입력');
     }
-
   });
 
   serverSocket.on('goblinSpawn', (data) => {
@@ -519,7 +511,6 @@ Promise.all([
       location.reload();
       alert('고블린 소환 실패: 클라이언트 변조 탐지');
     }
-
   });
 
   serverSocket.on('moveStage', async (data) => {
@@ -532,7 +523,6 @@ Promise.all([
     } else {
       alert(data.message);
     }
-
   });
 
   serverSocket.on('towerPurchase', (data) => {
@@ -543,7 +533,6 @@ Promise.all([
     } else {
       alert('타워 구매 검증 실패');
     }
-
   });
 
   serverSocket.on('towerRefund', (data) => {
@@ -552,7 +541,6 @@ Promise.all([
     } else {
       alert('타워 환불 검증에 실패했습니다.');
     }
-
   });
 
   serverSocket.on('towerUpgrade', (data) => {
@@ -561,7 +549,6 @@ Promise.all([
     } else {
       alert('실패 메시지 입력');
     }
-
   });
 
   serverSocket.on('targetTowerUpgrade', (data) => {
@@ -570,7 +557,6 @@ Promise.all([
     } else {
       alert('실패 메시지 입력');
     }
-
   });
 
   serverSocket.on('towerMove', (data) => {
@@ -579,7 +565,6 @@ Promise.all([
     } else {
       alert('실패 메시지 입력');
     }
-
   });
 
   serverSocket.on('highscore', (data) => {
@@ -684,7 +669,7 @@ upgradeTargetTowerButton.addEventListener('click', () => {
   printHTML = `업그레이드할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
   upgradeTargetTower();
-  customStyle;
+  customStyle();
 });
 
 document.body.appendChild(upgradeTargetTowerButton);
@@ -706,7 +691,7 @@ refundTargetTowerButton.addEventListener('click', () => {
   printHTML = `환불할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
   refundTargetTower();
-  customStyle;
+  customStyle();
 });
 
 document.body.appendChild(refundTargetTowerButton);
@@ -729,17 +714,18 @@ moveTowerButton.addEventListener('click', () => {
   printHTML = `이동할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
   moveTower();
-  customStyle;
+  customStyle();
 });
 
 document.body.appendChild(moveTowerButton);
-
 
 const customStyle = () => {
   //추가할 속성 목록
   print.style.position = 'absolute';
   print.style.top = '20vh';
-  print.fontSize = '50px';
+  print.style.fontSize = '50px';
   print.style.color = 'black';
-  print.style.textShadow = '2px 2px 4px rgba(0, 0, 0, 0.5)';
+  print.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+  print.style.boxShadow = '4px 4px 8px rgba(0, 0, 0, 0.3)';
+  print.style.borderRadius = '10px';
 };
