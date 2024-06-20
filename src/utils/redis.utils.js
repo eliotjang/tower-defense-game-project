@@ -13,6 +13,7 @@ const GAME_FIELD_BASE_HP = 'base_hp';
 const GAME_FIELD_START_TIME = 'start_time';
 const GAME_FIELD_SPAWN_INTERVAL = 'spawn_interval';
 const GAME_FIELD_KILL_COUNT = 'kill_count';
+const GAME_FIELD_GOBLIN_KILL_COUNT = 'goblin_kill_count';
 const GAME_FIELD_GOBLIN_TIME = 'goblin_time';
 const TOWERS_PREFIX = 'towers:';
 // const GAME_FIELD_HIGHSCORE = 'highscore';
@@ -104,6 +105,7 @@ export const gameRedis = {
    * @param {number} spawnInterval 몬스터 소환 interval in millis
    * @param {number} lastGoblinSpawnTime 마지막 고블린 스폰 시간 (클라 기준, Date.now())
    * @param {number} killCount 몬스터 킬 카운트
+   * @param {number} goblinKillCount 고블린 킬 카운트
    */
   createGameData: async function (
     uuid,
@@ -115,7 +117,8 @@ export const gameRedis = {
     startTime,
     spawnInterval,
     lastGoblinSpawnTime,
-    killCount
+    killCount,
+    goblinKillCount
   ) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
@@ -132,6 +135,7 @@ export const gameRedis = {
         transaction.hSet(key, `${GAME_FIELD_SPAWN_INTERVAL}`, `${spawnInterval}`);
         transaction.hSet(key, `${GAME_FIELD_GOBLIN_TIME}`, `${lastGoblinSpawnTime}`);
         transaction.hSet(key, `${GAME_FIELD_KILL_COUNT}`, `${killCount}`);
+        transaction.hSet(key, `${GAME_FIELD_GOBLIN_KILL_COUNT}`, `${goblinKillCount}`);
         while (true) {
           const result = await transaction.exec();
           if (result) {

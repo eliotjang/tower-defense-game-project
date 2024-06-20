@@ -333,7 +333,7 @@ function placeBase() {
 
 function spawnMonster(isGoblin) {
   monsters.push(new Monster(monsterPath, monsterImages, isGoblin));
-  sendEvent(22, isGoblin);
+  sendEvent(22, { isGoblin, timeStamp: Date.now() });
 }
 
 function gameLoop() {
@@ -378,16 +378,15 @@ function gameLoop() {
       }
       monster.draw(ctx);
     } else {
-      /* 몬스터가 죽었을 때 */
-      score += monster.score;
-
+      if (!monster.passed) {
+        /* 몬스터가 죽었을 때 */
+        score += monster.score;
+        sendEvent(21, { monsterId: monster.id });
+      }
       if (score > targetScore) {
         //스코어가 일정 이상이면 스테이지 이동요청
         sendEvent(11, { currentStage });
       }
-
-      sendEvent(21, { monsterId: monster.id });
-      //monsterId:1001,timeStamp:3450387
       monsters.splice(i, 1);
     }
   }
