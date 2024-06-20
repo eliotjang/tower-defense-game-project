@@ -27,7 +27,8 @@
 
 📝 [타워 디펜스 게임 프로젝트 패킷 명세서](https://www.notion.so/2fed892d7d3a4fde9e6423cd13afd820)
 
-<img width="1000" alt="image" src="https://github.com/eliotjang/tower-defense-game-project/assets/49065386/344f6a6b-aa10-445c-98f3-1371ac033405">
+![Untitled (1)](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/042f0ea0-5f09-4da6-97f1-f18c95ffa2cb)
+
 
 ## Redis 데이터 & 데이터 테이블
 📊 [Redis 데이터 & 데이터 테이블](https://eliotjang.notion.site/Redis-acfa00b6d8b1466ea124f76bc33ec525)
