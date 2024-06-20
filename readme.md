@@ -3,6 +3,7 @@
 ![image](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/12c5333d-ee4c-4f55-996f-002b881694e5)
 
 - ### 프로젝트 제작 기간 : 2024.6.17.(월) ~ 2024.6.20.(목)
+- ### 팀원: [eliotjang](https://github.com/eliotjang/) , [4cozm](https://github.com/4cozm/) , [donkim1212](https://github.com/donkim1212/)
 - ### 프로젝트 발표 대본 :
 - ### 프로젝트 포트폴리오 :
 - ### 프로젝트 시연 영상 :
@@ -23,8 +24,14 @@
 
 ## 패킷 구조 설계
 ⚙️ [타워 디펜스 게임 프로젝트 패킷 구조 설계](https://eliotjang.notion.site/212e9e10bfdb41bfbfe93662bb5ff3c8?pvs=25)
+
+<img width="1000" alt="image" src="https://github.com/eliotjang/tower-defense-game-project/assets/49065386/344f6a6b-aa10-445c-98f3-1371ac033405">
+
 ## Redis 데이터 & 데이터 테이블
 📊 [Redis 데이터 & 데이터 테이블](https://eliotjang.notion.site/Redis-acfa00b6d8b1466ea124f76bc33ec525)
+
+![image](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/0dc837d2-b3de-4cdf-baf1-96f5309f19d4)
+
 ## 게임 진행 및 검증
 ☑️ [Tower Defense Game Project 상세 문서](https://docs.google.com/document/d/1Kfs5g0g0XMkyDwW2GVRBIsG0SxAwl0vEWPsYPVKqRkc/edit?usp=sharing)
 
