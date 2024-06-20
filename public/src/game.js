@@ -179,8 +179,9 @@ function placeInitialTower(x, y) {
   tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
-function placeNewTower(x, y) {
+function placeNewTower(x, y, level) {
   const tower = new Tower(x, y);
+  tower.level = level;
   towers.push(tower);
   tower.draw(ctx, towerImages[tower.getLevel()]);
 }
@@ -572,7 +573,7 @@ Promise.all([
     if (data.status === 'success') {
       userGold = data.userGold;
       // console.log('타워 구매 후 잔액', userGold); 테스트용 코드
-      placeNewTower(data.towerData.x, data.towerData.y);
+      placeNewTower(data.towerData.x, data.towerData.y, data.towerLevel);
     } else {
       popUpAlert('타워 구매 검증 실패');
     }
@@ -669,7 +670,7 @@ buySelectTowerButton.addEventListener('click', () => {
   document.querySelectorAll('.btn').forEach((items) => {
     items.addEventListener('click', () => {
       const buttonValue = items.textContent;
-      sendEvent(31, { towerData: { x, y }, towerIndex, level: buttonValue });
+      sendEvent(31, { towerData: { x, y }, towerIndex, towerLevel: buttonValue });
       towerIndex++;
       towerModal.style.display = 'none';
     });
