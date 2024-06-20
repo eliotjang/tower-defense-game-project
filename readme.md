@@ -3,7 +3,7 @@
 ![image](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/12c5333d-ee4c-4f55-996f-002b881694e5)
 
 - ### 프로젝트 제작 기간 : 2024.6.17.(월) ~ 2024.6.20.(목)
-- ### 팀원: [eliotjang](https://github.com/eliotjang/) , [4cozm](https://github.com/4cozm/) , [donkim1212](https://github.com/donkim1212/)
+- ### 팀원: [(장성원)eliotjang](https://github.com/eliotjang/) , [(안홍걸)4cozm](https://github.com/4cozm/) , [(김동균)donkim1212](https://github.com/donkim1212/)
 - ### 프로젝트 발표 대본 :
 - ### 프로젝트 포트폴리오 :
 - ### 프로젝트 시연 영상 :
