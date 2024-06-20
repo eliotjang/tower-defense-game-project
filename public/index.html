@@ -58,9 +58,53 @@
         justify-content: center;
         align-items: center;
       }
+      .towerModal {
+        display: none;
+        padding-left: 10px;
+        padding-right: 10px;
+        position: absolute;
+        top: 10%;
+        width: auto;
+        height: 160px;
+        font-size: 25px;
+        background-color: white;
+        border-radius: 10px;
+        border: 1px solid black;
+        box-shadow: 3px 3px 10px black;
+        color: black;
+      }
+      .btn {
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 10px 20px;
+        margin: 10px;
+      }
+      .btn:hover {
+        background-color: black;
+        color: white;
+      }
+      .btnContainer {
+        display: flex;
+        justify-content: center;
+      }
+      .towerModalText {
+        text-align: center;
+      }
     </style>
   </head>
   <body>
+    <div id="towerModal" class="towerModal">
+      <div class="towerModal-content">
+        <p class="towerModalText">구매할 타워를 선택해 주세요</p>
+        <div class="btnContainer">
+          <p class="btn">1</p>
+          <p class="btn">2</p>
+          <p class="btn">3</p>
+          <p class="btn">4</p>
+          <p class="btn">5</p>
+        </div>
+      </div>
+    </div>
     <div id="modal" class="modal">
       <div class="modal-content">
         <p class="message">메시지 내용</p>
