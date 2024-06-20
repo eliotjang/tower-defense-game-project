@@ -1,6 +1,7 @@
 import { getGameAssets } from '../init/assets.js';
 import { gameRedis, highscoreRedis } from '../utils/redis.utils.js';
 import CustomError from '../utils/errors/classes/custom.error.js';
+import { spawnList } from '../models/user.model.js';
 
 export const gameStart = async (uuid, payload, socket) => {
   const { timeStamp } = payload;
@@ -28,6 +29,9 @@ export const gameStart = async (uuid, payload, socket) => {
     timeStamp,
     0
   );
+
+  spawnList.addSpawnList(uuid, timeStamp);
+
   const data = await gameRedis.getGameData(uuid);
 
   //console.log('Redis 데이터', data);
@@ -43,43 +47,34 @@ export const gameStart = async (uuid, payload, socket) => {
     goblinMinInterval,
     goblinMaxInterval,
   });
+
+  socket.emit('highscore', { highscore: (await highscoreRedis.getHighscoreData())?.score || 0 });
 };
 
 export const gameEnd = async (uuid, payload, socket) => {
   const { timeStamp, score } = payload;
   const { game, monster } = getGameAssets();
   const { baseHp, monsterSpawnInterval } = game.data;
-  const { attack_power: attackPower, speed } = monster.data[0];
-  console.log('attackPower', attackPower);
-  console.log('speed', speed);
-  const gameData = await gameRedis.getGameData(uuid);
-
-  const elapsedTime = (timeStamp - gameData.start_time) / 1000;
-  console.log('경과 시간', elapsedTime);
-
   const userGameData = await gameRedis.getGameData(uuid);
 
-  const prevScore = userGameData.score;
-  /* 검증 로직 구현 */
-  let verification = false;
-  if (prevScore === score) {
-    verification = true;
+  const elapsedTime = timeStamp - userGameData.start_time;
+  console.log('경과 시간', elapsedTime);
+
+  const totalScore = userGameData.score;
+  /* 검증 로직 */
+  // 일반 몬스터 kill count 검증
+  const maxPossibleSpawn = elapsedTime / game.data.monsterSpawnInterval;
+  if (maxPossibleSpawn < userGameData.kill_count) {
+    throw new CustomError('몬스터 kill count 검증 실패');
   }
 
-  // 최소로 진행되는 플레이 시간보다 짧은 시간으로 종료 시 게임 오버 검증 실패
-  let totalDamagePerInterval = 0;
-  for (let i = speed * 20; i < elapsedTime; i += monsterSpawnInterval / 1000) {
-    totalDamagePerInterval += attackPower;
-  }
-  if (totalDamagePerInterval <= baseHp) {
-    verification = false;
+  // 고블린 kill count 검증
+  const maxPossibleGoblinSpawn = elapsedTime / game.data.goblinMinInterval;
+  if (maxPossibleGoblinSpawn < userGameData.goblin_kill_count) {
+    throw new CustomError('고블린 kill count 검증 실패');
   }
 
-  console.log('totalDamagePerInterval', totalDamagePerInterval);
-
-  if (!verification) {
-    throw new CustomError('게임 오버 검증 실패', 'gameEnd');
-  }
+  /* ------ */
 
   socket.emit('gameEnd', { status: 'success', message: '게임 오버', elapsedTime, score });
 
