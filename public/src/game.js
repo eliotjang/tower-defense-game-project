@@ -495,11 +495,11 @@ Promise.all([
 
   serverSocket.on('monsterKill', (data) => {
     if (data.status === 'success') {
-    } else {
-      alert(data.message);
       if(data.reward>0){
         userGold += 500;
       }
+    } else {
+      alert(data.message);
     }
     //console.log(data);
   });

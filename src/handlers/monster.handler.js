@@ -12,6 +12,7 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
     let currentStageId; //redis 데이터 기준 유저의 현재 스테이지
     let monsterList; //현재 있는 스테이지에 출현 가능한 몬스터 목록
     let stageField; //현재 스테이지의 정보
+    let goblin_Reward = 0; // 고블린 처치시 받는 보상 (초기값)
     const userGameData = await gameRedis.getGameData(uuid);
 
     if (!userGameData) {
@@ -27,7 +28,7 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
       if (monsterId > 2000) {
         await gameRedis.patchGameDataEx(uuid, { goblin_kill_count: userGameData.goblin_kill_count + 1 });
         await gameRedis.patchGameDataEx(uuid, { user_gold: userGameData.user_gold + 500 });
-        const goblin_Reward = 500;
+        goblin_Reward = 500;
       } else {
         await gameRedis.patchGameDataEx(uuid, { kill_count: userGameData.kill_count + 1 });
       }
