@@ -295,44 +295,46 @@ function refundTargetTower() {
   canvas.addEventListener('click', onClickRefundTower);
 }
 
-const onClickSelectPosition = (tower) => {
-  canvas.removeEventListener('click', onClickMoveTower);
-  canvas.removeEventListener('click', onClickSelectPosition);
-
+const onClickSelectPosition = (event) => {
   printHTML = `옮길 위치를 클릭하세요`;
   print.innerHTML = printHTML;
   const posX = event.offsetX;
   const posY = event.offsetY;
 
-  tower.movePosition(posX, posY);
-  tower.draw(ctx, towerImages[tower.getLevel()]);
+  towers[targetTowerIndex].movePosition(posX, posY);
+  targetTowerIndex = null;
 
   printHTML = ``;
   print.innerHTML = printHTML;
   print.style.display = 'none';
+  canvas.removeEventListener('click', onClickSelectPosition);
 };
 
-const onClickMoveTower = () => {
+let targetTowerIndex;
+const onClickMoveTower = (event) => {
   const x = event.offsetX;
   const y = event.offsetY;
 
-  let checkClick = false;
-  for (const tower of towers) {
-    const left = tower.x;
-    const right = tower.x + tower.width;
-    const top = tower.y;
-    const bottom = tower.y + tower.height;
+  for (let i = 0; i < towers.length; i++) {
+    const left = towers[i].x;
+    const right = towers[i].x + towers[i].width;
+    const top = towers[i].y;
+    const bottom = towers[i].y + towers[i].height;
     if (left <= x && x <= right && top <= y && y <= bottom) {
-      canvas.addEventListener('click', onClickSelectPosition(tower));
-
-      checkClick = true;
+      targetTowerIndex = i;
       break;
     }
   }
 
-  if (!checkClick) {
+  if (targetTowerIndex === undefined || targetTowerIndex === null) {
     popUpAlert('타워가 지정되지 않았습니다');
+    printHTML = ``;
+    print.innerHTML = printHTML;
+    return;
   }
+
+  canvas.addEventListener('click', onClickSelectPosition);
+
   printHTML = ``;
   print.innerHTML = printHTML;
   print.style.display = 'none';
@@ -470,7 +472,6 @@ async function setGoblinSpawnRequest(minInterval, maxInterval) {
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
-  // new Promise((resolve) => (towerImage.onload = resolve)),
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
   Object.values(towerImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
@@ -740,7 +741,7 @@ refundTargetTowerButton.addEventListener('click', () => {
 document.body.appendChild(refundTargetTowerButton);
 
 const moveTowerButton = document.createElement('button');
-moveTowerButton.textContent = '타워 이동(미완성)';
+moveTowerButton.textContent = '타워 이동';
 moveTowerButton.style.position = 'absolute';
 moveTowerButton.style.top = '120px';
 moveTowerButton.style.right = '10px';
@@ -753,7 +754,6 @@ moveTowerButton.addEventListener('click', () => {
     popUpAlert('이동할 타워가 없습니다.');
     return;
   }
-  //printHTML = `이동할 타워를 클릭하고, 옮길 위치를 클릭하세요`;
   printHTML = `이동할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
   moveTower();
