@@ -53,7 +53,7 @@ export const towerRefundHandler = async (uuid, payload, socket) => {
     throw new CustomError('타워 환불 검증 실패', 'towerRefund');
   }
 
-  userGold += tower.data[towerLevel - 1].cost;
+  userGold += Math.floor((tower.data[towerLevel - 1].cost * 75) / 100);
   await gameRedis.patchGameDataGold(uuid, userGold);
 
   await gameRedis.deleteGameDataTower(uuid, towerData);
