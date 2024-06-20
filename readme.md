@@ -1,26 +1,31 @@
-# WebSocket Real-Time Game Server
+## 프로젝트명:타워 디펜스 게임 프로젝트
 ![image](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/12c5333d-ee4c-4f55-996f-002b881694e5)
 
-### 프로젝트 제작 기간 : 2024.6.17.(월) ~ 2024.6.20.(목)
+- ### 프로젝트 제작 기간 : 2024.6.17.(월) ~ 2024.6.20.(목)
+- ### 프로젝트 발표 대본 :
+- ### 프로젝트 포트폴리오 :
+- ### 프로젝트 시연 영상 :
+    🎥 [YouTube](https://youtu.be/qURxWc9FWu0)
 
-### 프로젝트 시연 영상
-🎥:[YouTube](https://youtu.be/qURxWc9FWu0)
+## 와이어프레임
 
-### 프로젝트 회의 기록 :
+![Untitled](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/0928c553-00c7-495e-acfd-2a497ee5b80d)
+
+## 프로젝트 회의록/ GitHub Rules / 코드 컨벤션 
 
 
-- 📄[타워 디펜스 게임 프로젝트 기획 및 설계](https://eliotjang.notion.site/2ac80fb1c240424fad064ddc8e101f53)
+📄 [타워 디펜스 게임 프로젝트 기획 및 설계](https://eliotjang.notion.site/2ac80fb1c240424fad064ddc8e101f53)
 
-- :octocat::[Github Rules](https://teamsparta.notion.site/Github-Rules-8d16ade1fe354cf0b5152b1f60e916b6?pvs=25)
+:octocat: [Github Rules](https://teamsparta.notion.site/Github-Rules-8d16ade1fe354cf0b5152b1f60e916b6?pvs=25)
 
-- 📁[Code Convention](https://teamsparta.notion.site/Code-Convention-43e5b060f8dd4a4590a083768393ff21?pvs=25)
+📁 [Code Convention](https://teamsparta.notion.site/Code-Convention-43e5b060f8dd4a4590a083768393ff21?pvs=25)
 
-### 패킷 구조 설계
-- ⚙️[타워 디펜스 게임 프로젝트 패킷 구조 설계](https://eliotjang.notion.site/212e9e10bfdb41bfbfe93662bb5ff3c8?pvs=25)
-### Redis 데이터 & 데이터 테이블
-- 📊[Redis 데이터 & 데이터 테이블](https://eliotjang.notion.site/Redis-acfa00b6d8b1466ea124f76bc33ec525)
-### 게임 진행 및 검증
-- ☑️[Tower Defense Game Project 상세 문서](https://docs.google.com/document/d/1Kfs5g0g0XMkyDwW2GVRBIsG0SxAwl0vEWPsYPVKqRkc/edit?usp=sharing)
+## 패킷 구조 설계
+⚙️ [타워 디펜스 게임 프로젝트 패킷 구조 설계](https://eliotjang.notion.site/212e9e10bfdb41bfbfe93662bb5ff3c8?pvs=25)
+## Redis 데이터 & 데이터 테이블
+📊 [Redis 데이터 & 데이터 테이블](https://eliotjang.notion.site/Redis-acfa00b6d8b1466ea124f76bc33ec525)
+## 게임 진행 및 검증
+☑️ [Tower Defense Game Project 상세 문서](https://docs.google.com/document/d/1Kfs5g0g0XMkyDwW2GVRBIsG0SxAwl0vEWPsYPVKqRkc/edit?usp=sharing)
 
 ### 스킬 스택
 
