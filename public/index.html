@@ -31,9 +31,41 @@
         font-size: 16px;
         cursor: pointer;
       }
+      .modal {
+        padding-left: 10px;
+        padding-right: 10px;
+        opacity: 0;
+        position: absolute;
+        top: 10%;
+        width: auto;
+        height: 80px;
+        font-size: 25px;
+        background-color: white;
+        border-radius: 10px;
+        border: 1px solid black;
+        box-shadow: 3px 3px 10px black;
+        transition: opacity 0.5s ease;
+        color: black;
+      }
+      .modal.show {
+        opacity: 1; /* 모달이 나타날 때 opacity를 1로 설정하여 보이게 함 */
+      }
+      .modal-content {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
     </style>
   </head>
   <body>
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <p class="message">메시지 내용</p>
+      </div>
+    </div>
     <div class="button-container">
       <h1 style="color: white">타워 디펜스 게임 프로젝트</h1>
       <button id="registerButton">회원가입</button>

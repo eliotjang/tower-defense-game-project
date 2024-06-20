@@ -40,7 +40,7 @@ export class Monster {
    */
   static setMonsterPoolByStageId(stageId) {
     monsterPool = monsterData.data.filter((data) => data.stage_id == stageId);
-    console.log('몬스터 풀 :', monsterPool);
+    // console.log('몬스터 풀 :', monsterPool); 테스트 코드
   }
 
   init(level) {

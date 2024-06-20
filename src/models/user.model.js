@@ -53,23 +53,3 @@ export const findUser = async (uuid) => {
 export const getUsers = async () => {
   return users;
 };
-
-// 킬로그를 기반으로 검증하는 코드는 아직 사용하지 않는 관계로 주석처리 함
-// const userData = [];
-// const getUser = (socketId) => {
-//   return userData.find((user) => user.socketId === socketId);
-// };
-
-// const initializeUser = (socketId) => {
-//   //킬로그를 저장하는 인메모리 저장공간
-//   let user = getUser(socketId);
-//   if (!user) {
-//     user = {
-//       socketId: socketId,
-//       killLog: [],
-//     };
-//     userData.push(user);
-//     console.log(`유저 정보가 생성되었습니다 socketId: ${socketId}`);
-//   }
-//   return user;
-// };

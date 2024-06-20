@@ -32,9 +32,41 @@
         font-size: 16px;
         cursor: pointer;
       }
+      .modal {
+        padding-left: 10px;
+        padding-right: 10px;
+        opacity: 0;
+        position: absolute;
+        top: 10%;
+        width: auto;
+        height: 80px;
+        font-size: 25px;
+        background-color: white;
+        border-radius: 10px;
+        border: 1px solid black;
+        box-shadow: 3px 3px 10px black;
+        transition: opacity 1s ease;
+        color: black;
+      }
+      .modal.show {
+        opacity: 1; /* 모달이 나타날 때 opacity를 1로 설정하여 보이게 함 */
+      }
+      .modal-content {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
     </style>
   </head>
   <body>
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <p class="message">메시지 내용</p>
+      </div>
+    </div>
     <div class="form-container">
       <h1>타워 디펜스 게임 프로젝트</h1>
       <h2>로그인</h2>
@@ -62,10 +94,12 @@
           if (!response.ok) {
             throw new Error(data.errorMessage || '로그인 실패');
           } else {
-            localStorage.setItem('accessToken', data.token);
+            sessionStorage.setItem('accessToken', data.token);
           }
-          alert(data.message);
-          window.location.href = 'index.html';
+          popUpAlert(data.message);
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 1000);
         } catch (error) {
           alert(error.message);
         }
@@ -78,6 +112,15 @@
       document.getElementById('back').addEventListener('click', () => {
         window.location.href = 'index.html';
       });
+      const modal = document.querySelector('.modal');
+      const popUpAlert = (message) => {
+        const messageElement = document.querySelector('.message');
+        messageElement.textContent = message;
+        modal.classList.add('show');
+        setTimeout(() => {
+          modal.classList.remove('show');
+        }, 2000);
+      };
     </script>
   </body>
 </html>

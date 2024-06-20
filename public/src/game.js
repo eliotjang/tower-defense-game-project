@@ -15,6 +15,23 @@ const NUM_OF_MONSTERS = 31; // 몬스터 이미지 개수
 let userGold = null; // 유저 골드
 let base; // 기지 객체
 let baseHp = null; // 기지 체력
+const modal = document.querySelector('.modal');
+const popUpAlert = (message) => {
+  const messageElement = document.querySelector('.message');
+  messageElement.textContent = message;
+  modal.classList.add('show');
+  setTimeout(() => {
+    modal.classList.remove('show');
+  }, 2000);
+};
+
+if (!sessionStorage.getItem('accessToken')) {
+  //엑세스 토큰이 없다면 메인화면으로 돌려보냄
+  popUpAlert('로그인이 필요합니다');
+  setTimeout(() => {
+    window.location.href = 'index.html';
+  }, 2000);
+}
 
 let towerCost = towerData.data[0].cost; // 타워 구입 비용
 let numOfInitialTowers = null; // 초기 타워 개수
@@ -175,7 +192,7 @@ function refundTower(x, y) {
 
 function upgradeTower() {
   if (towers.length === 0) {
-    alert('업그레이드를 할 타워가 없습니다.');
+    popUpAlert('업그레이드를 할 타워가 없습니다.');
     return;
   }
 
@@ -184,12 +201,12 @@ function upgradeTower() {
   const level = targetTower.getLevel();
 
   if (level === 5) {
-    alert('해당 타워가 최대 레벨에 도달했습니다.');
+    popUpAlert('해당 타워가 최대 레벨에 도달했습니다.');
     return;
   }
 
   if (userGold < towerData.data[level].cost) {
-    alert(`해당 타워의 업그레이드 비용이 부족합니다. 필요 골드 : ${towerData.data[level].cost}`);
+    popUpAlert(`해당 타워의 업그레이드 비용이 부족합니다. 필요 골드 : ${towerData.data[level].cost}`);
     return;
   }
 
@@ -209,11 +226,11 @@ const onClickUpgradeTower = () => {
     const bottom = tower.y + tower.height;
     if (left <= x && x <= right && top <= y && y <= bottom) {
       if (tower.level === 5) {
-        alert('해당 타워가 최대 레벨에 도달했습니다.');
+        popUpAlert('해당 타워가 최대 레벨에 도달했습니다.');
         return;
       }
       if (userGold < towerData.data[tower.level].cost) {
-        alert(`해당 타워의 업그레이드 비용이 부족합니다. 필요 골드 : ${towerData.data[tower.level].cost}`);
+        popUpAlert(`해당 타워의 업그레이드 비용이 부족합니다. 필요 골드 : ${towerData.data[tower.level].cost}`);
         return;
       }
 
@@ -223,16 +240,18 @@ const onClickUpgradeTower = () => {
       checkClick = true;
       printHTML = ``;
       print.innerHTML = printHTML;
+      print.style.display = 'none';
       canvas.removeEventListener('click', onClickUpgradeTower);
       break;
     }
   }
 
   if (!checkClick) {
-    alert('타워를 클릭하세요');
+    popUpAlert('타워가 클릭되지 않았습니다.');
   }
   printHTML = ``;
   print.innerHTML = printHTML;
+  print.style.display = 'none';
   canvas.removeEventListener('click', onClickUpgradeTower);
 };
 
@@ -257,16 +276,18 @@ const onClickRefundTower = () => {
       checkClick = true;
       printHTML = ``;
       print.innerHTML = printHTML;
+      print.style.display = 'none';
       canvas.removeEventListener('click', onClickRefundTower);
       break;
     }
   }
 
   if (!checkClick) {
-    alert('타워를 클릭하세요');
+    popUpAlert('타워를 클릭하세요');
   }
   printHTML = ``;
   print.innerHTML = printHTML;
+  print.style.display = 'none';
   canvas.removeEventListener('click', onClickRefundTower);
 };
 
@@ -288,6 +309,7 @@ const onClickSelectPosition = (tower) => {
 
   printHTML = ``;
   print.innerHTML = printHTML;
+  print.style.display = 'none';
 };
 
 const onClickMoveTower = () => {
@@ -301,11 +323,6 @@ const onClickMoveTower = () => {
     const top = tower.y;
     const bottom = tower.y + tower.height;
     if (left <= x && x <= right && top <= y && y <= bottom) {
-      //sendEvent(34, { towerData: { x: tower.x, y: tower.y }, towerLevel: tower.getLevel() });
-
-      /* setTimeout(() => {
-        canvas.addEventListener('click', onClickSelectPosition(tower));
-      }, 1000); */
       canvas.addEventListener('click', onClickSelectPosition(tower));
 
       checkClick = true;
@@ -314,15 +331,16 @@ const onClickMoveTower = () => {
   }
 
   if (!checkClick) {
-    alert('타워를 클릭하세요');
+    popUpAlert('타워가 지정되지 않았습니다');
   }
   printHTML = ``;
   print.innerHTML = printHTML;
+  print.style.display = 'none';
   canvas.removeEventListener('click', onClickMoveTower);
 };
 
 function moveTower() {
-  canvas.addEventListener('click', onClickMoveTower);
+  canvas.addEventListener('mouseclick', onClickMoveTower);
 }
 
 function placeBase() {
@@ -336,20 +354,38 @@ function spawnMonster(isGoblin) {
   sendEvent(22, { isGoblin, timeStamp: Date.now() });
 }
 
+const drawTextWithBackground = (ctx, text, x, y, textColor, backgroundColor) => {
+  const textMetrics = ctx.measureText(text);
+  const textWidth = textMetrics.width;
+  const textHeight = parseInt(ctx.font, 10);
+
+  // 박스의 크기와 위치 계산
+  const paddingX = 5;
+  const paddingY = 1;
+  const boxX = x - paddingX;
+  const boxY = y - textHeight + paddingY;
+  const boxWidth = textWidth + 2 * paddingX;
+  const boxHeight = textHeight + 2 * paddingY;
+
+  // 박스 그리기
+  ctx.fillStyle = backgroundColor;
+  ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+  // 텍스트 그리기
+  ctx.fillStyle = textColor;
+  ctx.fillText(text, x, y);
+};
+
 function gameLoop() {
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
 
   ctx.font = '25px Times New Roman';
-  ctx.fillStyle = 'skyblue';
-  ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
-  ctx.fillStyle = 'white';
-  ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
-  ctx.fillStyle = 'yellow';
-  ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
-  ctx.fillStyle = 'black';
-  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+  drawTextWithBackground(ctx, `최고 기록: ${highScore}`, 100, 50, 'skyblue', 'rgba(0, 0, 0, 0.8)');
+  drawTextWithBackground(ctx, `점수: ${score}`, 100, 100, 'white', 'rgba(0, 0, 0, 0.8)');
+  drawTextWithBackground(ctx, `골드: ${userGold}`, 100, 150, 'yellow', 'rgba(0, 0, 0, 0.8)');
+  drawTextWithBackground(ctx, `현재 레벨: ${monsterLevel}`, 100, 200, 'white', 'rgba(0, 0, 0, 0.8)');
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
@@ -375,6 +411,9 @@ function gameLoop() {
         sendEvent(3, { timeStamp: Date.now(), score });
         location.reload();
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
+        setInterval(() => {
+          window.location.href = 'index.html';
+        }, 5000);
       }
       monster.draw(ctx);
     } else {
@@ -423,7 +462,6 @@ async function setGoblinSpawnRequest(minInterval, maxInterval) {
   const diff = maxInterval - minInterval;
   const interval = Math.floor(Math.random() * diff + minInterval);
   setTimeout(() => {
-    console.log('GOBLIN SPAWN REQUEST');
     sendEvent(23, { spawnTime: Date.now() });
     setGoblinSpawnRequest(minInterval, maxInterval);
   }, interval);
@@ -438,18 +476,18 @@ Promise.all([
   Object.values(towerImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
   Object.values(monsterImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  serverSocket = io('eliotjang.shop:3000', {
+  serverSocket = io('http://elitojang:3000/', {
     query: {
       clientVersion: CLIENT_VERSION,
     },
     auth: {
-      token: localStorage.getItem('accessToken'),
+      token: sessionStorage.getItem('accessToken'),
     },
   });
 
   let userId = null;
   serverSocket.on('connection', async (data) => {
-    console.log(data);
+    console.log('서버와 연결되었습니다', data);
     userId = data.uuid;
     sendEvent(2, { timeStamp: Date.now() });
   });
@@ -458,14 +496,15 @@ Promise.all([
     if (data.status === 'success') {
       placeInitialTower(data.towerData.x, data.towerData.y); // 설정된 초기 타워 개수만큼 사전에 타워 배치
     } else {
-      alert('최초 타워 추가 검증 실패');
+      popUpAlert('최초 타워 추가 검증 실패');
     }
-    console.log(data);
   });
 
   serverSocket.on('authorization', (message) => {
-    alert(message);
-    window.location.href = 'index.html';
+    popUpAlert(message);
+    setInterval(() => {
+      window.location.href = 'index.html';
+    }, 2000);
   });
   serverSocket.on('gameStart', (data) => {
     if (data.status === 'success') {
@@ -482,7 +521,6 @@ Promise.all([
     } else {
       alert('게임 초기 정보 검증에 실패했습니다.');
     }
-    console.log(data);
   });
 
   serverSocket.on('gameEnd', (data) => {
@@ -490,18 +528,16 @@ Promise.all([
     } else {
       alert('gameEnd 실패 메시지 입력');
     }
-    console.log(data);
   });
 
   serverSocket.on('monsterKill', (data) => {
     if (data.status === 'success') {
-      if(data.reward>0){
+      if (data.reward > 0) {
         userGold += 500;
       }
     } else {
       alert(data.message);
     }
-    //console.log(data);
   });
 
   serverSocket.on('monsterSpawnHandler', (data) => {
@@ -509,7 +545,6 @@ Promise.all([
     } else {
       alert('monsterSpawnHandler 실패 메시지 입력');
     }
-    console.log(data);
   });
 
   serverSocket.on('goblinSpawn', (data) => {
@@ -517,43 +552,38 @@ Promise.all([
       spawnMonster(true);
     } else {
       location.reload();
-      alert('고블린 소환 실패: 클라이언트 변조 탐지');
+      popUpAlert('고블린 소환 실패: 클라이언트 변조 탐지');
     }
-    console.log(data);
   });
 
   serverSocket.on('moveStage', async (data) => {
     if (data.status === 'success') {
       targetScore = data.targetScore;
       Monster.setMonsterPoolByStageId(data.stageId);
-      console.log('스테이지 이동 허용.현재 스테이지:', data.stageId - 99, '목표 점수:', data.targetScore);
+      // console.log('스테이지 이동 허용.현재 스테이지:', data.stageId - 99, '목표 점수:', data.targetScore); 테스트용 코드
       userGold += 1000; //레벨이 오르면 유저에게 1000원 제공
       monsterLevel = data.stageId - 99; //스테이지 레벨 변경
     } else {
       alert(data.message);
     }
-    console.log(data);
   });
 
   serverSocket.on('towerPurchase', (data) => {
     if (data.status === 'success') {
       userGold = data.userGold;
-      console.log('타워 구매 후 잔액', userGold);
+      // console.log('타워 구매 후 잔액', userGold); 테스트용 코드
       placeNewTower(data.towerData.x, data.towerData.y);
     } else {
-      alert('타워 구매 검증 실패');
+      popUpAlert('타워 구매 검증 실패');
     }
-
-    console.log(data);
   });
 
   serverSocket.on('towerRefund', (data) => {
     if (data.status === 'success') {
       userGold = data.userGold;
     } else {
-      alert('타워 환불 검증에 실패했습니다.');
+      popUpAlert('타워 환불 검증에 실패했습니다.');
     }
-    console.log(data);
   });
 
   serverSocket.on('towerUpgrade', (data) => {
@@ -562,7 +592,6 @@ Promise.all([
     } else {
       alert('실패 메시지 입력');
     }
-    console.log(data);
   });
 
   serverSocket.on('targetTowerUpgrade', (data) => {
@@ -571,7 +600,6 @@ Promise.all([
     } else {
       alert('실패 메시지 입력');
     }
-    console.log(data);
   });
 
   serverSocket.on('towerMove', (data) => {
@@ -580,12 +608,11 @@ Promise.all([
     } else {
       alert('실패 메시지 입력');
     }
-    console.log(data);
   });
 
   serverSocket.on('highscore', (data) => {
     // TODO: update highscore
-    console.log(data);
+
     highScore = data.highscore;
   });
 
@@ -618,7 +645,7 @@ buyTowerButton.addEventListener('click', () => {
   const { x, y } = getRandomPositionNearPath(200);
 
   if (userGold < towerData.data[0].cost) {
-    alert(`타워 구매 비용이 부족합니다. 필요 골드 : ${towerData.data[0].cost}`);
+    popUpAlert(`타워 구매 비용이 부족합니다. 필요 골드 : ${towerData.data[0].cost}`);
     return;
   }
 
@@ -639,7 +666,7 @@ refundTowerButton.style.cursor = 'pointer';
 
 refundTowerButton.addEventListener('click', () => {
   if (towers.length === 0) {
-    alert('환불할 타워가 없습니다');
+    popUpAlert('환불할 타워가 없습니다');
     return;
   }
 
@@ -679,11 +706,12 @@ upgradeTargetTowerButton.style.cursor = 'pointer';
 
 upgradeTargetTowerButton.addEventListener('click', () => {
   if (towers.length === 0) {
-    alert('업그레이드할 타워가 없습니다.');
+    popUpAlert('업그레이드할 타워가 없습니다.');
     return;
   }
   printHTML = `업그레이드할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
+  customStyle();
   upgradeTargetTower();
 });
 
@@ -700,12 +728,13 @@ refundTargetTowerButton.style.cursor = 'pointer';
 
 refundTargetTowerButton.addEventListener('click', () => {
   if (towers.length === 0) {
-    alert('환불할 타워가 없습니다.');
+    popUpAlert('환불할 타워가 없습니다.');
     return;
   }
   printHTML = `환불할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
   refundTargetTower();
+  customStyle();
 });
 
 document.body.appendChild(refundTargetTowerButton);
@@ -721,13 +750,35 @@ moveTowerButton.style.cursor = 'pointer';
 
 moveTowerButton.addEventListener('click', () => {
   if (towers.length === 0) {
-    alert('이동할 타워가 없습니다.');
+    popUpAlert('이동할 타워가 없습니다.');
     return;
   }
   //printHTML = `이동할 타워를 클릭하고, 옮길 위치를 클릭하세요`;
   printHTML = `이동할 타워를 클릭하세요`;
   print.innerHTML = printHTML;
   moveTower();
+  customStyle();
 });
 
 document.body.appendChild(moveTowerButton);
+
+const customStyle = () => {
+  //css추가할 속성 목록
+  print.style.paddingLeft = '10px';
+  print.style.opacity = 1;
+  print.style.paddingRight = '10px';
+  print.style.position = 'absolute';
+  print.style.display = 'flex';
+  print.style.justifyContent = 'center';
+  print.style.alignItems = 'center';
+  print.style.top = ' 10%';
+  print.style.width = 'auto';
+  print.style.height = '80px';
+  print.style.fontSize = '25px';
+  print.style.backgroundColor = 'white';
+  print.style.borderRadius = '10px';
+  print.style.border = '1px solid black';
+  print.style.boxShadow = '3px 3px 10px black';
+  print.style.color = 'black';
+  print.style.transition = 'opacity 2s ease;';
+};
