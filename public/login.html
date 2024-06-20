@@ -62,7 +62,7 @@
           if (!response.ok) {
             throw new Error(data.errorMessage || '로그인 실패');
           } else {
-            localStorage.setItem('accessToken', data.token);
+            sessionStorage.setItem('accessToken', data.token);
           }
           alert(data.message);
           window.location.href = 'index.html';
