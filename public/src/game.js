@@ -497,6 +497,9 @@ Promise.all([
     if (data.status === 'success') {
     } else {
       alert(data.message);
+      if(data.reward>0){
+        userGold += 500;
+      }
     }
     //console.log(data);
   });
