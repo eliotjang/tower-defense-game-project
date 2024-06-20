@@ -476,7 +476,7 @@ Promise.all([
   Object.values(towerImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
   Object.values(monsterImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  serverSocket = io('http://localhost:3000/', {
+  serverSocket = io('http://elitojang:3000/', {
     query: {
       clientVersion: CLIENT_VERSION,
     },
