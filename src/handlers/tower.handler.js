@@ -18,7 +18,7 @@ export const towerInitialHandler = async (uuid, payload, socket) => {
 };
 
 export const towerPurchaseHandler = async (uuid, payload, socket) => {
-  const { towerData, towerIndex } = payload;
+  const { towerData, towerIndex, level } = payload; // @@@@@@@@@@@@@@@@@@ 받아온 level 데이터로 포탑 생성 부탁ㄷㅂㅈㄷㅂ즈ㅐㄱㄴ디ㅏ
   const { tower } = getGameAssets();
 
   if (!towerData) {

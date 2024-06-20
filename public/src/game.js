@@ -476,7 +476,7 @@ Promise.all([
   Object.values(towerImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
   Object.values(monsterImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  serverSocket = io('http://elitojang:3000/', {
+  serverSocket = io('http://localhost:3000/', {
     query: {
       clientVersion: CLIENT_VERSION,
     },
@@ -652,14 +652,36 @@ buyTowerButton.addEventListener('click', () => {
   sendEvent(31, { towerData: { x, y }, towerIndex });
   towerIndex++;
 });
-
 document.body.appendChild(buyTowerButton);
+const towerModal = document.querySelector('.towerModal');
+const buySelectTowerButton = document.createElement('button');
+buySelectTowerButton.textContent = '타워 구입(선택)';
+buySelectTowerButton.style.position = 'absolute';
+buySelectTowerButton.style.top = '10px';
+buySelectTowerButton.style.right = '130px';
+buySelectTowerButton.style.padding = '10px 20px';
+buySelectTowerButton.style.fontSize = '16px';
+buySelectTowerButton.style.cursor = 'pointer';
+
+buySelectTowerButton.addEventListener('click', () => {
+  const { x, y } = getRandomPositionNearPath(200);
+  towerModal.style.display = 'block';
+  document.querySelectorAll('.btn').forEach((items) => {
+    items.addEventListener('click', () => {
+      const buttonValue = items.textContent;
+      sendEvent(31, { towerData: { x, y }, towerIndex, level: buttonValue });
+      towerIndex++;
+      towerModal.style.display = 'none';
+    });
+  });
+});
+document.body.appendChild(buySelectTowerButton);
 
 const refundTowerButton = document.createElement('button');
 refundTowerButton.textContent = '타워 판매(랜덤)';
 refundTowerButton.style.position = 'absolute';
-refundTowerButton.style.top = '10px';
-refundTowerButton.style.right = '130px';
+refundTowerButton.style.top = '65px';
+refundTowerButton.style.right = '430px';
 refundTowerButton.style.padding = '10px 20px';
 refundTowerButton.style.fontSize = '16px';
 refundTowerButton.style.cursor = 'pointer';
@@ -720,8 +742,8 @@ document.body.appendChild(upgradeTargetTowerButton);
 const refundTargetTowerButton = document.createElement('button');
 refundTargetTowerButton.textContent = '타워 판매(지정)';
 refundTargetTowerButton.style.position = 'absolute';
-refundTargetTowerButton.style.top = '10px';
-refundTargetTowerButton.style.right = '290px';
+refundTargetTowerButton.style.top = '65px';
+refundTargetTowerButton.style.right = '595px';
 refundTargetTowerButton.style.padding = '10px 20px';
 refundTargetTowerButton.style.fontSize = '16px';
 refundTargetTowerButton.style.cursor = 'pointer';
