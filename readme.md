@@ -1,40 +1,37 @@
-## 프로젝트명:타워 디펜스 팀 프로젝트
+## 타워 디펜스 게임 프로젝트
 
 ![image](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/12c5333d-ee4c-4f55-996f-002b881694e5)
 
-- ### 프로젝트 제작 기간 : 2024.6.17.(월) ~ 2024.6.20.(목)
-- ### 팀원: [(장성원)eliotjang](https://github.com/eliotjang/) , [(안홍걸)4cozm](https://github.com/4cozm/) , [(김동균)donkim1212](https://github.com/donkim1212/)
-- ### 프로젝트 발표 대본 :
-- ### 프로젝트 포트폴리오 :
-- ### 프로젝트 시연 영상 :
-    🎥 [YouTube](https://youtu.be/qURxWc9FWu0)
+프로젝트 제작 기간 : 2024.6.17.(월) ~ 2024.6.20.(목)
 
-## 와이어프레임
+### 타워 디펜스 게임 프로젝트 기획 및 설계
 
-![Untitled](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/0928c553-00c7-495e-acfd-2a497ee5b80d)
+- 📄 [프로젝트 기획 및 설계 회의록](https://eliotjang.notion.site/2ac80fb1c240424fad064ddc8e101f53)
+- :octocat: [깃허브 규칙](https://teamsparta.notion.site/Github-Rules-8d16ade1fe354cf0b5152b1f60e916b6?pvs=25)
+- 📁 [코드 컨벤션](https://teamsparta.notion.site/Code-Convention-43e5b060f8dd4a4590a083768393ff21?pvs=25)
+- [프로젝트 발표 대본]()
+- [프로젝트 포트폴리오]()
+- [프로젝트 시연영상](https://youtu.be/qURxWc9FWu0)
 
-## 프로젝트 회의록/ GitHub Rules / 코드 컨벤션 
-
-
-📄 [타워 디펜스 게임 프로젝트 기획 및 설계](https://eliotjang.notion.site/2ac80fb1c240424fad064ddc8e101f53)
-
-:octocat: [Github Rules](https://teamsparta.notion.site/Github-Rules-8d16ade1fe354cf0b5152b1f60e916b6?pvs=25)
-
-📁 [Code Convention](https://teamsparta.notion.site/Code-Convention-43e5b060f8dd4a4590a083768393ff21?pvs=25)
-
-## 패킷 명세서
+### 프로젝트 패킷 명세서
 
 ![Untitled (1)](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/042f0ea0-5f09-4da6-97f1-f18c95ffa2cb)
 
-📝 [타워 디펜스 게임 프로젝트 패킷 명세서](https://www.notion.so/2fed892d7d3a4fde9e6423cd13afd820)
+- 📝 [프로젝트 패킷 명세서 링크](https://www.notion.so/2fed892d7d3a4fde9e6423cd13afd820)
 
+### Redis 데이터 & 데이터 테이블
 
+- 📊 [Redis 데이터 & 데이터 테이블 링크](https://eliotjang.notion.site/Redis-acfa00b6d8b1466ea124f76bc33ec525)
 
-## Redis 데이터 & 데이터 테이블
-📊 [Redis 데이터 & 데이터 테이블](https://eliotjang.notion.site/Redis-acfa00b6d8b1466ea124f76bc33ec525)
+### 게임 진행 및 검증
 
-## 게임 진행 및 검증
-☑️ [Tower Defense Game Project 상세 문서](https://docs.google.com/document/d/1Kfs5g0g0XMkyDwW2GVRBIsG0SxAwl0vEWPsYPVKqRkc/edit?usp=sharing)
+- ☑️ [게임 진행 및 검증 문서 링크](https://docs.google.com/document/d/1Kfs5g0g0XMkyDwW2GVRBIsG0SxAwl0vEWPsYPVKqRkc/edit?usp=sharing)
+
+### 와이어프레임
+
+![Untitled](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/0928c553-00c7-495e-acfd-2a497ee5b80d)
+
+- [Figma 와이어프레임 링크](https://www.figma.com/design/0AaF6o6BYZ0O7Kf2Gti03h/%ED%83%80%EC%9B%8C-%EB%94%94%ED%8E%9C%EC%8A%A4-%EA%B2%8C%EC%9E%84-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%99%80%EC%9D%B4%EC%96%B4%ED%94%84%EB%A0%88%EC%9E%84?node-id=0-1&t=stKLOtPYeCqIhrWz-0)
 
 ### 스킬 스택
 
@@ -141,4 +138,6 @@ tower-defense-game-project
                 └── custom.error.js
 ```
 
+### 프로젝트 제작 인원
 
+- [장성원](https://github.com/eliotjang/), [안홍걸](https://github.com/4cozm/), [김동균](https://github.com/donkim1212/)
