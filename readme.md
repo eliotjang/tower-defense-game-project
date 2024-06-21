@@ -1,6 +1,6 @@
 ## 타워 디펜스 게임 프로젝트
 
-![image](https://github.com/eliotjang/tower-defense-game-project/assets/49065386/12c5333d-ee4c-4f55-996f-002b881694e5)
+![image](https://github.com/eliotjang/tower-defense-game-project/blob/dev/public/images/gamePage.png)
 
 프로젝트 제작 기간 : 2024.6.17.(월) ~ 2024.6.20.(목)
 
@@ -10,7 +10,7 @@
 - :octocat: [깃허브 규칙](https://teamsparta.notion.site/Github-Rules-8d16ade1fe354cf0b5152b1f60e916b6?pvs=25)
 - 📁 [코드 컨벤션](https://teamsparta.notion.site/Code-Convention-43e5b060f8dd4a4590a083768393ff21?pvs=25)
 - [프로젝트 포트폴리오](https://docs.google.com/presentation/d/16CnsQqkdcBKKpK8ztdzdH4NmM0T4rZ3PMLtDoXfXEaU/edit#slide=id.g2e3233e2a6e_0_78)
-- [프로젝트 시연영상](https://youtu.be/qURxWc9FWu0)
+- [프로젝트 시연영상](https://youtu.be/7fsyATB_O5Q?si=ydoGoitFdOT5nHBy)
 
 ### 프로젝트 패킷 명세서
 
