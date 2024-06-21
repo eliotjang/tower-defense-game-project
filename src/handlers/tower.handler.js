@@ -11,9 +11,9 @@ export const towerInitialHandler = async (uuid, payload, socket) => {
   // 타워 좌표 저장 확인
   // await gameRedis.getGameDataTowerList(uuid);
 
-  if (!towerData) {
-    throw new CustomError('최초 타워 추가 검증 실패', 'towerInitial');
-  }
+  // if (!towerData) {
+  //   throw new CustomError('최초 타워 추가 검증 실패', 'towerInitial');
+  // }
 
   socket.emit('towerInitial', { status: 'success', message: '최초 타워 추가 완료', towerData });
 };
@@ -22,9 +22,9 @@ export const towerPurchaseHandler = async (uuid, payload, socket) => {
   const { towerData, towerIndex, towerLevel } = payload;
   const { tower } = getGameAssets();
 
-  if (!towerData) {
-    throw new CustomError('타워 구매 검증 실패', 'towerPurchase');
-  }
+  // if (!towerData) {
+  //   throw new CustomError('타워 구매 검증 실패', 'towerPurchase');
+  // }
 
   const user = await gameRedis.getGameData(uuid);
   // let userGold = user.user_gold;
