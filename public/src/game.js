@@ -174,16 +174,13 @@ function getRandomPositionNearPath(maxDistance) {
 }
 
 function placeInitialTower(x, y) {
-  const tower = new Tower(x, y);
+  const tower = new Tower(x, y, 1);
   towers.push(tower);
-  tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
 function placeNewTower(x, y, level) {
-  const tower = new Tower(x, y);
-  tower.level = level;
+  const tower = new Tower(x, y, level);
   towers.push(tower);
-  tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
 function refundTower(x, y) {
@@ -478,7 +475,7 @@ Promise.all([
   Object.values(towerImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
   Object.values(monsterImages).map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  serverSocket = io('http://eliotjang.shop:3000/', {
+  serverSocket = io('localhost:3000/', {
     query: {
       clientVersion: CLIENT_VERSION,
     },
@@ -683,7 +680,6 @@ buySelectTowerButton.addEventListener('click', () => {
   });
 });
 document.body.appendChild(buySelectTowerButton);
-
 
 const refundTowerButton = document.createElement('button');
 refundTowerButton.textContent = '타워 판매(랜덤)';

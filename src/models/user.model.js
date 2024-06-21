@@ -4,6 +4,19 @@
 
 const users = [];
 const monsterSpawnList = {};
+const userGoldData = {};
+
+export const createUserGoldData = function (uuid, gold) {
+  userGoldData[uuid] = gold;
+};
+
+export const addUserGoldData = function (uuid, goldToAdd) {
+  userGoldData[uuid] = userGoldData[uuid] + goldToAdd;
+};
+
+export const getUserGoldData = function (uuid) {
+  return userGoldData[uuid];
+};
 
 export const spawnList = {
   addSpawnList: (uuid, timestamp) => {

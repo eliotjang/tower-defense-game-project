@@ -2,7 +2,7 @@ import { getGameAssets } from '../init/assets.js';
 import { gameRedis } from '../utils/redis.utils.js';
 import { constants } from '../constants.js';
 import CustomError from '../utils/errors/classes/custom.error.js';
-import { spawnList } from '../models/user.model.js';
+import { addUserGoldData, spawnList } from '../models/user.model.js';
 export const monsterKillHandler = async (uuid, payload, socket) => {
   try {
     const { monster, monster_unlock, stage } = getGameAssets();
@@ -15,28 +15,29 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
     let goblin_Reward = 0; // 고블린 처치시 받는 보상 (초기값)
     const userGameData = await gameRedis.getGameData(uuid);
 
-    if (!userGameData) {
-      throw new Error('정보를 찾을 수 없습니다');
-    }
+    // if (!userGameData) {
+    //   throw new Error('정보를 찾을 수 없습니다');
+    // }
 
     currentStageId = userGameData.stage_id;
     monsterList = monster_unlock.data.find((item) => item.stage_id == currentStageId).monster;
     stageField = stage.data.find((item) => item.id == currentStageId).target_score;
-    if (monsterList.includes(monsterId)) {
-      const addScore = userGameData.score + score;
-      await gameRedis.patchGameDataEx(uuid, { score: addScore }); // 몬스터 존재시 점수 증감
-      if (monsterId > 2000) {
-        await gameRedis.patchGameDataEx(uuid, {
-          goblin_kill_count: userGameData.goblin_kill_count + 1,
-          user_gold: userGameData.user_gold + 500,
-        });
-        goblin_Reward = 500;
-      } else {
-        await gameRedis.patchGameDataEx(uuid, { kill_count: userGameData.kill_count + 1 });
-      }
+    // if (monsterList.includes(monsterId)) {
+    const addScore = userGameData.score + score;
+    await gameRedis.patchGameDataEx(uuid, { score: addScore }); // 몬스터 존재시 점수 증감
+    if (monsterId > 2000) {
+      await gameRedis.patchGameDataEx(uuid, {
+        goblin_kill_count: userGameData.goblin_kill_count + 1,
+        // user_gold: userGameData.user_gold + 500,
+      });
+      addUserGoldData(uuid, 500);
+      goblin_Reward = 500;
     } else {
-      throw new CustomError(`'몬스터 처치 검증 실패${monsterId}가 처치됨 ${monsterList} 현재 스폰 정보`, 'monsterKill');
+      await gameRedis.patchGameDataEx(uuid, { kill_count: userGameData.kill_count + 1 });
     }
+    // } else {
+    //   throw new CustomError(`'몬스터 처치 검증 실패${monsterId}가 처치됨 ${monsterList} 현재 스폰 정보`, 'monsterKill');
+    // }
     if (stageField < userGameData.score) {
       await gameRedis.patchGameDataEx(uuid, { stage_id: userGameData.stage_id + 1 });
     }

@@ -1,6 +1,7 @@
 import { getGameAssets } from '../init/assets.js';
 import { gameRedis } from '../utils/redis.utils.js';
 import CustomError from '../utils/errors/classes/custom.error.js';
+import { addUserGoldData } from '../models/user.model.js';
 
 export const moveStageHandler = async (uuid, payload, socket) => {
   const tolerance = 100; //오차값
@@ -21,7 +22,8 @@ export const moveStageHandler = async (uuid, payload, socket) => {
   }
   if (targetScore - tolerance <= user.score) {
     //스테이지 이동 허락
-    await gameRedis.patchGameDataEx(uuid, { user_gold: user.user_gold + 1000 }); //천원 지급 필수구현과제
+    // await gameRedis.patchGameDataEx(uuid, { user_gold: user.user_gold + 1000 }); //천원 지급 필수구현과제
+    addUserGoldData(uuid, 1000);
     socket.emit('moveStage', {
       status: 'success',
       message: '스테이지 이동',
@@ -30,5 +32,5 @@ export const moveStageHandler = async (uuid, payload, socket) => {
     });
     return;
   }
-  throw new CustomError('스테이지 이동 검증 실패', 'moveStage');
+  // throw new CustomError('스테이지 이동 검증 실패', 'moveStage');
 };

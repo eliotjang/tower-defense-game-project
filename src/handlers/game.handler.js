@@ -1,7 +1,7 @@
 import { getGameAssets } from '../init/assets.js';
 import { gameRedis, highscoreRedis } from '../utils/redis.utils.js';
 import CustomError from '../utils/errors/classes/custom.error.js';
-import { spawnList } from '../models/user.model.js';
+import { createUserGoldData, spawnList } from '../models/user.model.js';
 
 export const gameStart = async (uuid, payload, socket) => {
   const { timeStamp } = payload;
@@ -29,6 +29,7 @@ export const gameStart = async (uuid, payload, socket) => {
     timeStamp,
     0
   );
+  createUserGoldData(uuid, userGold);
 
   spawnList.addSpawnList(uuid, timeStamp);
 
@@ -63,15 +64,15 @@ export const gameEnd = async (uuid, payload, socket) => {
   /* 검증 로직 */
   // 일반 몬스터 kill count 검증
   const maxPossibleSpawn = elapsedTime / game.data.monsterSpawnInterval;
-  if (maxPossibleSpawn < userGameData.kill_count) {
-    throw new CustomError('몬스터 kill count 검증 실패');
-  }
+  // if (maxPossibleSpawn < userGameData.kill_count) {
+  //   throw new CustomError('몬스터 kill count 검증 실패');
+  // }
 
   // 고블린 kill count 검증
   const maxPossibleGoblinSpawn = elapsedTime / game.data.goblinMinInterval;
-  if (maxPossibleGoblinSpawn < userGameData.goblin_kill_count) {
-    throw new CustomError('고블린 kill count 검증 실패');
-  }
+  // if (maxPossibleGoblinSpawn < userGameData.goblin_kill_count) {
+  //   throw new CustomError('고블린 kill count 검증 실패');
+  // }
   const result = {
     emit: {
       event: 'gameEnd',
