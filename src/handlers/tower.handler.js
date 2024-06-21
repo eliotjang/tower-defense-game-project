@@ -55,9 +55,9 @@ export const towerRefundHandler = async (uuid, payload, socket) => {
 
   const targetTower = await gameRedis.getGameDataTower(uuid, towerData);
 
-  if (targetTower.constructor === Object && Object.keys(targetTower).length === 0) {
-    throw new CustomError('타워 환불 검증 실패', 'towerRefund');
-  }
+  // if (targetTower.constructor === Object && Object.keys(targetTower).length === 0) {
+  //   throw new CustomError('타워 환불 검증 실패', 'towerRefund');
+  // }
 
   addUserGoldData(uuid, Math.floor((tower.data[towerLevel - 1].cost * 75) / 100));
   // await gameRedis.patchGameDataGold(uuid, userGold);
@@ -104,9 +104,9 @@ export const towerMoveHandler = async (uuid, payload, socket) => {
 
   const targetTower = await gameRedis.getGameDataTower(uuid, towerData); */
 
-  if (targetTower.constructor === Object && Object.keys(targetTower).length === 0) {
-    throw new CustomError('타워 이동 검증 실패', 'towerMove');
-  }
+  // if (targetTower.constructor === Object && Object.keys(targetTower).length === 0) {
+  //   throw new CustomError('타워 이동 검증 실패', 'towerMove');
+  // }
 
   /*   userGold -= tower.data[towerLevel].cost;
   await gameRedis.patchGameDataGold(uuid, userGold); */
