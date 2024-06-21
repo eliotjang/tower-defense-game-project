@@ -62,7 +62,7 @@ export const towerRefundHandler = async (uuid, payload, socket) => {
 
   await gameRedis.deleteGameDataTower(uuid, towerData);
 
-  socket.emit('towerRefund', { status: 'success', message: '타워 환불 성공', userGold });
+  socket.emit('towerRefund', { status: 'success', message: '타워 환불 성공', userGold, towerLevel });
 };
 
 export const towerUpgradeHandler = async (uuid, payload, socket) => {
@@ -87,7 +87,7 @@ export const towerUpgradeHandler = async (uuid, payload, socket) => {
   userGold -= tower.data[towerLevel].cost;
   await gameRedis.patchGameDataGold(uuid, userGold);
 
-  socket.emit('towerUpgrade', { status: 'success', message: '타워 업그레이드 성공', userGold });
+  socket.emit('towerUpgrade', { status: 'success', message: '타워 업그레이드 성공', userGold, towerLevel });
 };
 
 export const towerMoveHandler = async (uuid, payload, socket) => {

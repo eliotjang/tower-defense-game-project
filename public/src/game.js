@@ -184,9 +184,6 @@ function placeNewTower(x, y, level) {
 }
 
 function refundTower(targetTowerIndex) {
-  console.log(targetTowerIndex);
-  console.log(towers);
-  console.log(towers[targetTowerIndex]);
   sendEvent(32, {
     towerData: { x: towers[targetTowerIndex].x, y: towers[targetTowerIndex].y },
     towerLevel: towers[targetTowerIndex].getLevel(),
@@ -595,7 +592,7 @@ Promise.all([
 
   serverSocket.on('towerRefund', (data) => {
     if (data.status === 'success') {
-      userGold = data.userGold;
+      userGold += towerData.data[data.towerLevel - 1].cost;
     } else {
       popUpAlert('타워 환불 검증에 실패했습니다.');
     }
@@ -603,9 +600,10 @@ Promise.all([
 
   serverSocket.on('towerUpgrade', (data) => {
     if (data.status === 'success') {
-      userGold = data.userGold;
+      userGold -= towerData.data[data.towerLevel - 1].cost;
     } else {
-      alert('실패 메시지 입력');
+      // alert('실패 메시지 입력');
+      popUpAlert(data.message);
     }
   });
 
