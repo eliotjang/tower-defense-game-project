@@ -51,7 +51,7 @@ export const towerRefundHandler = async (uuid, payload, socket) => {
 
   const user = await gameRedis.getGameData(uuid);
   // let userGold = +user.user_gold;
-  userGold = getUserGoldData(uuid);
+  let userGold = getUserGoldData(uuid);
 
   const targetTower = await gameRedis.getGameDataTower(uuid, towerData);
 
