@@ -26,8 +26,10 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
       const addScore = userGameData.score + score;
       await gameRedis.patchGameDataEx(uuid, { score: addScore }); // 몬스터 존재시 점수 증감
       if (monsterId > 2000) {
-        await gameRedis.patchGameDataEx(uuid, { goblin_kill_count: userGameData.goblin_kill_count + 1 });
-        await gameRedis.patchGameDataEx(uuid, { user_gold: userGameData.user_gold + 500 });
+        await gameRedis.patchGameDataEx(uuid, {
+          goblin_kill_count: userGameData.goblin_kill_count + 1,
+          user_gold: userGameData.user_gold + 500,
+        });
         goblin_Reward = 500;
       } else {
         await gameRedis.patchGameDataEx(uuid, { kill_count: userGameData.kill_count + 1 });
