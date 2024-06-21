@@ -21,7 +21,11 @@ export const moveStageHandler = async (uuid, payload, socket) => {
   }
   if (targetScore - tolerance <= user.score) {
     //스테이지 이동 허락
-    await gameRedis.patchGameDataEx(uuid, { user_gold: user.user_gold + 1000 }); //천원 지급 필수구현과제
+    await gameRedis.patchGameDataEx(
+      uuid,
+      { user_gold: user.user_gold + 1000, stage_id: user.stage_id + 1 },
+      'monsterKillHandler'
+    ); //천원 지급 필수구현과제
     socket.emit('moveStage', {
       status: 'success',
       message: '스테이지 이동',

@@ -52,7 +52,9 @@ export const towerRefundHandler = async (uuid, payload, socket) => {
   const targetTower = await gameRedis.getGameDataTower(uuid, towerData);
 
   if (targetTower.constructor === Object && Object.keys(targetTower).length === 0) {
-    throw new CustomError('타워 환불 검증 실패', 'towerRefund');
+    // throw new CustomError('타워 환불 검증 실패', 'towerRefund');
+    socket.emit('towerRefund', { status: 'success', message: '타워가 없습니다' });
+    return;
   }
 
   userGold += Math.floor((tower.data[towerLevel - 1].cost * 75) / 100);
