@@ -28,8 +28,11 @@ export const handleEvent = async (io, socket, data) => {
 
     // 유저에게 메시지 전송
     const result = await handler(data.userId, data.payload, socket, io);
-    if (result?.broadcast?.namespace) {
-      io.emit(result.broadcast.namespace, result.broadcast[namespace]);
+    if (result) {
+      socket.emit(result.emit.event, result.emit.data);
+      if (result.broadcast?.event) {
+        io.emit(result.broadcast.event, result.broadcast[namespace]);
+      }
     }
   } catch (err) {
     await handleError(err, socket, data.userId);

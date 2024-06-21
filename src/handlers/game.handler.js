@@ -72,12 +72,19 @@ export const gameEnd = async (uuid, payload, socket) => {
   if (maxPossibleGoblinSpawn < userGameData.goblin_kill_count) {
     throw new CustomError('고블린 kill count 검증 실패');
   }
-  socket.emit('gameEnd', { status: 'success', message: '게임 오버', elapsedTime, score });
+  const result = {
+    emit: {
+      event: 'gameEnd',
+      data: { status: 'success', message: '게임 오버', elapsedTime, score },
+    },
+  };
+
   /* highscore 갱신 */
   const isHighscore = await highscoreRedis.createHighscoreData(uuid, score);
 
   if (isHighscore && isHighscore[1]) {
-    return { broadcast: { namespace: 'highscore', highscore: score } };
+    result.broadcast = { event: 'highscore', highscore: score };
   }
   /* ----- */
+  return result;
 };
