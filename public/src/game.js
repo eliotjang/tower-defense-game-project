@@ -174,21 +174,24 @@ function getRandomPositionNearPath(maxDistance) {
 }
 
 function placeInitialTower(x, y) {
-  const tower = new Tower(x, y);
+  const tower = new Tower(x, y, 1);
   towers.push(tower);
-  tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
 function placeNewTower(x, y, level) {
-  const tower = new Tower(x, y);
-  tower.level = level;
+  const tower = new Tower(x, y, level);
   towers.push(tower);
-  tower.draw(ctx, towerImages[tower.getLevel()]);
 }
 
-function refundTower(x, y) {
-  const index = towers.findIndex((e) => e.x === x && e.y === y);
-  towers.splice(index, 1);
+function refundTower(targetTowerIndex) {
+  console.log(targetTowerIndex);
+  console.log(towers);
+  console.log(towers[targetTowerIndex]);
+  sendEvent(32, {
+    towerData: { x: towers[targetTowerIndex].x, y: towers[targetTowerIndex].y },
+    towerLevel: towers[targetTowerIndex].getLevel(),
+  });
+  towers.splice(targetTowerIndex, 1);
 }
 
 function upgradeTower() {
@@ -215,41 +218,49 @@ function upgradeTower() {
   targetTower.upgrade();
 }
 
-const onClickUpgradeTower = () => {
+const onClickUpgradeTower = (event) => {
   const x = event.offsetX;
   const y = event.offsetY;
 
-  let checkClick = false;
-  for (const tower of towers) {
-    const left = tower.x;
-    const right = tower.x + tower.width;
-    const top = tower.y;
-    const bottom = tower.y + tower.height;
+  // let checkClick = false;
+  let targetTowerIndex;
+  for (let i = 0; i < towers.length; i++) {
+    const left = towers[i].x;
+    const right = towers[i].x + towers[i].width;
+    const top = towers[i].y;
+    const bottom = towers[i].y + towers[i].height;
     if (left <= x && x <= right && top <= y && y <= bottom) {
-      if (tower.level === 5) {
-        popUpAlert('해당 타워가 최대 레벨에 도달했습니다.');
-        return;
-      }
-      if (userGold < towerData.data[tower.level].cost) {
-        popUpAlert(`해당 타워의 업그레이드 비용이 부족합니다. 필요 골드 : ${towerData.data[tower.level].cost}`);
-        return;
-      }
-
-      sendEvent(33, { towerData: { x: tower.x, y: tower.y }, towerLevel: tower.getLevel() });
-
-      tower.upgrade();
-      checkClick = true;
-      printHTML = ``;
-      print.innerHTML = printHTML;
-      print.style.display = 'none';
-      canvas.removeEventListener('click', onClickUpgradeTower);
+      targetTowerIndex = i;
       break;
     }
   }
 
-  if (!checkClick) {
+  if (targetTowerIndex === undefined || targetTowerIndex === null) {
     popUpAlert('타워가 클릭되지 않았습니다.');
+    printHTML = ``;
+    print.innerHTML = printHTML;
+    print.style.display = 'none';
+    return;
   }
+
+  if (towers[targetTowerIndex].level === 5) {
+    popUpAlert('해당 타워가 최대 레벨에 도달했습니다.');
+    return;
+  }
+  if (userGold < towerData.data[towers[targetTowerIndex].level].cost) {
+    popUpAlert(
+      `해당 타워의 업그레이드 비용이 부족합니다. 필요 골드 : ${towerData.data[towers[targetTowerIndex].level].cost}`
+    );
+    return;
+  }
+
+  sendEvent(33, {
+    towerData: { x: towers[targetTowerIndex].x, y: towers[targetTowerIndex].y },
+    towerLevel: towers[targetTowerIndex].getLevel(),
+  });
+
+  towers[targetTowerIndex].upgrade();
+
   printHTML = ``;
   print.innerHTML = printHTML;
   print.style.display = 'none';
@@ -260,32 +271,33 @@ function upgradeTargetTower() {
   canvas.addEventListener('click', onClickUpgradeTower);
 }
 
-const onClickRefundTower = () => {
+const onClickRefundTower = (event) => {
   const x = event.offsetX;
   const y = event.offsetY;
 
-  let checkClick = false;
-  for (const tower of towers) {
-    const left = tower.x;
-    const right = tower.x + tower.width;
-    const top = tower.y;
-    const bottom = tower.y + tower.height;
+  // let checkClick = false;
+  let targetTowerIndex;
+  for (let i = 0; i < towers.length; i++) {
+    const left = towers[i].x;
+    const right = towers[i].x + towers[i].width;
+    const top = towers[i].y;
+    const bottom = towers[i].y + towers[i].height;
     if (left <= x && x <= right && top <= y && y <= bottom) {
-      sendEvent(32, { towerData: { x: tower.x, y: tower.y }, towerLevel: tower.getLevel() });
-
-      refundTower(tower.x, tower.y);
-      checkClick = true;
-      printHTML = ``;
-      print.innerHTML = printHTML;
-      print.style.display = 'none';
-      canvas.removeEventListener('click', onClickRefundTower);
+      targetTowerIndex = i;
       break;
     }
   }
 
-  if (!checkClick) {
+  if (targetTowerIndex === undefined || targetTowerIndex === null) {
     popUpAlert('타워를 클릭하세요');
+    printHTML = ``;
+    print.innerHTML = printHTML;
+    print.style.display = 'none';
+    return;
   }
+
+  refundTower(targetTowerIndex);
+
   printHTML = ``;
   print.innerHTML = printHTML;
   print.style.display = 'none';
@@ -331,6 +343,7 @@ const onClickMoveTower = (event) => {
     popUpAlert('타워가 지정되지 않았습니다');
     printHTML = ``;
     print.innerHTML = printHTML;
+    print.style.display = 'none';
     return;
   }
 
@@ -572,7 +585,7 @@ Promise.all([
 
   serverSocket.on('towerPurchase', (data) => {
     if (data.status === 'success') {
-      userGold = data.userGold;
+      userGold -= towerData.data[data.towerLevel - 1].cost;
       // console.log('타워 구매 후 잔액', userGold); 테스트용 코드
       placeNewTower(data.towerData.x, data.towerData.y, data.towerLevel);
     } else {
@@ -684,7 +697,6 @@ buySelectTowerButton.addEventListener('click', () => {
 });
 document.body.appendChild(buySelectTowerButton);
 
-
 const refundTowerButton = document.createElement('button');
 refundTowerButton.textContent = '타워 판매(랜덤)';
 refundTowerButton.style.position = 'absolute';
@@ -703,9 +715,17 @@ refundTowerButton.addEventListener('click', () => {
   const refundIndex = Math.floor(Math.random() * towers.length);
   const targetTower = towers[refundIndex];
 
-  refundTower(targetTower.x, targetTower.y);
+  refundTower(refundIndex);
   sendEvent(32, { towerData: { x: targetTower.x, y: targetTower.y }, towerLevel: targetTower.getLevel() });
   towerIndex++;
+  // if (towers.length === 0) {
+  //   popUpAlert('업그레이드할 타워가 없습니다.');
+  //   return;
+  // }
+  // printHTML = `업그레이드할 타워를 클릭하세요`;
+  // print.innerHTML = printHTML;
+  // customStyle();
+  // upgradeTargetTower();
 });
 
 document.body.appendChild(refundTowerButton);

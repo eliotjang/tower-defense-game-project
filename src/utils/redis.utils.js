@@ -194,27 +194,123 @@ export const gameRedis = {
    * @param {uuid} uuid 유저의 UUID
    * @param {Object} data Redis 테이블의 field를 key로 가지는 key-value 페어를 담은 객체 (예: {stage_id: 100, gold:50})
    */
-  patchGameDataEx: async function (uuid, data) {
+  patchGameDataEx: async function (uuid, data, name) {
+    console.log('patchGameDataEx from ', name);
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
-      const properties = Object.keys(data);
-      for (let i = 0; i < properties.length; i++) {
-        const exists = await redisClient.hExists(key, `${properties[i]}`);
-        if (exists) {
-          await redisClient.hSet(key, `${properties[i]}`, JSON.stringify(data[properties[i]]));
+      let retries = 3; // Number of retries
+      let delay = 100; // Initial delay in milliseconds
+
+      while (retries > 0) {
+        await redisClient.watch(key);
+
+        // Validate that the game data exists
+        const gameData = await this.getGameData(uuid);
+        if (!gameData) {
+          await redisClient.unwatch();
+          throw new Error("User's game data not found or invalid.");
         }
+
+        const transaction = redisClient.multi();
+
+        // Update fields based on the provided 'data' object
+        if (data.hasOwnProperty(GAME_FIELD_GOLD)) {
+          transaction.hSet(key, GAME_FIELD_GOLD, JSON.stringify(data[GAME_FIELD_GOLD]));
+        }
+        if (data.hasOwnProperty(GAME_FIELD_STAGE)) {
+          transaction.hSet(key, GAME_FIELD_STAGE, JSON.stringify(data[GAME_FIELD_STAGE]));
+        }
+        if (data.hasOwnProperty(GAME_FIELD_SCORE)) {
+          transaction.hSet(key, GAME_FIELD_SCORE, JSON.stringify(data[GAME_FIELD_SCORE]));
+        }
+        if (data.hasOwnProperty(GAME_FIELD_INITIAL_TOWERS)) {
+          transaction.hSet(key, GAME_FIELD_INITIAL_TOWERS, JSON.stringify(data[GAME_FIELD_INITIAL_TOWERS]));
+        }
+        if (data.hasOwnProperty(GAME_FIELD_BASE_HP)) {
+          transaction.hSet(key, GAME_FIELD_BASE_HP, JSON.stringify(data[GAME_FIELD_BASE_HP]));
+        }
+        if (data.hasOwnProperty(GAME_FIELD_START_TIME)) {
+          transaction.hSet(key, GAME_FIELD_START_TIME, JSON.stringify(data[GAME_FIELD_START_TIME]));
+        }
+        if (data.hasOwnProperty(GAME_FIELD_SPAWN_INTERVAL)) {
+          transaction.hSet(key, GAME_FIELD_SPAWN_INTERVAL, JSON.stringify(data[GAME_FIELD_SPAWN_INTERVAL]));
+        }
+        if (data.hasOwnProperty(GAME_FIELD_GOBLIN_TIME)) {
+          transaction.hSet(key, GAME_FIELD_GOBLIN_TIME, JSON.stringify(data[GAME_FIELD_GOBLIN_TIME]));
+        }
+        if (data.hasOwnProperty(GAME_FIELD_KILL_COUNT)) {
+          transaction.hSet(key, GAME_FIELD_KILL_COUNT, JSON.stringify(data[GAME_FIELD_KILL_COUNT]));
+        }
+        if (data.hasOwnProperty(GAME_FIELD_GOBLIN_KILL_COUNT)) {
+          transaction.hSet(key, GAME_FIELD_GOBLIN_KILL_COUNT, JSON.stringify(data[GAME_FIELD_GOBLIN_KILL_COUNT]));
+        }
+
+        const result = await transaction.exec();
+        if (result) {
+          console.log('Patch game data (Ex) successful.');
+          break; // Exit loop on successful transaction
+        }
+
+        retries--;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff
+      }
+
+      if (retries === 0) {
+        console.error('Max retries exceeded. Transaction failed.');
       }
     } catch (err) {
-      console.error('Error patching game data: ', err);
+      console.error('Error patching game data (Ex): ', err);
+    } finally {
+      await redisClient.unwatch();
     }
   },
   /* ----- 제대로 동작하는 타워 함수들 ------- */
   patchGameDataTower: async function (uuid, towerData, index) {
     try {
-      const key = `${TOWERS_PREFIX}${uuid}${index}`;
-      await redisClient.set(key, JSON.stringify(towerData));
+      const key = `${TOWERS_PREFIX}${uuid}:${index}`;
+      let retries = 3; // Number of retries
+      let delay = 100; // Initial delay in milliseconds
+
+      while (retries > 0) {
+        await redisClient.watch(key);
+
+        // Check current value of the tower data
+        const currentValue = await redisClient.get(key);
+        const parsedValue = JSON.parse(currentValue);
+
+        // If no existing data, set initial tower data
+        if (!parsedValue) {
+          const transaction = redisClient.multi();
+          transaction.set(key, JSON.stringify(towerData));
+          const result = await transaction.exec();
+          if (result) {
+            console.log('Patch game data (Tower) successful.');
+            break;
+          }
+        } else {
+          // Update existing tower data
+          const transaction = redisClient.multi();
+          transaction.set(key, JSON.stringify(towerData));
+          const result = await transaction.exec();
+          if (result) {
+            console.log('Patch game data (Tower) successful.');
+            break;
+          }
+        }
+
+        retries--;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff
+      }
+
+      if (retries === 0) {
+        console.error('Max retries exceeded. Transaction failed.');
+      }
     } catch (err) {
-      console.error('Error patching game data (tower test): ', err);
+      console.error('Error patching game data (Tower): ', err);
+    } finally {
+      await redisClient.unwatch();
     }
   },
   deleteGameDataTower: async function (uuid, towerData) {
@@ -285,39 +381,38 @@ export const gameRedis = {
   patchGameDataTowerEx: async function (uuid, towerData) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
-      while (true) {
-        await redisClient.watch(key);
+      let retries = 3; // Number of retries
+      let delay = 100; // Initial delay in milliseconds
 
+      while (retries > 0) {
+        await redisClient.watch(key);
         const gameData = await this.getGameData(uuid);
+
         if (!gameData) {
+          await redisClient.unwatch();
           throw new Error("User's game data not found.");
         }
 
         const towers = gameData[GAME_FIELD_TOWER];
         towers.push(towerData);
+
         const transaction = redisClient.multi();
         transaction.hSet(key, GAME_FIELD_TOWER, JSON.stringify(towers));
-        // while (true) {
+
         const result = await transaction.exec();
         if (result) {
           console.log('Patch game data (towers Ex) successful.');
-          break;
+          break; // Exit loop on successful transaction
         }
-        // }
+
+        retries--;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff
       }
 
-      // const transaction = redisClient.multi().hVals(key);
-      // const gameData = await transaction.hVals(key);
-      // if (!gameData) {
-      //   throw new Error('temp');
-      // }
-      // const towerArr = gameData[GAME_FIELD_TOWER];
-      // console.log('타워 목록: ', towerArr);
-      // towerArr.push(towerData);
-
-      // transaction.hSet(key, GAME_FIELD_TOWER, JSON.stringify(towerArr));
-
-      // await transaction.exec();
+      if (retries === 0) {
+        console.error('Max retries exceeded. Transaction failed.');
+      }
     } catch (err) {
       console.error('Error patching game data (towerEx): ', err);
     } finally {
@@ -327,12 +422,42 @@ export const gameRedis = {
   patchGameDataGold: async function (uuid, newGold) {
     try {
       const key = `${GAME_DATA_PREFIX}${uuid}`;
-      const exists = await redisClient.hExists(key, `${GAME_FIELD_GOLD}`);
-      if (exists) {
-        await redisClient.hSet(key, `${GAME_FIELD_GOLD}`, JSON.stringify(newGold));
+      let retries = 3; // Number of retries
+      let delay = 100; // Initial delay in milliseconds
+
+      while (retries > 0) {
+        await redisClient.watch(key);
+
+        // Validate that the game data exists
+        const gameData = await this.getGameData(uuid);
+        if (!gameData) {
+          await redisClient.unwatch();
+          throw new Error("User's game data not found or invalid.");
+        }
+
+        const transaction = redisClient.multi();
+
+        // Update the gold field
+        transaction.hSet(key, GAME_FIELD_GOLD, JSON.stringify(newGold));
+
+        const result = await transaction.exec();
+        if (result) {
+          console.log('Patch game data (Gold) successful.');
+          break; // Exit loop on successful transaction
+        }
+
+        retries--;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff
+      }
+
+      if (retries === 0) {
+        console.error('Max retries exceeded. Transaction failed.');
       }
     } catch (err) {
-      console.error('Error patching game data: ', err);
+      console.error('Error patching game data (Gold): ', err);
+    } finally {
+      await redisClient.unwatch();
     }
   },
   patchGameDataStage: async function (uuid, newStage) {

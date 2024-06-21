@@ -24,21 +24,25 @@ export const monsterKillHandler = async (uuid, payload, socket) => {
     stageField = stage.data.find((item) => item.id == currentStageId).target_score;
     if (monsterList.includes(monsterId)) {
       const addScore = userGameData.score + score;
-      await gameRedis.patchGameDataEx(uuid, { score: addScore }); // 몬스터 존재시 점수 증감
+      await gameRedis.patchGameDataEx(uuid, { score: addScore }, 'monsterKillHandler'); // 몬스터 존재시 점수 증감
       if (monsterId > 2000) {
-        await gameRedis.patchGameDataEx(uuid, {
-          goblin_kill_count: userGameData.goblin_kill_count + 1,
-          user_gold: userGameData.user_gold + 500,
-        });
+        await gameRedis.patchGameDataEx(
+          uuid,
+          {
+            goblin_kill_count: userGameData.goblin_kill_count + 1,
+            user_gold: userGameData.user_gold + 500,
+          },
+          'monsterKillHandler'
+        );
         goblin_Reward = 500;
       } else {
-        await gameRedis.patchGameDataEx(uuid, { kill_count: userGameData.kill_count + 1 });
+        await gameRedis.patchGameDataEx(uuid, { kill_count: userGameData.kill_count + 1 }, 'monsterKillHandler');
       }
     } else {
       throw new CustomError(`'몬스터 처치 검증 실패${monsterId}가 처치됨 ${monsterList} 현재 스폰 정보`, 'monsterKill');
     }
     if (stageField < userGameData.score) {
-      await gameRedis.patchGameDataEx(uuid, { stage_id: userGameData.stage_id + 1 });
+      await gameRedis.patchGameDataEx(uuid, { stage_id: userGameData.stage_id + 1 }, 'monsterKillHandler');
     }
     socket.emit('monsterKill', {
       status: 'success',
