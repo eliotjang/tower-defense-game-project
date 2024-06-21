@@ -572,7 +572,7 @@ Promise.all([
 
   serverSocket.on('towerPurchase', (data) => {
     if (data.status === 'success') {
-      userGold = data.userGold;
+      userGold -= towerData.data[data.towerLevel - 1].cost;
       // console.log('타워 구매 후 잔액', userGold); 테스트용 코드
       placeNewTower(data.towerData.x, data.towerData.y, data.towerLevel);
     } else {
@@ -683,7 +683,6 @@ buySelectTowerButton.addEventListener('click', () => {
   });
 });
 document.body.appendChild(buySelectTowerButton);
-
 
 const refundTowerButton = document.createElement('button');
 refundTowerButton.textContent = '타워 판매(랜덤)';
