@@ -684,7 +684,6 @@ buySelectTowerButton.addEventListener('click', () => {
 });
 document.body.appendChild(buySelectTowerButton);
 
-
 const refundTowerButton = document.createElement('button');
 refundTowerButton.textContent = '타워 판매(랜덤)';
 refundTowerButton.style.position = 'absolute';
